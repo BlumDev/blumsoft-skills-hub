@@ -7,3 +7,6 @@ Desktop.ini
 
 # Local test outputs
 .temp/
+
+# Sync output (generated locally)
+.github/skills/
