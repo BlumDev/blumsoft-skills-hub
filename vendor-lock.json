@@ -1,0 +1,436 @@
+﻿{
+    "version":  1,
+    "generated_at":  "2026-02-08T14:42:04.1758451Z",
+    "repos":  {
+                  "guanyang/antigravity-skills":  {
+                                                      "ref":  "main",
+                                                      "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13"
+                                                  },
+                  "sickn33/antigravity-awesome-skills":  {
+                                                             "ref":  "main",
+                                                             "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b"
+                                                         }
+              },
+    "skills":  {
+                   "advanced-evaluation":  {
+                                               "source":  "vendor-guanyang",
+                                               "repo":  "guanyang/antigravity-skills",
+                                               "path":  "skills/advanced-evaluation",
+                                               "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                               "license":  "MIT"
+                                           },
+                   "brainstorming":  {
+                                         "source":  "vendor-guanyang",
+                                         "repo":  "guanyang/antigravity-skills",
+                                         "path":  "skills/brainstorming",
+                                         "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                         "license":  "MIT"
+                                     },
+                   "context-optimization":  {
+                                                "source":  "vendor-guanyang",
+                                                "repo":  "guanyang/antigravity-skills",
+                                                "path":  "skills/context-optimization",
+                                                "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                                "license":  "MIT"
+                                            },
+                   "dispatching-parallel-agents":  {
+                                                       "source":  "vendor-guanyang",
+                                                       "repo":  "guanyang/antigravity-skills",
+                                                       "path":  "skills/dispatching-parallel-agents",
+                                                       "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                                       "license":  "MIT"
+                                                   },
+                   "evaluation":  {
+                                      "source":  "vendor-guanyang",
+                                      "repo":  "guanyang/antigravity-skills",
+                                      "path":  "skills/evaluation",
+                                      "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                      "license":  "MIT"
+                                  },
+                   "executing-plans":  {
+                                           "source":  "vendor-guanyang",
+                                           "repo":  "guanyang/antigravity-skills",
+                                           "path":  "skills/executing-plans",
+                                           "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                           "license":  "MIT"
+                                       },
+                   "finishing-a-development-branch":  {
+                                                          "source":  "vendor-guanyang",
+                                                          "repo":  "guanyang/antigravity-skills",
+                                                          "path":  "skills/finishing-a-development-branch",
+                                                          "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                                          "license":  "MIT"
+                                                      },
+                   "frontend-design":  {
+                                           "source":  "vendor-guanyang",
+                                           "repo":  "guanyang/antigravity-skills",
+                                           "path":  "skills/frontend-design",
+                                           "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                           "license":  "MIT"
+                                       },
+                   "mcp-builder":  {
+                                       "source":  "vendor-guanyang",
+                                       "repo":  "guanyang/antigravity-skills",
+                                       "path":  "skills/mcp-builder",
+                                       "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                       "license":  "MIT"
+                                   },
+                   "notebooklm":  {
+                                      "source":  "vendor-guanyang",
+                                      "repo":  "guanyang/antigravity-skills",
+                                      "path":  "skills/notebooklm",
+                                      "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                      "license":  "MIT"
+                                  },
+                   "planning-with-files":  {
+                                               "source":  "vendor-guanyang",
+                                               "repo":  "guanyang/antigravity-skills",
+                                               "path":  "skills/planning-with-files",
+                                               "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                               "license":  "MIT"
+                                           },
+                   "project-development":  {
+                                               "source":  "vendor-guanyang",
+                                               "repo":  "guanyang/antigravity-skills",
+                                               "path":  "skills/project-development",
+                                               "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                               "license":  "MIT"
+                                           },
+                   "receiving-code-review":  {
+                                                 "source":  "vendor-guanyang",
+                                                 "repo":  "guanyang/antigravity-skills",
+                                                 "path":  "skills/receiving-code-review",
+                                                 "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                                 "license":  "MIT"
+                                             },
+                   "requesting-code-review":  {
+                                                  "source":  "vendor-guanyang",
+                                                  "repo":  "guanyang/antigravity-skills",
+                                                  "path":  "skills/requesting-code-review",
+                                                  "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                                  "license":  "MIT"
+                                              },
+                   "subagent-driven-development":  {
+                                                       "source":  "vendor-guanyang",
+                                                       "repo":  "guanyang/antigravity-skills",
+                                                       "path":  "skills/subagent-driven-development",
+                                                       "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                                       "license":  "MIT"
+                                                   },
+                   "systematic-debugging":  {
+                                                "source":  "vendor-guanyang",
+                                                "repo":  "guanyang/antigravity-skills",
+                                                "path":  "skills/systematic-debugging",
+                                                "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                                "license":  "MIT"
+                                            },
+                   "test-driven-development":  {
+                                                   "source":  "vendor-guanyang",
+                                                   "repo":  "guanyang/antigravity-skills",
+                                                   "path":  "skills/test-driven-development",
+                                                   "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                                   "license":  "MIT"
+                                               },
+                   "tool-design":  {
+                                       "source":  "vendor-guanyang",
+                                       "repo":  "guanyang/antigravity-skills",
+                                       "path":  "skills/tool-design",
+                                       "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                       "license":  "MIT"
+                                   },
+                   "ui-ux-pro-max":  {
+                                         "source":  "vendor-guanyang",
+                                         "repo":  "guanyang/antigravity-skills",
+                                         "path":  "skills/ui-ux-pro-max",
+                                         "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                         "license":  "MIT"
+                                     },
+                   "using-git-worktrees":  {
+                                               "source":  "vendor-guanyang",
+                                               "repo":  "guanyang/antigravity-skills",
+                                               "path":  "skills/using-git-worktrees",
+                                               "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                               "license":  "MIT"
+                                           },
+                   "verification-before-completion":  {
+                                                          "source":  "vendor-guanyang",
+                                                          "repo":  "guanyang/antigravity-skills",
+                                                          "path":  "skills/verification-before-completion",
+                                                          "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                                          "license":  "MIT"
+                                                      },
+                   "webapp-testing":  {
+                                          "source":  "vendor-guanyang",
+                                          "repo":  "guanyang/antigravity-skills",
+                                          "path":  "skills/webapp-testing",
+                                          "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                          "license":  "MIT"
+                                      },
+                   "writing-plans":  {
+                                         "source":  "vendor-guanyang",
+                                         "repo":  "guanyang/antigravity-skills",
+                                         "path":  "skills/writing-plans",
+                                         "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                         "license":  "MIT"
+                                     },
+                   "writing-skills":  {
+                                          "source":  "vendor-guanyang",
+                                          "repo":  "guanyang/antigravity-skills",
+                                          "path":  "skills/writing-skills",
+                                          "commit":  "e30493f0d54dfc7a3074d1c2a9646946b8bc0a13",
+                                          "license":  "MIT"
+                                      },
+                   "ab-test-setup":  {
+                                         "source":  "vendor-sickn33",
+                                         "repo":  "sickn33/antigravity-awesome-skills",
+                                         "path":  "skills/ab-test-setup",
+                                         "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                         "license":  "MIT"
+                                     },
+                   "analytics-tracking":  {
+                                              "source":  "vendor-sickn33",
+                                              "repo":  "sickn33/antigravity-awesome-skills",
+                                              "path":  "skills/analytics-tracking",
+                                              "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                              "license":  "MIT"
+                                          },
+                   "api-security-best-practices":  {
+                                                       "source":  "vendor-sickn33",
+                                                       "repo":  "sickn33/antigravity-awesome-skills",
+                                                       "path":  "skills/api-security-best-practices",
+                                                       "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                                       "license":  "MIT"
+                                                   },
+                   "auth-implementation-patterns":  {
+                                                        "source":  "vendor-sickn33",
+                                                        "repo":  "sickn33/antigravity-awesome-skills",
+                                                        "path":  "skills/auth-implementation-patterns",
+                                                        "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                                        "license":  "MIT"
+                                                    },
+                   "backend-security-coder":  {
+                                                  "source":  "vendor-sickn33",
+                                                  "repo":  "sickn33/antigravity-awesome-skills",
+                                                  "path":  "skills/backend-security-coder",
+                                                  "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                                  "license":  "MIT"
+                                              },
+                   "business-analyst":  {
+                                            "source":  "vendor-sickn33",
+                                            "repo":  "sickn33/antigravity-awesome-skills",
+                                            "path":  "skills/business-analyst",
+                                            "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                            "license":  "MIT"
+                                        },
+                   "competitive-landscape":  {
+                                                 "source":  "vendor-sickn33",
+                                                 "repo":  "sickn33/antigravity-awesome-skills",
+                                                 "path":  "skills/competitive-landscape",
+                                                 "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                                 "license":  "MIT"
+                                             },
+                   "copywriting":  {
+                                       "source":  "vendor-sickn33",
+                                       "repo":  "sickn33/antigravity-awesome-skills",
+                                       "path":  "skills/copywriting",
+                                       "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                       "license":  "MIT"
+                                   },
+                   "data-scientist":  {
+                                          "source":  "vendor-sickn33",
+                                          "repo":  "sickn33/antigravity-awesome-skills",
+                                          "path":  "skills/data-scientist",
+                                          "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                          "license":  "MIT"
+                                      },
+                   "deployment-procedures":  {
+                                                 "source":  "vendor-sickn33",
+                                                 "repo":  "sickn33/antigravity-awesome-skills",
+                                                 "path":  "skills/deployment-procedures",
+                                                 "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                                 "license":  "MIT"
+                                             },
+                   "devops-troubleshooter":  {
+                                                 "source":  "vendor-sickn33",
+                                                 "repo":  "sickn33/antigravity-awesome-skills",
+                                                 "path":  "skills/devops-troubleshooter",
+                                                 "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                                 "license":  "MIT"
+                                             },
+                   "distributed-tracing":  {
+                                               "source":  "vendor-sickn33",
+                                               "repo":  "sickn33/antigravity-awesome-skills",
+                                               "path":  "skills/distributed-tracing",
+                                               "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                               "license":  "MIT"
+                                           },
+                   "docker-expert":  {
+                                         "source":  "vendor-sickn33",
+                                         "repo":  "sickn33/antigravity-awesome-skills",
+                                         "path":  "skills/docker-expert",
+                                         "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                         "license":  "MIT"
+                                     },
+                   "form-cro":  {
+                                    "source":  "vendor-sickn33",
+                                    "repo":  "sickn33/antigravity-awesome-skills",
+                                    "path":  "skills/form-cro",
+                                    "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                    "license":  "MIT"
+                                },
+                   "frontend-security-coder":  {
+                                                   "source":  "vendor-sickn33",
+                                                   "repo":  "sickn33/antigravity-awesome-skills",
+                                                   "path":  "skills/frontend-security-coder",
+                                                   "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                                   "license":  "MIT"
+                                               },
+                   "gitlab-ci-patterns":  {
+                                              "source":  "vendor-sickn33",
+                                              "repo":  "sickn33/antigravity-awesome-skills",
+                                              "path":  "skills/gitlab-ci-patterns",
+                                              "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                              "license":  "MIT"
+                                          },
+                   "incident-responder":  {
+                                              "source":  "vendor-sickn33",
+                                              "repo":  "sickn33/antigravity-awesome-skills",
+                                              "path":  "skills/incident-responder",
+                                              "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                              "license":  "MIT"
+                                          },
+                   "kubernetes-architect":  {
+                                                "source":  "vendor-sickn33",
+                                                "repo":  "sickn33/antigravity-awesome-skills",
+                                                "path":  "skills/kubernetes-architect",
+                                                "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                                "license":  "MIT"
+                                            },
+                   "langgraph":  {
+                                     "source":  "vendor-sickn33",
+                                     "repo":  "sickn33/antigravity-awesome-skills",
+                                     "path":  "skills/langgraph",
+                                     "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                     "license":  "MIT"
+                                 },
+                   "launch-strategy":  {
+                                           "source":  "vendor-sickn33",
+                                           "repo":  "sickn33/antigravity-awesome-skills",
+                                           "path":  "skills/launch-strategy",
+                                           "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                           "license":  "MIT"
+                                       },
+                   "nextjs-best-practices":  {
+                                                 "source":  "vendor-sickn33",
+                                                 "repo":  "sickn33/antigravity-awesome-skills",
+                                                 "path":  "skills/nextjs-best-practices",
+                                                 "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                                 "license":  "MIT"
+                                             },
+                   "observability-engineer":  {
+                                                  "source":  "vendor-sickn33",
+                                                  "repo":  "sickn33/antigravity-awesome-skills",
+                                                  "path":  "skills/observability-engineer",
+                                                  "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                                  "license":  "MIT"
+                                              },
+                   "pricing-strategy":  {
+                                            "source":  "vendor-sickn33",
+                                            "repo":  "sickn33/antigravity-awesome-skills",
+                                            "path":  "skills/pricing-strategy",
+                                            "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                            "license":  "MIT"
+                                        },
+                   "product-manager-toolkit":  {
+                                                   "source":  "vendor-sickn33",
+                                                   "repo":  "sickn33/antigravity-awesome-skills",
+                                                   "path":  "skills/product-manager-toolkit",
+                                                   "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                                   "license":  "MIT"
+                                               },
+                   "prompt-engineer":  {
+                                           "source":  "vendor-sickn33",
+                                           "repo":  "sickn33/antigravity-awesome-skills",
+                                           "path":  "skills/prompt-engineer",
+                                           "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                           "license":  "MIT"
+                                       },
+                   "rag-engineer":  {
+                                        "source":  "vendor-sickn33",
+                                        "repo":  "sickn33/antigravity-awesome-skills",
+                                        "path":  "skills/rag-engineer",
+                                        "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                        "license":  "MIT"
+                                    },
+                   "rag-implementation":  {
+                                              "source":  "vendor-sickn33",
+                                              "repo":  "sickn33/antigravity-awesome-skills",
+                                              "path":  "skills/rag-implementation",
+                                              "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                              "license":  "MIT"
+                                          },
+                   "react-best-practices":  {
+                                                "source":  "vendor-sickn33",
+                                                "repo":  "sickn33/antigravity-awesome-skills",
+                                                "path":  "skills/react-best-practices",
+                                                "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                                "license":  "MIT"
+                                            },
+                   "security-auditor":  {
+                                            "source":  "vendor-sickn33",
+                                            "repo":  "sickn33/antigravity-awesome-skills",
+                                            "path":  "skills/security-auditor",
+                                            "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                            "license":  "MIT"
+                                        },
+                   "seo-audit":  {
+                                     "source":  "vendor-sickn33",
+                                     "repo":  "sickn33/antigravity-awesome-skills",
+                                     "path":  "skills/seo-audit",
+                                     "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                     "license":  "MIT"
+                                 },
+                   "terraform-specialist":  {
+                                                "source":  "vendor-sickn33",
+                                                "repo":  "sickn33/antigravity-awesome-skills",
+                                                "path":  "skills/terraform-specialist",
+                                                "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                                "license":  "MIT"
+                                            },
+                   "top-web-vulnerabilities":  {
+                                                   "source":  "vendor-sickn33",
+                                                   "repo":  "sickn33/antigravity-awesome-skills",
+                                                   "path":  "skills/top-web-vulnerabilities",
+                                                   "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                                   "license":  "MIT"
+                                               },
+                   "vulnerability-scanner":  {
+                                                 "source":  "vendor-sickn33",
+                                                 "repo":  "sickn33/antigravity-awesome-skills",
+                                                 "path":  "skills/vulnerability-scanner",
+                                                 "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                                 "license":  "MIT"
+                                             },
+                   "workflow-automation":  {
+                                               "source":  "vendor-sickn33",
+                                               "repo":  "sickn33/antigravity-awesome-skills",
+                                               "path":  "skills/workflow-automation",
+                                               "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                               "license":  "MIT"
+                                           },
+                   "workflow-orchestration-patterns":  {
+                                                           "source":  "vendor-sickn33",
+                                                           "repo":  "sickn33/antigravity-awesome-skills",
+                                                           "path":  "skills/workflow-orchestration-patterns",
+                                                           "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                                           "license":  "MIT"
+                                                       },
+                   "workflow-patterns":  {
+                                             "source":  "vendor-sickn33",
+                                             "repo":  "sickn33/antigravity-awesome-skills",
+                                             "path":  "skills/workflow-patterns",
+                                             "commit":  "56720c9e1beb4a687dc3c2b900a47a3a7705a91b",
+                                             "license":  "MIT"
+                                         }
+               }
+}

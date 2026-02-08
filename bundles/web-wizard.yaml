@@ -1,0 +1,18 @@
+﻿id: web-wizard
+name: Web Wizard
+goal: Build and ship modern, accessible web products with conversion focus.
+core_skills:
+  - webdev
+  - frontend-design
+  - ui-ux-pro-max
+  - webapp-testing
+  - seo-audit
+extended_skills:
+  - ai-seo-auditor
+  - form-cro
+  - copywriting
+  - nextjs-best-practices
+  - react-best-practices
+compose_with:
+  - essentials
+starter_prompt: bundles/prompts/web-wizard.md

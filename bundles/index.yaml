@@ -1,0 +1,22 @@
+﻿bundles:
+  - id: essentials
+    name: Essentials
+    file: bundles/essentials.yaml
+  - id: web-wizard
+    name: Web Wizard
+    file: bundles/web-wizard.yaml
+  - id: security-engineer
+    name: Security Engineer
+    file: bundles/security-engineer.yaml
+  - id: startup-growth
+    name: Startup Growth
+    file: bundles/startup-growth.yaml
+  - id: data-ai
+    name: Data & AI
+    file: bundles/data-ai.yaml
+  - id: devops-cloud
+    name: DevOps & Cloud
+    file: bundles/devops-cloud.yaml
+  - id: workflow-ops
+    name: Workflow Ops
+    file: bundles/workflow-ops.yaml

@@ -1,0 +1,18 @@
+﻿id: data-ai
+name: Data & AI
+goal: Build practical AI features and data workflows for product impact.
+core_skills:
+  - prompt-engineer
+  - rag-engineer
+  - rag-implementation
+  - langgraph
+  - mcp-builder
+extended_skills:
+  - evaluation
+  - advanced-evaluation
+  - notebooklm
+  - data-scientist
+  - context-optimization
+compose_with:
+  - essentials
+starter_prompt: bundles/prompts/data-ai.md

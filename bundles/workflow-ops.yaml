@@ -1,0 +1,18 @@
+﻿id: workflow-ops
+name: Workflow Ops
+goal: Standardize delivery execution with repeatable orchestration and automation.
+core_skills:
+  - workflow-automation
+  - workflow-orchestration-patterns
+  - workflow-patterns
+  - project-development
+  - executing-plans
+extended_skills:
+  - subagent-driven-development
+  - dispatching-parallel-agents
+  - planning-with-files
+  - writing-skills
+  - tool-design
+compose_with:
+  - essentials
+starter_prompt: bundles/prompts/workflow-ops.md

@@ -1,0 +1,18 @@
+﻿id: security-engineer
+name: Security Engineer
+goal: Secure product code with practical hardening, auditing, and incident readiness.
+core_skills:
+  - code-review
+  - security-auditor
+  - api-security-best-practices
+  - backend-security-coder
+  - vulnerability-scanner
+extended_skills:
+  - auth-implementation-patterns
+  - frontend-security-coder
+  - top-web-vulnerabilities
+  - incident-responder
+  - verification-before-completion
+compose_with:
+  - essentials
+starter_prompt: bundles/prompts/security-engineer.md

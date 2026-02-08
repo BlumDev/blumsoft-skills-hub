@@ -1,0 +1,18 @@
+﻿id: startup-growth
+name: Startup Growth
+goal: Build growth loops, pricing strategy, and go-to-market execution.
+core_skills:
+  - product-manager-toolkit
+  - pricing-strategy
+  - copywriting
+  - launch-strategy
+  - seo-audit
+extended_skills:
+  - competitive-landscape
+  - analytics-tracking
+  - ab-test-setup
+  - business-analyst
+  - docu
+compose_with:
+  - essentials
+starter_prompt: bundles/prompts/startup-growth.md

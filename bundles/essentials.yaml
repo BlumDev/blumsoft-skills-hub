@@ -1,0 +1,17 @@
+﻿id: essentials
+name: Essentials
+goal: Plan, implement, debug, and review changes with high reliability.
+core_skills:
+  - brainstorming
+  - writing-plans
+  - systematic-debugging
+  - verification-before-completion
+  - requesting-code-review
+extended_skills:
+  - test-driven-development
+  - receiving-code-review
+  - finishing-a-development-branch
+  - using-git-worktrees
+  - docu
+compose_with:
+starter_prompt: bundles/prompts/essentials.md

@@ -1,0 +1,9 @@
+﻿# Windows
+Thumbs.db
+Desktop.ini
+
+# PowerShell
+*.ps1xml
+
+# Local test outputs
+.temp/

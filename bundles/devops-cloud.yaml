@@ -1,0 +1,18 @@
+﻿id: devops-cloud
+name: DevOps & Cloud
+goal: Deploy, operate, and scale reliable systems in production.
+core_skills:
+  - backend
+  - docker-expert
+  - deployment-procedures
+  - terraform-specialist
+  - observability-engineer
+extended_skills:
+  - kubernetes-architect
+  - devops-troubleshooter
+  - distributed-tracing
+  - incident-responder
+  - gitlab-ci-patterns
+compose_with:
+  - essentials
+starter_prompt: bundles/prompts/devops-cloud.md

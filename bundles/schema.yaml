@@ -1,0 +1,11 @@
+﻿# Bundle schema (fixed fields)
+id: "<bundle-id>"
+name: "<Bundle Name>"
+goal: "<Short outcome statement>"
+core_skills:
+  - "<skill-name>"
+extended_skills:
+  - "<skill-name>"
+compose_with:
+  - "<other-bundle-id>"
+starter_prompt: "bundles/prompts/<bundle-id>.md"

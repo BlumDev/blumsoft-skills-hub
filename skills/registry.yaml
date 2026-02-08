@@ -1,0 +1,256 @@
+﻿skills:
+  - name: docu
+    source: custom
+    path: skills/custom/docu
+  - name: code-review
+    source: custom
+    path: skills/custom/code-review
+  - name: webdev
+    source: custom
+    path: skills/custom/webdev
+  - name: ai-seo-auditor
+    source: custom
+    path: skills/custom/ai-seo-auditor
+  - name: backend
+    source: custom
+    path: skills/custom/backend
+  - name: advanced-evaluation
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/advanced-evaluation
+    upstream_repo: guanyang/antigravity-skills
+  - name: brainstorming
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/brainstorming
+    upstream_repo: guanyang/antigravity-skills
+  - name: context-optimization
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/context-optimization
+    upstream_repo: guanyang/antigravity-skills
+  - name: dispatching-parallel-agents
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/dispatching-parallel-agents
+    upstream_repo: guanyang/antigravity-skills
+  - name: evaluation
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/evaluation
+    upstream_repo: guanyang/antigravity-skills
+  - name: executing-plans
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/executing-plans
+    upstream_repo: guanyang/antigravity-skills
+  - name: finishing-a-development-branch
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/finishing-a-development-branch
+    upstream_repo: guanyang/antigravity-skills
+  - name: frontend-design
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/frontend-design
+    upstream_repo: guanyang/antigravity-skills
+  - name: mcp-builder
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/mcp-builder
+    upstream_repo: guanyang/antigravity-skills
+  - name: notebooklm
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/notebooklm
+    upstream_repo: guanyang/antigravity-skills
+  - name: planning-with-files
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/planning-with-files
+    upstream_repo: guanyang/antigravity-skills
+  - name: project-development
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/project-development
+    upstream_repo: guanyang/antigravity-skills
+  - name: receiving-code-review
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/receiving-code-review
+    upstream_repo: guanyang/antigravity-skills
+  - name: requesting-code-review
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/requesting-code-review
+    upstream_repo: guanyang/antigravity-skills
+  - name: subagent-driven-development
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/subagent-driven-development
+    upstream_repo: guanyang/antigravity-skills
+  - name: systematic-debugging
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/systematic-debugging
+    upstream_repo: guanyang/antigravity-skills
+  - name: test-driven-development
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/test-driven-development
+    upstream_repo: guanyang/antigravity-skills
+  - name: tool-design
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/tool-design
+    upstream_repo: guanyang/antigravity-skills
+  - name: ui-ux-pro-max
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/ui-ux-pro-max
+    upstream_repo: guanyang/antigravity-skills
+  - name: using-git-worktrees
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/using-git-worktrees
+    upstream_repo: guanyang/antigravity-skills
+  - name: verification-before-completion
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/verification-before-completion
+    upstream_repo: guanyang/antigravity-skills
+  - name: webapp-testing
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/webapp-testing
+    upstream_repo: guanyang/antigravity-skills
+  - name: writing-plans
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/writing-plans
+    upstream_repo: guanyang/antigravity-skills
+  - name: writing-skills
+    source: vendor-guanyang
+    path: skills/vendor/guanyang/writing-skills
+    upstream_repo: guanyang/antigravity-skills
+  - name: ab-test-setup
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/ab-test-setup
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: analytics-tracking
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/analytics-tracking
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: api-security-best-practices
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/api-security-best-practices
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: auth-implementation-patterns
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/auth-implementation-patterns
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: backend-security-coder
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/backend-security-coder
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: business-analyst
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/business-analyst
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: competitive-landscape
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/competitive-landscape
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: copywriting
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/copywriting
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: data-scientist
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/data-scientist
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: deployment-procedures
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/deployment-procedures
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: devops-troubleshooter
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/devops-troubleshooter
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: distributed-tracing
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/distributed-tracing
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: docker-expert
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/docker-expert
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: form-cro
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/form-cro
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: frontend-security-coder
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/frontend-security-coder
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: gitlab-ci-patterns
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/gitlab-ci-patterns
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: incident-responder
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/incident-responder
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: kubernetes-architect
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/kubernetes-architect
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: langgraph
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/langgraph
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: launch-strategy
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/launch-strategy
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: nextjs-best-practices
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/nextjs-best-practices
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: observability-engineer
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/observability-engineer
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: pricing-strategy
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/pricing-strategy
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: product-manager-toolkit
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/product-manager-toolkit
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: prompt-engineer
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/prompt-engineer
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: rag-engineer
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/rag-engineer
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: rag-implementation
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/rag-implementation
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: react-best-practices
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/react-best-practices
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: security-auditor
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/security-auditor
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: seo-audit
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/seo-audit
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: terraform-specialist
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/terraform-specialist
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: top-web-vulnerabilities
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/top-web-vulnerabilities
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: vulnerability-scanner
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/vulnerability-scanner
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: workflow-automation
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/workflow-automation
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: workflow-orchestration-patterns
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/workflow-orchestration-patterns
+    upstream_repo: sickn33/antigravity-awesome-skills
+  - name: workflow-patterns
+    source: vendor-sickn33
+    path: skills/vendor/sickn33/workflow-patterns
+    upstream_repo: sickn33/antigravity-awesome-skills

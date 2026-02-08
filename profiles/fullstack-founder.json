@@ -1,0 +1,20 @@
+﻿{
+    "profile_name":  "fullstack-founder",
+    "include_extended":  false,
+    "bundle_ids":  [
+                       "essentials",
+                       "web-wizard",
+                       "security-engineer",
+                       "startup-growth",
+                       "data-ai",
+                       "devops-cloud",
+                       "workflow-ops"
+                   ],
+    "default_targets":  [
+                            "codex",
+                            "cursor",
+                            "antigravity",
+                            "vscode-copilot",
+                            "vscode-chatgpt"
+                        ]
+}
