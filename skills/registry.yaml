@@ -14,6 +14,9 @@
   - name: backend
     source: custom
     path: skills/custom/backend
+  - name: project-bootstrap
+    source: custom
+    path: skills/custom/project-bootstrap
   - name: advanced-evaluation
     source: vendor-guanyang
     path: skills/vendor/guanyang/advanced-evaluation

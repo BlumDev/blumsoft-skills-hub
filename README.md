@@ -54,6 +54,50 @@ Im Repo `blumsoft-skills-hub` ausfuehren:
 ./scripts/skills/resolve-bundle.ps1 -BundleId web-wizard -IncludeExtended
 ```
 
+1b. Bundle Kurzinfo (Startskill + 2 Fallbacks):
+
+```powershell
+./scripts/skills/resolve-bundle.ps1 -BundleId web-wizard -Summary
+```
+
+## Project Kickoff (neues Projekt optimal starten)
+
+Wenn du ein neues Projekt beginnst oder ein fremdes Repo uebernimmst, starte mit `project-kickoff`.
+
+Ziel:
+- Klarer Kontext (Ziel, User, Constraints, Erfolgsmessung)
+- Minimale Architektur-Entscheidungen (ADR-lite)
+- Erste vertikale Slice (End-to-End) statt Feature-Suppe
+- Wiederverwendbare Feature-Specs und Verification-Gates
+
+### Schnellstart (empfohlen)
+
+1. In dein Zielprojekt die Kickoff-Dateien und projekt-lokale Skills installieren:
+
+```powershell
+cd "e:\\Marcus Daten\\Coding Lokal\\Github\\blumsoft-skills-hub"
+.\scripts\project\bootstrap-project.ps1 -ProjectRoot "E:\\path\\to\\your-project"
+```
+
+Das erstellt (falls noch nicht vorhanden):
+- `PROJECT_CONTEXT.md`
+- `DECISIONS.md`
+- `FEATURES/README.md` + `FEATURES/feature-template.md`
+- `HOW_TO_USE_BUNDLES.md`
+- `.github/copilot-instructions.md`
+- `.github/skills/` (Skills fuer VS Code / Copilot im Projekt)
+
+2. Session starten:
+- Antigravity: starte mit `project-kickoff.md` aus `global_workflows`
+- Codex/Cursor: nutze das Bundle `project-kickoff` (core only)
+
+### Best Practice Ablauf
+
+1. Schreibe zuerst `PROJECT_CONTEXT.md` (kein Code).
+2. Entscheide 3-5 Kernentscheidungen in `DECISIONS.md`.
+3. Lege die erste vertikale Slice als Feature-Spec in `FEATURES/` an.
+4. Erst dann implementieren, mit klarer Verifikation (Checks + Smoke Test).
+
 2. Skills in deine Tools synchronisieren:
 
 ```powershell

@@ -1,6 +1,10 @@
 ﻿id: essentials
 name: Essentials
 goal: Plan, implement, debug, and review changes with high reliability.
+recommended_start_skill: writing-plans
+fallback_skills:
+  - systematic-debugging
+  - verification-before-completion
 core_skills:
   - brainstorming
   - writing-plans

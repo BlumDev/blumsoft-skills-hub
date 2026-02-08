@@ -1,6 +1,10 @@
 ﻿id: startup-growth
 name: Startup Growth
 goal: Build growth loops, pricing strategy, and go-to-market execution.
+recommended_start_skill: product-manager-toolkit
+fallback_skills:
+  - pricing-strategy
+  - copywriting
 core_skills:
   - product-manager-toolkit
   - pricing-strategy

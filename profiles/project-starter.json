@@ -1,0 +1,14 @@
+{
+  "profile_name": "project-starter",
+  "include_extended": false,
+  "bundle_ids": [
+    "project-kickoff"
+  ],
+  "default_targets": [
+    "codex",
+    "cursor",
+    "antigravity",
+    "vscode-copilot"
+  ]
+}
+

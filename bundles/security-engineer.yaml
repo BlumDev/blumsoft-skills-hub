@@ -1,6 +1,10 @@
 ﻿id: security-engineer
 name: Security Engineer
 goal: Secure product code with practical hardening, auditing, and incident readiness.
+recommended_start_skill: code-review
+fallback_skills:
+  - security-auditor
+  - api-security-best-practices
 core_skills:
   - code-review
   - security-auditor

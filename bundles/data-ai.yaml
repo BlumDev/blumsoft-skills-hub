@@ -1,6 +1,10 @@
 ﻿id: data-ai
 name: Data & AI
 goal: Build practical AI features and data workflows for product impact.
+recommended_start_skill: prompt-engineer
+fallback_skills:
+  - rag-engineer
+  - mcp-builder
 core_skills:
   - prompt-engineer
   - rag-engineer

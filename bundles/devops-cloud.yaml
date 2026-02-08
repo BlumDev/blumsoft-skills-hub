@@ -1,6 +1,10 @@
 ﻿id: devops-cloud
 name: DevOps & Cloud
 goal: Deploy, operate, and scale reliable systems in production.
+recommended_start_skill: deployment-procedures
+fallback_skills:
+  - observability-engineer
+  - docker-expert
 core_skills:
   - backend
   - docker-expert

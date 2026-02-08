@@ -1,6 +1,10 @@
 ﻿id: workflow-ops
 name: Workflow Ops
 goal: Standardize delivery execution with repeatable orchestration and automation.
+recommended_start_skill: workflow-patterns
+fallback_skills:
+  - workflow-orchestration-patterns
+  - workflow-automation
 core_skills:
   - workflow-automation
   - workflow-orchestration-patterns

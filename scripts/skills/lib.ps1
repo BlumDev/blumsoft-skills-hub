@@ -20,11 +20,12 @@ function Get-BundleFromFile {
 
   $bundle = [ordered]@{
     id=""; name=""; goal="";
+    recommended_start_skill=""; fallback_skills=@();
     core_skills=@(); extended_skills=@(); compose_with=@();
     starter_prompt=""; file=$Path
   }
 
-  $listKeys = @("core_skills","extended_skills","compose_with")
+  $listKeys = @("core_skills","extended_skills","compose_with","fallback_skills")
   $activeList = ""
   foreach ($line in Get-Content -Path $Path) {
     $trim = $line.Trim()

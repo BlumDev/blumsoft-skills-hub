@@ -1,0 +1,18 @@
+﻿id: project-kickoff
+name: Project Kickoff
+goal: Bootstrap a new project fast with clear decisions, minimal docs, and an execution plan.
+recommended_start_skill: project-bootstrap
+fallback_skills:
+  - docu
+  - tool-design
+core_skills:
+  - project-bootstrap
+  - project-development
+  - tool-design
+  - docu
+extended_skills:
+  - workflow-patterns
+  - executing-plans
+compose_with:
+  - essentials
+starter_prompt: bundles/prompts/project-kickoff.md

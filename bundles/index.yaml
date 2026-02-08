@@ -20,3 +20,6 @@
   - id: workflow-ops
     name: Workflow Ops
     file: bundles/workflow-ops.yaml
+  - id: project-kickoff
+    name: Project Kickoff
+    file: bundles/project-kickoff.yaml

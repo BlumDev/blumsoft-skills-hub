@@ -10,3 +10,6 @@ Desktop.ini
 
 # Sync output (generated locally)
 .github/skills/
+
+# Editor/workspace files
+*.code-workspace

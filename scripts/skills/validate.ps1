@@ -22,6 +22,8 @@ foreach ($bundleId in ($bundles.Keys | Sort-Object)) {
   $bundle = $bundles[$bundleId]
   if ([string]::IsNullOrWhiteSpace($bundle.name)) { $errors.Add("Bundle '$bundleId' missing name") | Out-Null }
   if ([string]::IsNullOrWhiteSpace($bundle.goal)) { $errors.Add("Bundle '$bundleId' missing goal") | Out-Null }
+  if ([string]::IsNullOrWhiteSpace($bundle.recommended_start_skill)) { $errors.Add("Bundle '$bundleId' missing recommended_start_skill") | Out-Null }
+  if (-not $bundle.fallback_skills -or $bundle.fallback_skills.Count -ne 2) { $errors.Add("Bundle '$bundleId' must have exactly 2 fallback_skills") | Out-Null }
   if ($bundle.core_skills.Count -eq 0) { $errors.Add("Bundle '$bundleId' has no core_skills") | Out-Null }
   if ([string]::IsNullOrWhiteSpace($bundle.starter_prompt)) {
     $errors.Add("Bundle '$bundleId' missing starter_prompt") | Out-Null
@@ -41,6 +43,28 @@ foreach ($entry in $registryEntries) {
 foreach ($bundleId in ($bundles.Keys | Sort-Object)) {
   $bundle = $bundles[$bundleId]
   foreach ($dep in $bundle.compose_with) { if (-not $bundles.ContainsKey($dep)) { $errors.Add("Bundle '$bundleId' references missing compose_with bundle '$dep'") | Out-Null } }
+
+  # Ensure start/fallback skills exist and are part of the bundle resolution (core-only).
+  try {
+    $resolvedCore = Resolve-BundleSkills -BundleIds @($bundleId) -Bundles $bundles
+    if ($bundle.recommended_start_skill -and ($resolvedCore -notcontains $bundle.recommended_start_skill)) {
+      $errors.Add("Bundle '$bundleId' recommended_start_skill is not part of core resolution: $($bundle.recommended_start_skill)") | Out-Null
+    }
+    foreach ($s in @($bundle.fallback_skills)) {
+      if ($s -and ($resolvedCore -notcontains $s)) { $errors.Add("Bundle '$bundleId' fallback_skill is not part of core resolution: $s") | Out-Null }
+    }
+  } catch {
+    $errors.Add("Bundle '$bundleId' failed to resolve for start/fallback validation: $($_.Exception.Message)") | Out-Null
+  }
+
+  foreach ($skill in @($bundle.recommended_start_skill) + @($bundle.fallback_skills)) {
+    if ([string]::IsNullOrWhiteSpace($skill)) { continue }
+    if (-not $registryMap.ContainsKey($skill)) { $errors.Add("Bundle '$bundleId' references skill not in registry (start/fallback): $skill") | Out-Null; continue }
+    $entry = $registryMap[$skill]
+    $skillPath = Join-Path $root $entry.path
+    if (-not (Test-Path (Join-Path $skillPath 'SKILL.md'))) { $errors.Add("SKILL.md missing for '$skill' (start/fallback) at $($entry.path)") | Out-Null }
+  }
+
   foreach ($skill in ($bundle.core_skills + $bundle.extended_skills)) {
     if (-not $registryMap.ContainsKey($skill)) { $errors.Add("Bundle '$bundleId' references skill not in registry: $skill") | Out-Null; continue }
     $entry = $registryMap[$skill]
