@@ -245,6 +245,16 @@ Ablauf:
 3. Nutze pro Aufgabe ein primaeres Bundle.
 4. Fuer Security- oder Release-kritische Aufgaben immer Verifikation erzwingen.
 5. Bundle/Registry-Aenderungen nie ohne `validate.ps1` abschliessen.
+6. `SKILL.md` immer als `UTF-8 ohne BOM` speichern (BOM kann Skill-Indexer in Codex/VS Code brechen).
+
+### Encoding-Fix (BOM entfernen)
+
+Falls `validate.ps1` auf BOM-Fehler laeuft:
+
+```powershell
+./scripts/skills/fix-encoding.ps1
+./scripts/skills/validate.ps1
+```
 
 ## Aufraeumen alter lokaler Skills (optional)
 

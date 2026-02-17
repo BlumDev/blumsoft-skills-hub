@@ -1,4 +1,4 @@
-﻿---
+---
 name: code-review
 description: Use for strict code audits focused on security, performance, maintainability, and type safety before merge or release.
 ---

@@ -15,6 +15,30 @@ function Normalize-YamlValue {
   $v
 }
 
+function Test-HasUtf8Bom {
+  param([byte[]]$Bytes)
+  if ($null -eq $Bytes -or $Bytes.Length -lt 3) { return $false }
+  ($Bytes[0] -eq 0xEF -and $Bytes[1] -eq 0xBB -and $Bytes[2] -eq 0xBF)
+}
+
+function Test-FileHasUtf8Bom {
+  param([Parameter(Mandatory=$true)][string]$Path)
+  $bytes = [System.IO.File]::ReadAllBytes($Path)
+  Test-HasUtf8Bom -Bytes $bytes
+}
+
+function Convert-FileToUtf8NoBom {
+  param([Parameter(Mandatory=$true)][string]$Path)
+  $bytes = [System.IO.File]::ReadAllBytes($Path)
+  if (-not (Test-HasUtf8Bom -Bytes $bytes)) { return $false }
+
+  # Keep file content unchanged while removing only the UTF-8 BOM.
+  $text = [System.Text.Encoding]::UTF8.GetString($bytes, 3, $bytes.Length - 3)
+  $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+  [System.IO.File]::WriteAllText($Path, $text, $utf8NoBom)
+  $true
+}
+
 function Get-BundleFromFile {
   param([Parameter(Mandatory=$true)][string]$Path)
 

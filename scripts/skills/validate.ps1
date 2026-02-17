@@ -40,6 +40,37 @@ foreach ($entry in $registryEntries) {
   $registryMap[$entry.name] = $entry
 }
 
+# Validate canonical registry skill files (independent of bundle references).
+foreach ($entry in $registryEntries) {
+  if ([string]::IsNullOrWhiteSpace($entry.path)) {
+    $errors.Add("Registry entry '$($entry.name)' is missing path") | Out-Null
+    continue
+  }
+  $skillPath = Join-Path $root $entry.path
+  if (-not (Test-Path $skillPath)) {
+    $errors.Add("Registry path missing for '$($entry.name)': $($entry.path)") | Out-Null
+    continue
+  }
+  $skillMd = Join-Path $skillPath 'SKILL.md'
+  if (-not (Test-Path $skillMd)) {
+    $errors.Add("Registry skill '$($entry.name)' has no SKILL.md at $($entry.path)") | Out-Null
+    continue
+  }
+  if (Test-FileHasUtf8Bom -Path $skillMd) {
+    $errors.Add("SKILL.md must be UTF-8 without BOM for '$($entry.name)': $($entry.path)/SKILL.md") | Out-Null
+  }
+}
+
+# Keep checked-in .github skill mirror BOM-free to avoid reintroducing bad files.
+$githubSkillsDir = Join-Path $root '.github/skills'
+if (Test-Path $githubSkillsDir) {
+  foreach ($md in Get-ChildItem -Path $githubSkillsDir -Recurse -Filter 'SKILL.md' -File) {
+    if (Test-FileHasUtf8Bom -Path $md.FullName) {
+      $errors.Add(".github skill mirror SKILL.md must be UTF-8 without BOM: $($md.FullName)") | Out-Null
+    }
+  }
+}
+
 foreach ($bundleId in ($bundles.Keys | Sort-Object)) {
   $bundle = $bundles[$bundleId]
   foreach ($dep in $bundle.compose_with) { if (-not $bundles.ContainsKey($dep)) { $errors.Add("Bundle '$bundleId' references missing compose_with bundle '$dep'") | Out-Null } }

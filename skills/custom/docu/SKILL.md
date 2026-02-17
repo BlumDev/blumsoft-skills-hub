@@ -1,4 +1,4 @@
-﻿---
+---
 name: docu
 description: Use when creating technical documentation, handover docs, README/API docs, or architecture explanations for product delivery.
 ---

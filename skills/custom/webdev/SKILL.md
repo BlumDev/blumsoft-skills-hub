@@ -1,4 +1,4 @@
-﻿---
+---
 name: webdev
 description: Use when creating or refactoring web pages for performance, accessibility, semantics, and conversion.
 ---

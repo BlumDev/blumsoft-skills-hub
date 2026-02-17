@@ -64,6 +64,11 @@ foreach ($target in $Targets) {
     $dstPath = Join-Path $targetDir $skill
     if (Test-Path $dstPath) { Remove-Item -Path $dstPath -Recurse -Force }
     Copy-Item -Path $srcPath -Destination $dstPath -Recurse -Force
+    $dstSkillMd = Join-Path $dstPath 'SKILL.md'
+    if (Test-Path $dstSkillMd) {
+      $changedEncoding = Convert-FileToUtf8NoBom -Path $dstSkillMd
+      if ($changedEncoding) { Write-Host "  [FIX] normalized SKILL.md encoding (UTF-8 no BOM)" -ForegroundColor DarkYellow }
+    }
     Write-Host "  [OK] $skill"
   }
 }

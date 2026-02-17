@@ -1,4 +1,4 @@
-﻿---
+---
 name: ai-seo-auditor
 description: Use when auditing SEO and AI-readiness including metadata, structured data, crawl policy, and llms files.
 ---
