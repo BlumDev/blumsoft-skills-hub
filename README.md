@@ -1,6 +1,20 @@
-﻿# BlumSoft Skills Hub
+# BlumSoft Skills Hub
+
+![Automation](https://img.shields.io/badge/Automation-PowerShell-5391FE?logo=powershell&logoColor=white)
+![Workflow](https://img.shields.io/badge/Workflow-Bundle--First-1F6FEB)
+![Targets](https://img.shields.io/badge/Targets-Codex%20%7C%20Cursor%20%7C%20Antigravity%20%7C%20VS%20Code-2DA44E)
 
 Bundle-first Skill-System fuer Codex, Cursor, Antigravity und VS Code.
+
+## Quick links
+
+- [Was ist was?](#was-ist-was)
+- [Einmaliges Setup](#einmaliges-setup)
+- [Taegliche Nutzung](#taegliche-nutzung)
+- [Project Kickoff](#project-kickoff-neues-projekt-optimal-starten)
+- [How-to: Was wann nutzen?](#how-to-was-wann-nutzen)
+- [Best Practices](#best-practices-wichtig)
+
 
 ## Was ist was?
 
@@ -151,6 +165,9 @@ Hinweis: Der Target `vscode-copilot` erzeugt lokal `./.github/skills/` als Sync-
 - `docu`: technische Dokumentation und strukturierte Wissensuebergabe.
 - `ai-seo-auditor`: AI-gestuetzter SEO- und Content-Qualitaetscheck.
 
+<details>
+<summary><strong>Bundle-Playbooks und Prompt-Beispiele (aufklappen)</strong></summary>
+
 ### Bundle-Playbooks (Best Practice)
 
 #### 1) Essentials
@@ -237,6 +254,8 @@ Ablauf:
   - "Use `devops-cloud` core. Plane und implementiere sicheres Deployment fuer Service Z mit Rollback."
 - Workflow Ops:
   - "Use `workflow-ops` core. Standardisiere unseren Delivery-Workflow mit klaren Gates."
+
+</details>
 
 ## Best Practices (wichtig)
 
