@@ -1,22 +1,13 @@
-﻿id: security-engineer
+id: security-engineer
 name: Security Engineer
-goal: Secure product code with practical hardening, auditing, and incident readiness.
+goal: Legacy wrapper for the lean security-engineering bundle.
 recommended_start_skill: code-review
 fallback_skills:
   - security-auditor
   - api-security-best-practices
 core_skills:
   - code-review
-  - security-auditor
-  - api-security-best-practices
-  - backend-security-coder
-  - vulnerability-scanner
 extended_skills:
-  - auth-implementation-patterns
-  - frontend-security-coder
-  - top-web-vulnerabilities
-  - incident-responder
-  - verification-before-completion
 compose_with:
-  - essentials
+  - security-engineering
 starter_prompt: bundles/prompts/security-engineer.md

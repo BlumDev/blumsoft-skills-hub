@@ -1,0 +1,21 @@
+id: engineering-core
+name: Engineering Core
+goal: Plan, implement, debug, and verify delivery work with a lean engineering workflow.
+recommended_start_skill: writing-plans
+fallback_skills:
+  - systematic-debugging
+  - verification-before-completion
+core_skills:
+  - brainstorming
+  - writing-plans
+  - systematic-debugging
+  - verification-before-completion
+extended_skills:
+  - requesting-code-review
+  - test-driven-development
+  - receiving-code-review
+  - using-git-worktrees
+  - finishing-a-development-branch
+  - smart-commits
+compose_with:
+starter_prompt: bundles/prompts/engineering-core.md

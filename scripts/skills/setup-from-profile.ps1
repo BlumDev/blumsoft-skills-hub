@@ -1,5 +1,5 @@
 ﻿param(
-  [string]$Profile = 'fullstack-founder',
+  [string]$Profile = 'freelancer-fullstack',
   [switch]$Apply,
   [switch]$SyncAntigravityWorkflows
 )

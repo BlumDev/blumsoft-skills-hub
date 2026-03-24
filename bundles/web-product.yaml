@@ -1,0 +1,22 @@
+id: web-product
+name: Web Product
+goal: Build websites and SaaS frontends with strong UI quality, UX clarity, and practical verification.
+recommended_start_skill: webdev
+fallback_skills:
+  - ui-ux-pro-max
+  - frontend-design
+core_skills:
+  - webdev
+  - ui-ux-pro-max
+  - frontend-design
+  - webapp-testing
+extended_skills:
+  - seo-audit
+  - ai-seo-auditor
+  - form-cro
+  - copywriting
+  - nextjs-best-practices
+  - react-best-practices
+compose_with:
+  - engineering-core
+starter_prompt: bundles/prompts/web-product.md

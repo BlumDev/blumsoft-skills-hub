@@ -1,22 +1,14 @@
-﻿id: workflow-ops
+id: workflow-ops
 name: Workflow Ops
-goal: Standardize delivery execution with repeatable orchestration and automation.
-recommended_start_skill: workflow-patterns
+goal: Legacy wrapper for project-bootstrap-core with workflow-oriented extensions on demand.
+recommended_start_skill: project-bootstrap
 fallback_skills:
-  - workflow-orchestration-patterns
-  - workflow-automation
-core_skills:
-  - workflow-automation
-  - workflow-orchestration-patterns
-  - workflow-patterns
   - project-development
-  - executing-plans
-extended_skills:
-  - subagent-driven-development
-  - dispatching-parallel-agents
-  - planning-with-files
-  - writing-skills
+  - workflow-patterns
+core_skills:
+  - workflow-patterns
   - tool-design
+extended_skills:
 compose_with:
-  - essentials
+  - project-bootstrap-core
 starter_prompt: bundles/prompts/workflow-ops.md

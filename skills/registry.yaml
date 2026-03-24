@@ -17,6 +17,9 @@
   - name: project-bootstrap
     source: custom
     path: skills/custom/project-bootstrap
+  - name: smart-commits
+    source: custom
+    path: skills/custom/smart-commits
   - name: advanced-evaluation
     source: vendor-guanyang
     path: skills/vendor/guanyang/advanced-evaluation
@@ -31,7 +34,7 @@
     upstream_repo: guanyang/antigravity-skills
   - name: dispatching-parallel-agents
     source: vendor-guanyang
-    path: skills/vendor/guanyang/dispatching-parallel-agents
+    path: skills/archive/guanyang/dispatching-parallel-agents
     upstream_repo: guanyang/antigravity-skills
   - name: evaluation
     source: vendor-guanyang
@@ -59,7 +62,7 @@
     upstream_repo: guanyang/antigravity-skills
   - name: planning-with-files
     source: vendor-guanyang
-    path: skills/vendor/guanyang/planning-with-files
+    path: skills/archive/guanyang/planning-with-files
     upstream_repo: guanyang/antigravity-skills
   - name: project-development
     source: vendor-guanyang
@@ -75,7 +78,7 @@
     upstream_repo: guanyang/antigravity-skills
   - name: subagent-driven-development
     source: vendor-guanyang
-    path: skills/vendor/guanyang/subagent-driven-development
+    path: skills/archive/guanyang/subagent-driven-development
     upstream_repo: guanyang/antigravity-skills
   - name: systematic-debugging
     source: vendor-guanyang
@@ -111,7 +114,7 @@
     upstream_repo: guanyang/antigravity-skills
   - name: writing-skills
     source: vendor-guanyang
-    path: skills/vendor/guanyang/writing-skills
+    path: skills/archive/guanyang/writing-skills
     upstream_repo: guanyang/antigravity-skills
   - name: ab-test-setup
     source: vendor-sickn33

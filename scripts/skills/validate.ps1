@@ -40,6 +40,39 @@ foreach ($entry in $registryEntries) {
   $registryMap[$entry.name] = $entry
 }
 
+$archiveEntries = @()
+$archiveMap = @{}
+$allowedArchiveStatuses = @('active-core', 'active-extended', 'archive-reference')
+try {
+  $archiveEntries = Get-ArchivePlanEntries -Root $root
+  foreach ($entry in $archiveEntries) {
+    if ($archiveMap.ContainsKey($entry.name)) { $errors.Add("Duplicate skill in archive plan: $($entry.name)") | Out-Null; continue }
+    $archiveMap[$entry.name] = $entry
+    if ($allowedArchiveStatuses -notcontains $entry.status) { $errors.Add("Archive plan has invalid status for '$($entry.name)': $($entry.status)") | Out-Null }
+    if ([string]::IsNullOrWhiteSpace($entry.target)) { $errors.Add("Archive plan missing target for '$($entry.name)'") | Out-Null }
+  }
+} catch {
+  $errors.Add($_.Exception.Message) | Out-Null
+}
+
+foreach ($entry in $registryEntries) {
+  if (-not $archiveMap.ContainsKey($entry.name)) { $errors.Add("Registry skill missing from archive plan: $($entry.name)") | Out-Null }
+}
+foreach ($entry in $archiveEntries) {
+  if (-not $registryMap.ContainsKey($entry.name)) { $errors.Add("Archive plan references skill not in registry: $($entry.name)") | Out-Null }
+}
+foreach ($entry in $archiveEntries) {
+  if (-not $registryMap.ContainsKey($entry.name)) { continue }
+  $registryEntry = $registryMap[$entry.name]
+  $path = $registryEntry.path.Replace('\','/')
+  if ($entry.status -eq 'archive-reference' -and -not $path.StartsWith('skills/archive/')) {
+    $errors.Add("Archive-reference skill must live under skills/archive: $($entry.name) -> $($registryEntry.path)") | Out-Null
+  }
+  if ($entry.status -ne 'archive-reference' -and $path.StartsWith('skills/archive/')) {
+    $errors.Add("Active skill must not live under skills/archive: $($entry.name) -> $($registryEntry.path)") | Out-Null
+  }
+}
+
 # Validate canonical registry skill files (independent of bundle references).
 foreach ($entry in $registryEntries) {
   if ([string]::IsNullOrWhiteSpace($entry.path)) {
@@ -105,6 +138,23 @@ foreach ($bundleId in ($bundles.Keys | Sort-Object)) {
   }
 }
 
+$profilePaths = Get-ChildItem -Path (Join-Path $root 'profiles') -Filter '*.json' -File
+foreach ($profileFile in $profilePaths) {
+  $profile = Get-Content -Path $profileFile.FullName -Raw | ConvertFrom-Json
+  $bundleIds = @($profile.bundle_ids)
+  if ($bundleIds.Count -eq 0) { continue }
+  try {
+    $resolved = Resolve-BundleSkills -BundleIds $bundleIds -Bundles $bundles -IncludeExtended:$false
+    foreach ($skill in $resolved) {
+      if ($archiveMap.ContainsKey($skill) -and $archiveMap[$skill].status -eq 'archive-reference') {
+        $errors.Add("Profile '$($profile.profile_name)' includes archive-reference skill in core resolution: $skill") | Out-Null
+      }
+    }
+  } catch {
+    $errors.Add("Profile '$($profile.profile_name)' failed to resolve: $($_.Exception.Message)") | Out-Null
+  }
+}
+
 $guanyangDir = Join-Path $root 'skills/vendor/guanyang'
 foreach ($entry in $registryEntries | Where-Object { $_.source -eq 'vendor-sickn33' }) {
   $dupePath = Join-Path $guanyangDir $entry.name
@@ -121,3 +171,4 @@ if ($errors.Count -gt 0) {
 Write-Host 'Validation passed.' -ForegroundColor Green
 Write-Host "Bundles: $($bundles.Count)"
 Write-Host "Registry skills: $($registryEntries.Count)"
+Write-Host "Archive plan skills: $($archiveEntries.Count)"

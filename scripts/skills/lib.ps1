@@ -159,6 +159,34 @@ function Get-RegistryMap {
   $map
 }
 
+function Get-ArchivePlanEntries {
+  param([string]$Root = (Get-SkillsRepoRoot))
+  $path = Join-Path $Root "skills/archive-plan.yaml"
+  if (-not (Test-Path $path)) { throw "Archive plan not found: $path" }
+
+  $entries = New-Object System.Collections.Generic.List[hashtable]
+  $current = $null
+
+  foreach ($line in Get-Content -Path $path) {
+    $trim = $line.Trim()
+    if ([string]::IsNullOrWhiteSpace($trim) -or $trim.StartsWith("#") -or $trim -eq "skills:") { continue }
+    if ($trim -match '^version:\s*(.+)$') { continue }
+
+    if ($trim -match '^- name:\s*(.+)$') {
+      if ($current) { $entries.Add($current) | Out-Null }
+      $current = [ordered]@{name=(Normalize-YamlValue -Value $matches[1]); status=""; target=""}
+      continue
+    }
+
+    if (-not $current) { continue }
+    if ($trim -match '^status:\s*(.+)$') { $current.status = Normalize-YamlValue -Value $matches[1]; continue }
+    if ($trim -match '^target:\s*(.+)$') { $current.target = Normalize-YamlValue -Value $matches[1]; continue }
+  }
+
+  if ($current) { $entries.Add($current) | Out-Null }
+  ,$entries.ToArray()
+}
+
 function Get-RepoHeadCommit {
   param([Parameter(Mandatory=$true)][string]$Repo)
   $repoInfo = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo"

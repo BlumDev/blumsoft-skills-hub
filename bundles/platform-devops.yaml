@@ -1,0 +1,22 @@
+id: platform-devops
+name: Platform DevOps
+goal: Design, deploy, and operate production-ready backend and cloud systems without dragging every infra specialty into default context.
+recommended_start_skill: backend
+fallback_skills:
+  - deployment-procedures
+  - docker-expert
+core_skills:
+  - backend
+  - deployment-procedures
+  - docker-expert
+  - observability-engineer
+extended_skills:
+  - terraform-specialist
+  - kubernetes-architect
+  - devops-troubleshooter
+  - distributed-tracing
+  - gitlab-ci-patterns
+  - incident-responder
+compose_with:
+  - engineering-core
+starter_prompt: bundles/prompts/platform-devops.md

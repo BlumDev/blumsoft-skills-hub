@@ -1,22 +1,13 @@
-﻿id: web-wizard
+id: web-wizard
 name: Web Wizard
-goal: Build and ship modern, accessible web products with conversion focus.
+goal: Legacy wrapper for the lean web-product bundle.
 recommended_start_skill: webdev
 fallback_skills:
-  - seo-audit
   - ui-ux-pro-max
+  - frontend-design
 core_skills:
   - webdev
-  - frontend-design
-  - ui-ux-pro-max
-  - webapp-testing
-  - seo-audit
 extended_skills:
-  - ai-seo-auditor
-  - form-cro
-  - copywriting
-  - nextjs-best-practices
-  - react-best-practices
 compose_with:
-  - essentials
+  - web-product
 starter_prompt: bundles/prompts/web-wizard.md

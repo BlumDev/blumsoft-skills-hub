@@ -15,9 +15,10 @@ if (-not (Test-Path $installer)) { throw "Installer script not found: $installer
 function Install-RepoSkills {
   param([Parameter(Mandatory=$true)][string]$Repo,[Parameter(Mandatory=$true)][string]$SourceType,[Parameter(Mandatory=$true)][string]$DestPath)
 
+  $destRelative = [System.IO.Path]::GetRelativePath($root, $DestPath).Replace('\','/')
   $allSkills = @(
     $registry |
-      Where-Object { $_['source'] -eq $SourceType } |
+      Where-Object { $_['source'] -eq $SourceType -and $_['path'].Replace('\','/').StartsWith($destRelative + '/') } |
       ForEach-Object { $_['name'] } |
       Sort-Object -Unique
   )

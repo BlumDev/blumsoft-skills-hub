@@ -1,5 +1,5 @@
 {
-  "profile_name": "fullstack-founder",
+  "profile_name": "freelancer-fullstack",
   "include_extended": false,
   "bundle_ids": [
     "engineering-core",
@@ -7,8 +7,7 @@
     "web-product",
     "data-ai-systems",
     "platform-devops",
-    "security-engineering",
-    "business-growth"
+    "security-engineering"
   ],
   "default_targets": [
     "codex",

@@ -1,5 +1,5 @@
 ﻿param(
-  [string]$Profile = 'fullstack-founder',
+  [string]$Profile = 'freelancer-fullstack',
   [string[]]$BundleId,
   [switch]$IncludeExtended,
   [string[]]$Targets = @('codex','cursor','antigravity','vscode-copilot','vscode-chatgpt'),

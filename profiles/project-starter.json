@@ -2,7 +2,8 @@
   "profile_name": "project-starter",
   "include_extended": false,
   "bundle_ids": [
-    "project-kickoff"
+    "engineering-core",
+    "project-bootstrap-core"
   ],
   "default_targets": [
     "codex",
@@ -11,4 +12,3 @@
     "vscode-copilot"
   ]
 }
-

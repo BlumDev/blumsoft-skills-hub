@@ -1,0 +1,203 @@
+version: 1
+skills:
+  - name: docu
+    status: active-core
+    target: project-bootstrap-core
+  - name: code-review
+    status: active-core
+    target: security-engineering
+  - name: webdev
+    status: active-core
+    target: web-product
+  - name: ai-seo-auditor
+    status: active-extended
+    target: web-product
+  - name: backend
+    status: active-core
+    target: platform-devops
+  - name: project-bootstrap
+    status: active-core
+    target: project-bootstrap-core
+  - name: smart-commits
+    status: active-extended
+    target: engineering-core
+  - name: advanced-evaluation
+    status: active-extended
+    target: data-ai-systems
+  - name: brainstorming
+    status: active-core
+    target: engineering-core
+  - name: context-optimization
+    status: active-extended
+    target: data-ai-systems
+  - name: dispatching-parallel-agents
+    status: archive-reference
+    target: engineering-core
+  - name: evaluation
+    status: active-extended
+    target: data-ai-systems
+  - name: executing-plans
+    status: active-extended
+    target: project-bootstrap-core
+  - name: finishing-a-development-branch
+    status: active-extended
+    target: engineering-core
+  - name: frontend-design
+    status: active-core
+    target: web-product
+  - name: mcp-builder
+    status: active-core
+    target: data-ai-systems
+  - name: notebooklm
+    status: active-extended
+    target: data-ai-systems
+  - name: planning-with-files
+    status: archive-reference
+    target: engineering-core
+  - name: project-development
+    status: active-core
+    target: project-bootstrap-core
+  - name: receiving-code-review
+    status: active-extended
+    target: engineering-core
+  - name: requesting-code-review
+    status: active-extended
+    target: engineering-core
+  - name: subagent-driven-development
+    status: archive-reference
+    target: engineering-core
+  - name: systematic-debugging
+    status: active-core
+    target: engineering-core
+  - name: test-driven-development
+    status: active-extended
+    target: engineering-core
+  - name: tool-design
+    status: active-extended
+    target: project-bootstrap-core
+  - name: ui-ux-pro-max
+    status: active-core
+    target: web-product
+  - name: using-git-worktrees
+    status: active-extended
+    target: engineering-core
+  - name: verification-before-completion
+    status: active-core
+    target: engineering-core
+  - name: webapp-testing
+    status: active-core
+    target: web-product
+  - name: writing-plans
+    status: active-core
+    target: engineering-core
+  - name: writing-skills
+    status: archive-reference
+    target: project-bootstrap-core
+  - name: ab-test-setup
+    status: active-extended
+    target: business-growth
+  - name: analytics-tracking
+    status: active-extended
+    target: business-growth
+  - name: api-security-best-practices
+    status: active-core
+    target: security-engineering
+  - name: auth-implementation-patterns
+    status: active-extended
+    target: security-engineering
+  - name: backend-security-coder
+    status: active-core
+    target: security-engineering
+  - name: business-analyst
+    status: active-extended
+    target: business-growth
+  - name: competitive-landscape
+    status: active-extended
+    target: business-growth
+  - name: copywriting
+    status: active-extended
+    target: web-product
+  - name: data-scientist
+    status: active-extended
+    target: data-ai-systems
+  - name: deployment-procedures
+    status: active-core
+    target: platform-devops
+  - name: devops-troubleshooter
+    status: active-extended
+    target: platform-devops
+  - name: distributed-tracing
+    status: active-extended
+    target: platform-devops
+  - name: docker-expert
+    status: active-core
+    target: platform-devops
+  - name: form-cro
+    status: active-extended
+    target: web-product
+  - name: frontend-security-coder
+    status: active-extended
+    target: security-engineering
+  - name: gitlab-ci-patterns
+    status: active-extended
+    target: platform-devops
+  - name: incident-responder
+    status: active-extended
+    target: platform-devops
+  - name: kubernetes-architect
+    status: active-extended
+    target: platform-devops
+  - name: langgraph
+    status: active-core
+    target: data-ai-systems
+  - name: launch-strategy
+    status: active-core
+    target: business-growth
+  - name: nextjs-best-practices
+    status: active-extended
+    target: web-product
+  - name: observability-engineer
+    status: active-core
+    target: platform-devops
+  - name: pricing-strategy
+    status: active-core
+    target: business-growth
+  - name: product-manager-toolkit
+    status: active-core
+    target: business-growth
+  - name: prompt-engineer
+    status: active-core
+    target: data-ai-systems
+  - name: rag-engineer
+    status: active-extended
+    target: data-ai-systems
+  - name: rag-implementation
+    status: active-core
+    target: data-ai-systems
+  - name: react-best-practices
+    status: active-extended
+    target: web-product
+  - name: security-auditor
+    status: active-core
+    target: security-engineering
+  - name: seo-audit
+    status: active-extended
+    target: web-product
+  - name: terraform-specialist
+    status: active-extended
+    target: platform-devops
+  - name: top-web-vulnerabilities
+    status: active-extended
+    target: security-engineering
+  - name: vulnerability-scanner
+    status: active-extended
+    target: security-engineering
+  - name: workflow-automation
+    status: active-extended
+    target: project-bootstrap-core
+  - name: workflow-orchestration-patterns
+    status: active-extended
+    target: project-bootstrap-core
+  - name: workflow-patterns
+    status: active-extended
+    target: project-bootstrap-core

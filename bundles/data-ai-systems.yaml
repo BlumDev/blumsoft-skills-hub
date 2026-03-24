@@ -1,0 +1,22 @@
+id: data-ai-systems
+name: Data AI Systems
+goal: Build practical AI features, agents, automation, and knowledge workflows for products and internal tools.
+recommended_start_skill: mcp-builder
+fallback_skills:
+  - prompt-engineer
+  - rag-implementation
+core_skills:
+  - prompt-engineer
+  - mcp-builder
+  - rag-implementation
+  - langgraph
+extended_skills:
+  - rag-engineer
+  - evaluation
+  - advanced-evaluation
+  - context-optimization
+  - notebooklm
+  - data-scientist
+compose_with:
+  - engineering-core
+starter_prompt: bundles/prompts/data-ai-systems.md

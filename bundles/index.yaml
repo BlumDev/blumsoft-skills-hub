@@ -1,4 +1,25 @@
-﻿bundles:
+bundles:
+  - id: engineering-core
+    name: Engineering Core
+    file: bundles/engineering-core.yaml
+  - id: web-product
+    name: Web Product
+    file: bundles/web-product.yaml
+  - id: security-engineering
+    name: Security Engineering
+    file: bundles/security-engineering.yaml
+  - id: platform-devops
+    name: Platform DevOps
+    file: bundles/platform-devops.yaml
+  - id: data-ai-systems
+    name: Data AI Systems
+    file: bundles/data-ai-systems.yaml
+  - id: business-growth
+    name: Business Growth
+    file: bundles/business-growth.yaml
+  - id: project-bootstrap-core
+    name: Project Bootstrap Core
+    file: bundles/project-bootstrap-core.yaml
   - id: essentials
     name: Essentials
     file: bundles/essentials.yaml

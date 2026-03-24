@@ -1,0 +1,20 @@
+id: project-bootstrap-core
+name: Project Bootstrap Core
+goal: Start a new client project or existing repo takeover with minimal docs, decisions, and a clean execution path.
+recommended_start_skill: project-bootstrap
+fallback_skills:
+  - docu
+  - project-development
+core_skills:
+  - project-bootstrap
+  - project-development
+  - docu
+extended_skills:
+  - tool-design
+  - workflow-patterns
+  - executing-plans
+  - workflow-automation
+  - workflow-orchestration-patterns
+compose_with:
+  - engineering-core
+starter_prompt: bundles/prompts/project-bootstrap-core.md

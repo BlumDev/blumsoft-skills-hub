@@ -1,0 +1,20 @@
+id: business-growth
+name: Business Growth
+goal: Support product strategy, pricing, launch planning, and growth measurement when a freelance project also carries commercial goals.
+recommended_start_skill: product-manager-toolkit
+fallback_skills:
+  - pricing-strategy
+  - launch-strategy
+core_skills:
+  - product-manager-toolkit
+  - pricing-strategy
+  - launch-strategy
+extended_skills:
+  - analytics-tracking
+  - ab-test-setup
+  - competitive-landscape
+  - business-analyst
+compose_with:
+  - engineering-core
+  - web-product
+starter_prompt: bundles/prompts/business-growth.md
