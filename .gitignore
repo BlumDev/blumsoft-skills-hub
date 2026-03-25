@@ -13,3 +13,6 @@ Desktop.ini
 
 # Editor/workspace files
 *.code-workspace
+
+# Local IDE/project metadata
+cereblum.project.json
