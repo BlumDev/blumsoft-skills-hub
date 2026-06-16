@@ -2,7 +2,7 @@
   [string]$Profile = 'freelancer-fullstack',
   [string[]]$BundleId,
   [switch]$IncludeExtended,
-  [string[]]$Targets = @('codex','cursor','antigravity','vscode-copilot','vscode-chatgpt'),
+  [string[]]$Targets = @('claude','codex','cursor','antigravity','vscode-copilot','vscode-chatgpt'),
   [string]$WorkspaceRoot = '',
   [switch]$SyncAntigravityWorkflows,
   [switch]$DryRun
@@ -32,6 +32,7 @@ if ($BundleId -and $BundleId.Count -gt 0) {
 $skills = Resolve-BundleSkills -BundleIds $bundleIds -Bundles $bundles -IncludeExtended:$IncludeExtended
 
 $targetMap = [ordered]@{
+  'claude'         = Join-Path $HOME '.claude/skills'
   'codex'          = Join-Path $HOME '.codex/skills'
   'cursor'         = Join-Path $HOME '.cursor/skills'
   'antigravity'    = Join-Path $HOME '.gemini/antigravity/skills'

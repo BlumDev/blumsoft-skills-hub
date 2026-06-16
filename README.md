@@ -26,6 +26,7 @@ For the default setup, use the curated profile `freelancer-fullstack`. It is int
 
 | Target | Sync path | Scope |
 |---|---|---|
+| claude | `~/.claude/skills` | global |
 | codex | `~/.codex/skills` | global |
 | cursor | `~/.cursor/skills` | global |
 | antigravity | `~/.gemini/antigravity/skills` | global |

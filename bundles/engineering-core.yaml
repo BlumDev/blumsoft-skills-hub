@@ -10,12 +10,13 @@ core_skills:
   - writing-plans
   - systematic-debugging
   - verification-before-completion
+  - smart-commits
+  - code-audit
 extended_skills:
   - requesting-code-review
   - test-driven-development
   - receiving-code-review
   - using-git-worktrees
   - finishing-a-development-branch
-  - smart-commits
 compose_with:
 starter_prompt: bundles/prompts/engineering-core.md

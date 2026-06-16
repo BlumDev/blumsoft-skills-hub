@@ -10,6 +10,7 @@ core_skills:
   - mcp-builder
   - rag-implementation
   - langgraph
+  - ai-hardening
 extended_skills:
   - rag-engineer
   - evaluation

@@ -21,6 +21,12 @@ skills:
   - name: smart-commits
     status: active-extended
     target: engineering-core
+  - name: code-audit
+    status: active-core
+    target: engineering-core
+  - name: ai-hardening
+    status: active-core
+    target: data-ai-systems
   - name: advanced-evaluation
     status: active-extended
     target: data-ai-systems
