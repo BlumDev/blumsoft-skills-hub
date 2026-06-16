@@ -21,9 +21,13 @@ Look for:
 - **Missing edge cases.** Empty collection, single element, zero/negative numbers,
   null/None, max values, duplicate keys, off-by-one at boundaries, empty string,
   Unicode. Walk the obvious ones for the logic at hand.
-- **Leaked resources.** A file/socket/lock/connection opened without guaranteed
-  release on the error path. Fix: `with`/`using`/`defer`/try-finally so cleanup
-  always runs.
+- **Leaked resources.** A file/socket/lock/db-connection opened without guaranteed
+  release on every path. Scan *every* function that opens one (`open`, `connect`,
+  `acquire`, `lock`): is it wrapped in `with`/`using`/`defer`/try-finally? Leaks
+  love to hide in a function you are already flagging for something else (a query
+  helper with a SQL bug that also never closes its connection), so check resource
+  cleanup independently of the other findings in that function. Fix: a context
+  manager so cleanup always runs.
 - **Unsafe external assumptions.** Assuming a network call succeeds, returns the
   expected schema, or returns quickly — no timeout, no retry/backoff where it
   matters, no handling of a partial/malformed response. Fix: timeouts, bounded

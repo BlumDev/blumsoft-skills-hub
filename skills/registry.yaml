@@ -26,6 +26,9 @@
   - name: ai-hardening
     source: custom
     path: skills/custom/ai-hardening
+  - name: engineering
+    source: custom
+    path: skills/custom/engineering
   - name: advanced-evaluation
     source: vendor-guanyang
     path: skills/vendor/guanyang/advanced-evaluation

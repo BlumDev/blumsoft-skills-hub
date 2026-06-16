@@ -27,6 +27,9 @@ skills:
   - name: ai-hardening
     status: active-core
     target: data-ai-systems
+  - name: engineering
+    status: active-core
+    target: engineering-core
   - name: advanced-evaluation
     status: active-extended
     target: data-ai-systems

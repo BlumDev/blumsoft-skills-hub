@@ -1,12 +1,12 @@
 id: essentials
 name: Essentials
 goal: Legacy wrapper for the lean engineering-core bundle.
-recommended_start_skill: writing-plans
+recommended_start_skill: engineering
 fallback_skills:
-  - systematic-debugging
-  - verification-before-completion
+  - code-audit
+  - smart-commits
 core_skills:
-  - writing-plans
+  - engineering
 extended_skills:
 compose_with:
   - engineering-core
