@@ -1,12 +1,10 @@
 id: data-ai
 name: Data & AI
 goal: Legacy wrapper for the lean data-ai-systems bundle.
-recommended_start_skill: mcp-builder
+recommended_start_skill: ai-systems
 fallback_skills:
-  - prompt-engineer
-  - rag-implementation
 core_skills:
-  - mcp-builder
+  - ai-systems
 extended_skills:
 compose_with:
   - data-ai-systems

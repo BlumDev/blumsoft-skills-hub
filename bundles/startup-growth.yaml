@@ -1,12 +1,10 @@
 id: startup-growth
 name: Startup Growth
 goal: Legacy wrapper for the business-growth bundle.
-recommended_start_skill: product-manager-toolkit
+recommended_start_skill: business
 fallback_skills:
-  - pricing-strategy
-  - launch-strategy
 core_skills:
-  - product-manager-toolkit
+  - business
 extended_skills:
 compose_with:
   - business-growth

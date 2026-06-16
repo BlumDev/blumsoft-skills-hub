@@ -1,12 +1,10 @@
 id: web-wizard
 name: Web Wizard
 goal: Legacy wrapper for the lean web-product bundle.
-recommended_start_skill: webdev
+recommended_start_skill: web
 fallback_skills:
-  - ui-ux-pro-max
-  - frontend-design
 core_skills:
-  - webdev
+  - web
 extended_skills:
 compose_with:
   - web-product

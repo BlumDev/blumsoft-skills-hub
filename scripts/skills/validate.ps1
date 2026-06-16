@@ -23,7 +23,7 @@ foreach ($bundleId in ($bundles.Keys | Sort-Object)) {
   if ([string]::IsNullOrWhiteSpace($bundle.name)) { $errors.Add("Bundle '$bundleId' missing name") | Out-Null }
   if ([string]::IsNullOrWhiteSpace($bundle.goal)) { $errors.Add("Bundle '$bundleId' missing goal") | Out-Null }
   if ([string]::IsNullOrWhiteSpace($bundle.recommended_start_skill)) { $errors.Add("Bundle '$bundleId' missing recommended_start_skill") | Out-Null }
-  if (-not $bundle.fallback_skills -or $bundle.fallback_skills.Count -ne 2) { $errors.Add("Bundle '$bundleId' must have exactly 2 fallback_skills") | Out-Null }
+  if ($bundle.fallback_skills.Count -gt 2) { $errors.Add("Bundle '$bundleId' must have at most 2 fallback_skills") | Out-Null }
   if ($bundle.core_skills.Count -eq 0) { $errors.Add("Bundle '$bundleId' has no core_skills") | Out-Null }
   if ([string]::IsNullOrWhiteSpace($bundle.starter_prompt)) {
     $errors.Add("Bundle '$bundleId' missing starter_prompt") | Out-Null

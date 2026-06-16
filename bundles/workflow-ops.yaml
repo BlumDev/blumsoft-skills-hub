@@ -1,13 +1,10 @@
 id: workflow-ops
 name: Workflow Ops
 goal: Legacy wrapper for project-bootstrap-core with workflow-oriented extensions on demand.
-recommended_start_skill: project-bootstrap
+recommended_start_skill: bootstrap
 fallback_skills:
-  - project-development
-  - workflow-patterns
 core_skills:
-  - workflow-patterns
-  - tool-design
+  - bootstrap
 extended_skills:
 compose_with:
   - project-bootstrap-core

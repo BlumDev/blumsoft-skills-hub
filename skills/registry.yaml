@@ -29,6 +29,24 @@
   - name: engineering
     source: custom
     path: skills/custom/engineering
+  - name: ai-systems
+    source: custom
+    path: skills/custom/ai-systems
+  - name: web
+    source: custom
+    path: skills/custom/web
+  - name: security
+    source: custom
+    path: skills/custom/security
+  - name: platform
+    source: custom
+    path: skills/custom/platform
+  - name: business
+    source: custom
+    path: skills/custom/business
+  - name: bootstrap
+    source: custom
+    path: skills/custom/bootstrap
   - name: advanced-evaluation
     source: vendor-guanyang
     path: skills/vendor/guanyang/advanced-evaluation

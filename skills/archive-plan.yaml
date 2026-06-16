@@ -30,6 +30,24 @@ skills:
   - name: engineering
     status: active-core
     target: engineering-core
+  - name: ai-systems
+    status: active-core
+    target: data-ai-systems
+  - name: web
+    status: active-core
+    target: web-product
+  - name: security
+    status: active-core
+    target: security-engineering
+  - name: platform
+    status: active-core
+    target: platform-devops
+  - name: business
+    status: active-core
+    target: business-growth
+  - name: bootstrap
+    status: active-core
+    target: project-bootstrap-core
   - name: advanced-evaluation
     status: active-extended
     target: data-ai-systems
