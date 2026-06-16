@@ -27,3 +27,4 @@ load only what the task needs.
 ## Boundaries
 
 - The ongoing plan / implement / debug / verify delivery loop → **engineering** skill.
+- Agent/LLM orchestration and model-facing tool design → **ai-systems** skill; this skill keeps generic (non-LLM) workflow and automation patterns.

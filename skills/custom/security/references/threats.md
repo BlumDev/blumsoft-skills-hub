@@ -190,7 +190,9 @@ Organized by category. Each entry: definition, root cause, impact, mitigation.
 
 ---
 
-## OWASP Top 10 (2025)
+## OWASP Top 10 (2025, draft — not final)
+
+> Note: the 2025 list is a release candidate; ordering and categories may still shift before release. The 2021 Top 10 remains the stable reference. Treat the table below as illustrative of the expected direction, not canonical.
 
 | Rank | Category | Focus |
 |------|----------|-------|

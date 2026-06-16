@@ -43,5 +43,6 @@ pick up at the relevant one.
 - Auditing existing code for quality, security, or robustness → **code-audit**
   skill (don't duplicate it here).
 - Commit messages and commit hygiene → **smart-commits** skill.
+- Reviewing the current uncommitted diff before a merge → the `/code-review` command. This skill covers review *etiquette* (how to request/respond), not the diff scan itself.
 - This skill is the methodology layer; those two are sharp single-purpose tools
   that sit alongside it.

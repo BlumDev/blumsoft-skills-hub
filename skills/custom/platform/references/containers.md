@@ -15,19 +15,19 @@ Use Read/Grep/Glob to inspect the project before running shell commands. Locate 
 - Consolidate `RUN` commands where it genuinely reduces layers.
 
 ```dockerfile
-FROM node:18-alpine AS deps
+FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production && npm cache clean --force
 
-FROM node:18-alpine AS build
+FROM node:22-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
 RUN npm run build && npm prune --production
 
-FROM node:18-alpine AS runtime
+FROM node:22-alpine AS runtime
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 WORKDIR /app
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
@@ -40,6 +40,43 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 CMD ["node", "dist/index.js"]
 ```
 
+### Python track
+
+Same principles apply to Python: install dependencies before copying source, build wheels in a throwaway stage, ship a slim runtime as a non-root user. Set `PYTHONUNBUFFERED=1` so logs stream straight to the container's stdout/stderr (no buffering), and `PYTHONDONTWRITEBYTECODE=1` to skip `.pyc` clutter. The builder compiles dependencies into wheels with `pip wheel`; the runtime installs those prebuilt wheels with no toolchain present. For a FastAPI/ASGI app use a uvicorn-managed gunicorn entrypoint; for Django/WSGI drop the worker class.
+
+```dockerfile
+FROM python:3.12-slim AS build
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+WORKDIR /app
+COPY requirements.txt ./
+RUN pip wheel --no-cache-dir --wheel-dir /wheels -r requirements.txt
+
+FROM python:3.12-slim AS runtime
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+RUN addgroup --gid 1001 --system appgroup && \
+    adduser --uid 1001 --system --ingroup appgroup appuser
+WORKDIR /app
+COPY --from=build /wheels /wheels
+COPY requirements.txt ./
+RUN pip install --no-cache-dir --no-index --find-links=/wheels -r requirements.txt && \
+    rm -rf /wheels
+COPY --chown=appuser:appgroup . .
+USER appuser
+EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
+# FastAPI / ASGI: gunicorn managing uvicorn workers
+CMD ["gunicorn", "app.main:app", \
+     "--worker-class", "uvicorn.workers.UvicornWorker", \
+     "--workers", "4", "--bind", "0.0.0.0:8000"]
+# Django / WSGI alternative:
+# CMD ["gunicorn", "app.wsgi:application", "--workers", "4", "--bind", "0.0.0.0:8000"]
+```
+
+Alternatives to plain `pip`: **uv** (`uv pip install --system -r requirements.txt`, or `uv sync` from `pyproject.toml`/`uv.lock`) is dramatically faster and lock-aware; **Poetry** (`poetry export -f requirements.txt` into the wheel stage, or `poetry install --no-root --only main`) suits projects already standardized on `pyproject.toml`. With either, still split dependency install from source copy to preserve layer caching.
+
 ## Security hardening
 
 - Create and run as a non-root user with an explicit UID/GID; add `USER`.
@@ -49,7 +86,7 @@ CMD ["node", "dist/index.js"]
 - Add health checks for monitoring.
 
 ```dockerfile
-FROM node:18-alpine
+FROM node:22-alpine
 RUN addgroup -g 1001 -S appgroup && \
     adduser -S appuser -u 1001 -G appgroup
 WORKDIR /app
@@ -66,7 +103,7 @@ USER 1001
 - Clean the package-manager cache in the same `RUN` layer that populates it.
 
 ```dockerfile
-FROM gcr.io/distroless/nodejs18-debian11
+FROM gcr.io/distroless/nodejs22-debian12
 COPY --from=build /app/dist /app
 COPY --from=build /app/node_modules /app/node_modules
 WORKDIR /app
@@ -103,7 +140,7 @@ services:
         reservations: { cpus: '0.25', memory: 256M }
 
   db:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     environment:
       POSTGRES_DB_FILE: /run/secrets/db_name
       POSTGRES_USER_FILE: /run/secrets/db_user

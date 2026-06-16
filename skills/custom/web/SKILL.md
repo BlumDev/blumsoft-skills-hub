@@ -27,3 +27,4 @@ focused reference; load only what the task needs.
 ## Boundaries
 
 - Auditing existing code for quality, security, or robustness → **code-audit** skill.
+- When `ui-ux.md` and `frontend-design.md` conflict on specifics (e.g. fonts: ui-ux defaults to Inter, frontend-design avoids it): `frontend-design.md` governs a new or deliberately distinctive visual direction, `ui-ux.md` governs conventional SaaS UI. Pick by the task.

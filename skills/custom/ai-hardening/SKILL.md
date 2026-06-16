@@ -114,4 +114,4 @@ Do not flood the report with theoretical issues on paths an attacker cannot reac
   a finding is real.
 - Model-behavior tuning (refusals, alignment, eval of answer quality) is out of
   scope — this is about code-level attack surface, not prompt-engineering quality.
-- Non-AI appsec → code-audit `security` dimension.
+- Non-AI appsec: auditing existing code → code-audit `security` dimension; writing/designing new secure code → the **security** skill.

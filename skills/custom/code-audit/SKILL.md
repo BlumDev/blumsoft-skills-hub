@@ -189,3 +189,4 @@ Keep each finding tight enough to act on without a follow-up question.
   re-drawing module boundaries is a design conversation — raise it, do not
   silently undertake it.
 - Not LLM/agent attack hardening — that is the **ai-hardening** skill.
+- For *writing* new secure code or designing secure systems (vs. auditing existing code), use the **security** skill.

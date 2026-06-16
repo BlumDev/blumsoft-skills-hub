@@ -122,10 +122,9 @@ services:
   jaeger:
     image: jaegertracing/all-in-one:latest
     ports:
-      - "6831:6831/udp"
+      - "4317:4317"    # OTLP gRPC
+      - "4318:4318"    # OTLP HTTP
       - "16686:16686"  # UI
-      - "14268:14268"  # Collector
-      - "14250:14250"  # gRPC
       - "9411:9411"    # Zipkin
     environment:
       - COLLECTOR_ZIPKIN_HOST_PORT=:9411
@@ -133,11 +132,13 @@ services:
 
 ## Instrumentation (OpenTelemetry)
 
+> Note: the dedicated Jaeger exporter packages were removed from OpenTelemetry; Jaeger now ingests OTLP natively, so export via OTLP to ports 4317 (gRPC) / 4318 (HTTP).
+
 ### Python (Flask)
 
 ```python
 from opentelemetry import trace
-from opentelemetry.exporter.jaeger.thrift import JaegerExporter
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
@@ -147,7 +148,7 @@ from flask import Flask
 resource = Resource(attributes={SERVICE_NAME: "my-service"})
 provider = TracerProvider(resource=resource)
 provider.add_span_processor(BatchSpanProcessor(
-    JaegerExporter(agent_host_name="jaeger", agent_port=6831)
+    OTLPSpanExporter(endpoint="http://jaeger:4317")
 ))
 trace.set_tracer_provider(provider)
 
@@ -166,7 +167,7 @@ def get_users():
 
 ```javascript
 const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
-const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
+const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc');
 const { BatchSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
@@ -176,7 +177,7 @@ const provider = new NodeTracerProvider({
   resource: { attributes: { 'service.name': 'my-service' } }
 });
 provider.addSpanProcessor(new BatchSpanProcessor(
-  new JaegerExporter({ endpoint: 'http://jaeger:14268/api/traces' })
+  new OTLPTraceExporter({ url: 'http://jaeger:4317' })
 ));
 provider.register();
 

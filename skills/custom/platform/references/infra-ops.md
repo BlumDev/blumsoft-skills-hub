@@ -37,6 +37,31 @@ Rules:
 - Pin provider/module versions for reproducibility.
 - Drift detection and continuous compliance checks.
 
+Example (remote backend + module call):
+```hcl
+terraform {
+  required_version = ">= 1.6"
+  backend "s3" {
+    bucket         = "acme-tfstate"
+    key            = "prod/network/terraform.tfstate"
+    region         = "eu-central-1"
+    dynamodb_table = "tf-locks"   # state locking
+    encrypt        = true
+  }
+}
+
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 5.0"               # pin the module
+
+  name           = "prod-vpc"
+  cidr           = var.vpc_cidr
+  azs            = var.azs
+  public_subnets = var.public_subnets
+  tags           = { Environment = "prod" }
+}
+```
+
 ## Kubernetes
 
 Workflow:
@@ -76,9 +101,71 @@ Multi-tenancy & scaling:
 
 Safety: no production changes without approval and rollback plan; test policy/admission changes in staging first.
 
-## CI pipelines (GitLab CI)
+Example (minimal Deployment + Service):
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 3
+  selector:
+    matchLabels: { app: web }
+  template:
+    metadata:
+      labels: { app: web }
+    spec:
+      containers:
+        - name: web
+          image: registry.example.com/web:1.4.2   # pin tag, not latest
+          ports:
+            - containerPort: 8080
+          resources:
+            requests: { cpu: 100m, memory: 128Mi }
+            limits:   { cpu: 500m, memory: 256Mi }
+          readinessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  selector: { app: web }
+  ports:
+    - port: 80
+      targetPort: 8080
+```
 
-Stage structure: `build` -> `test` -> `deploy`. Use specific image tags (`node:20`, not `latest`).
+## CI pipelines
+
+Stage structure: `build` -> `test` -> `deploy`. Use specific image tags (`node:20`, not `latest`). Patterns below apply to any runner (GitHub Actions, GitLab CI, Azure DevOps, Jenkins); two concrete examples follow.
+
+Example: GitHub Actions (`.github/workflows/ci.yml`):
+```yaml
+on:
+  push: { branches: [main] }
+  pull_request:
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci
+      - run: npm test
+  deploy:
+    needs: build-test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production        # manual approval gate via env rules
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./deploy.sh           # uses secrets via ${{ secrets.* }}
+```
+
+Example: GitLab CI
 
 Core patterns:
 - Cache dependencies per ref: `key: ${CI_COMMIT_REF_SLUG}`, `paths: [node_modules/]`.

@@ -82,12 +82,12 @@ Rate limiting blocks brute force, throttles abuse, and reduces cost. Use a distr
 
 ```javascript
 const rateLimit = require('express-rate-limit');
-const RedisStore = require('rate-limit-redis');
+const { RedisStore } = require('rate-limit-redis');
 const redis = new Redis({ host: process.env.REDIS_HOST, port: process.env.REDIS_PORT });
 
 // General API limit
 const apiLimiter = rateLimit({
-  store: new RedisStore({ client: redis, prefix: 'rl:api:' }),
+  store: new RedisStore({ sendCommand: (...args) => redis.call(...args), prefix: 'rl:api:' }),
   windowMs: 15 * 60 * 1000,
   max: 100,
   standardHeaders: true,
@@ -97,7 +97,7 @@ const apiLimiter = rateLimit({
 
 // Strict limit for auth endpoints
 const authLimiter = rateLimit({
-  store: new RedisStore({ client: redis, prefix: 'rl:auth:' }),
+  store: new RedisStore({ sendCommand: (...args) => redis.call(...args), prefix: 'rl:auth:' }),
   windowMs: 15 * 60 * 1000,
   max: 5,
   skipSuccessfulRequests: true
@@ -234,10 +234,17 @@ function authenticate(req, res, next) {
 Store refresh tokens **hashed** in the database so they can be verified and revoked. Verify the JWT signature, confirm the hashed token exists and is unexpired, then issue a new access token.
 
 ```typescript
+import { createHash } from 'crypto';
+
 class RefreshTokenService {
+  // Deterministic hash so the row is findable; the raw token stays secret (never stored).
+  private tokenKey(refreshToken: string) {
+    return createHash('sha256').update(refreshToken).digest('hex');
+  }
+
   async storeRefreshToken(userId: string, refreshToken: string) {
     await db.refreshTokens.create({
-      token: await hash(refreshToken),  // hash before storing
+      token: this.tokenKey(refreshToken),  // store deterministic SHA-256, indexable
       userId,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
@@ -251,7 +258,7 @@ class RefreshTokenService {
       throw new Error('Invalid refresh token');
     }
     const stored = await db.refreshTokens.findOne({
-      where: { token: await hash(refreshToken), userId: payload.userId, expiresAt: { $gt: new Date() } },
+      where: { token: this.tokenKey(refreshToken), userId: payload.userId, expiresAt: { $gt: new Date() } },
     });
     if (!stored) throw new Error('Refresh token not found or expired');
 
@@ -266,7 +273,7 @@ class RefreshTokenService {
   }
 
   async revokeRefreshToken(refreshToken: string) {
-    await db.refreshTokens.deleteOne({ token: await hash(refreshToken) });
+    await db.refreshTokens.deleteOne({ token: this.tokenKey(refreshToken) });
   }
   async revokeAllUserTokens(userId: string) {
     await db.refreshTokens.deleteMany({ userId });  // logout all devices
@@ -282,7 +289,7 @@ Use a shared store (Redis) and secure cookie flags. Destroy the session and clea
 
 ```typescript
 import session from 'express-session';
-import RedisStore from 'connect-redis';
+import { RedisStore } from 'connect-redis';
 
 app.use(session({
   store: new RedisStore({ client: redisClient }),
@@ -338,7 +345,15 @@ app.get('/api/auth/google/callback',
   passport.authenticate('google', { session: false }),
   (req, res) => {
     const tokens = generateTokens(req.user.id, req.user.email, req.user.role);
-    res.redirect(`${process.env.FRONTEND_URL}/auth/callback?token=${tokens.accessToken}`);
+    // Set the token as an httpOnly cookie, not in the URL: redirect URLs leak into
+    // browser history, server logs, and the Referer header.
+    res.cookie('access_token', tokens.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000,
+    });
+    res.redirect(`${process.env.FRONTEND_URL}/auth/callback`);
   }
 );
 ```

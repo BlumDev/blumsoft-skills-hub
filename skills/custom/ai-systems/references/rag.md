@@ -46,7 +46,7 @@ Store and retrieve document embeddings efficiently.
 
 Convert text to vectors for similarity search.
 
-- **text-embedding-ada-002** (OpenAI): general purpose, 1536 dims
+- **text-embedding-3-small** (OpenAI): general purpose, 1536 dims (legacy: text-embedding-ada-002)
 - **all-MiniLM-L6-v2** (Sentence Transformers): fast, lightweight
 - **e5-large-v2**: high quality, multilingual
 - **bge-large-en-v1.5**: SOTA performance
@@ -71,12 +71,12 @@ Reorder retrieved results to improve quality.
 ## Quick start
 
 ```python
-from langchain.document_loaders import DirectoryLoader
-from langchain.text_splitters import RecursiveCharacterTextSplitter
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import Chroma
+from langchain_community.document_loaders import DirectoryLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_openai import OpenAIEmbeddings
+from langchain_chroma import Chroma
 from langchain.chains import RetrievalQA
-from langchain.llms import OpenAI
+from langchain_openai import ChatOpenAI
 
 # 1. Load documents
 loader = DirectoryLoader('./docs', glob="**/*.txt")
@@ -94,7 +94,7 @@ vectorstore = Chroma.from_documents(chunks, embeddings)
 
 # 4. Create retrieval chain
 qa_chain = RetrievalQA.from_chain_type(
-    llm=OpenAI(),
+    llm=ChatOpenAI(),
     chain_type="stuff",
     retriever=vectorstore.as_retriever(search_kwargs={"k": 4}),
     return_source_documents=True
@@ -111,7 +111,8 @@ print(result['source_documents'])
 ### Hybrid search
 
 ```python
-from langchain.retrievers import BM25Retriever, EnsembleRetriever
+from langchain_community.retrievers import BM25Retriever
+from langchain.retrievers import EnsembleRetriever
 
 bm25_retriever = BM25Retriever.from_documents(chunks)
 bm25_retriever.k = 5
@@ -129,9 +130,9 @@ ensemble_retriever = EnsembleRetriever(
 from langchain.retrievers.multi_query import MultiQueryRetriever
 
 retriever = MultiQueryRetriever.from_llm(
-    retriever=vectorstore.as_retriever(), llm=OpenAI()
+    retriever=vectorstore.as_retriever(), llm=ChatOpenAI()
 )
-results = retriever.get_relevant_documents("What is the main topic?")
+results = retriever.invoke("What is the main topic?")
 ```
 
 ### Contextual compression
@@ -145,7 +146,7 @@ compression_retriever = ContextualCompressionRetriever(
     base_compressor=compressor,
     base_retriever=vectorstore.as_retriever()
 )
-compressed_docs = compression_retriever.get_relevant_documents("query")
+compressed_docs = compression_retriever.invoke("query")
 ```
 
 ### Parent document retriever
