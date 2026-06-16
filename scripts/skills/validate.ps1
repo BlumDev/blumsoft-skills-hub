@@ -42,7 +42,7 @@ foreach ($entry in $registryEntries) {
 
 $archiveEntries = @()
 $archiveMap = @{}
-$allowedArchiveStatuses = @('active-core', 'active-extended', 'archive-reference')
+$allowedArchiveStatuses = @('active-core', 'active-extended', 'archive-reference', 'inactive')
 try {
   $archiveEntries = Get-ArchivePlanEntries -Root $root
   foreach ($entry in $archiveEntries) {

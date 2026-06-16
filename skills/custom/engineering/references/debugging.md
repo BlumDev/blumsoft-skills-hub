@@ -121,3 +121,4 @@ If investigation shows the issue is truly environmental, timing-dependent, or ex
 - `root-cause-tracing.md` — trace bugs backward through the call stack to the original trigger
 - `defense-in-depth.md` — add validation at multiple layers after finding root cause
 - `condition-based-waiting.md` — replace arbitrary timeouts with condition polling
+- `find-polluter.sh` — bisect a flaky / order-dependent test suite to find the test that pollutes shared state (adapt the test command for the project; the script assumes `npm test`)
