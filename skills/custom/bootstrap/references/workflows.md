@@ -15,14 +15,14 @@ Implement tasks via a TDD red-green-refactor cycle against a written plan:
 Durable execution is what makes agent automation reliable: a network hiccup mid-flow must resume exactly where it left off, not lose state or double-charge.
 
 Platform tradeoffs:
-- **n8n** — accessible, low-code; sacrifices performance.
-- **Temporal** — correct and robust; complex.
-- **Inngest** — balances developer experience and reliability.
+- **n8n**, accessible, low-code; sacrifices performance.
+- **Temporal**, correct and robust; complex.
+- **Inngest**, balances developer experience and reliability.
 
 Core patterns:
-- **Sequential** — steps run in order; each output feeds the next input.
-- **Parallel** — independent steps run simultaneously; aggregate results.
-- **Orchestrator-worker** — a coordinator dispatches work to specialized workers.
+- **Sequential**, steps run in order; each output feeds the next input.
+- **Parallel**, independent steps run simultaneously; aggregate results.
+- **Orchestrator-worker**, a coordinator dispatches work to specialized workers.
 
 Anti-patterns: no durable execution for payments; monolithic workflows; no observability.
 
@@ -56,10 +56,10 @@ Decision: touches external systems → activity; orchestration/decision logic �
 - Versioning: use the versioning API (`get_version()`), or route new executions to a new workflow type; ensure old events still replay.
 
 **Core patterns:**
-- **Saga + compensation** — for each step, register its compensation before executing; on failure, run compensations in reverse (LIFO). Compensations must be idempotent.
-- **Entity (actor)** — one long-lived execution per entity (cart, account, inventory); driven by signals, inspected via queries.
-- **Fan-out/fan-in** — spawn parallel children, await all, aggregate, handle partial failures. Don't scale one giant workflow; for 1M tasks spawn 1K children × 1K tasks.
-- **Async callback** — workflow requests then waits for a signal (human approval, webhook) to resume.
+- **Saga + compensation**, for each step, register its compensation before executing; on failure, run compensations in reverse (LIFO). Compensations must be idempotent.
+- **Entity (actor)**, one long-lived execution per entity (cart, account, inventory); driven by signals, inspected via queries.
+- **Fan-out/fan-in**, spawn parallel children, await all, aggregate, handle partial failures. Don't scale one giant workflow; for 1M tasks spawn 1K children × 1K tasks.
+- **Async callback**, workflow requests then waits for a signal (human approval, webhook) to resume.
 
 **Resilience:**
 - Retry policy: initial interval, backoff coefficient, max interval, max attempts. Mark validation failures, business-rule violations, and permanent errors as non-retryable.

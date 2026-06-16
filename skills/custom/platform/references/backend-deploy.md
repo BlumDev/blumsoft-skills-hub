@@ -33,11 +33,11 @@ Learn to think, not memorize scripts. Every deployment is unique; understand the
 
 ### Deployment workflow (5 phases)
 
-1. **Prepare** — verify code, build, env vars. Never deploy untested code.
-2. **Backup** — save current state. You can't rollback without it.
-3. **Deploy** — execute with monitoring open. Don't walk away.
-4. **Verify** — health check, logs, key flows. Trust but verify.
-5. **Confirm or rollback** — all good? Confirm. Issues? Rollback.
+1. **Prepare**, verify code, build, env vars. Never deploy untested code.
+2. **Backup**, save current state. You can't rollback without it.
+3. **Deploy**, execute with monitoring open. Don't walk away.
+4. **Verify**, health check, logs, key flows. Trust but verify.
+5. **Confirm or rollback**, all good? Confirm. Issues? Rollback.
 
 ### Post-deployment verification
 
@@ -66,9 +66,9 @@ Principles: rollback first and debug later; one rollback, not multiple changes; 
 
 ### Zero-downtime strategies
 
-- **Rolling** (replace instances one by one) — standard release
-- **Blue-green** (switch traffic between environments) — high-risk change, easy rollback
-- **Canary** (gradual traffic shift) — when you need validation with real traffic
+- **Rolling** (replace instances one by one), standard release
+- **Blue-green** (switch traffic between environments), high-risk change, easy rollback
+- **Canary** (gradual traffic shift), when you need validation with real traffic
 
 ### Emergency procedures
 

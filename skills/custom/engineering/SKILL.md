@@ -32,6 +32,8 @@ needs rather than reading all of them.
 | Preparing a change for review, or responding to one | `references/code-review.md` |
 | Isolating work in a worktree, or landing a branch | `references/git-workflow.md` |
 
+The references' code examples are illustrative (several use TypeScript/jest); the techniques are language-agnostic, adapt them to the project's stack (e.g. pytest/PowerShell here).
+
 ## Typical flow
 
 ideate / plan → implement (TDD where it fits) → debug when stuck → verify before

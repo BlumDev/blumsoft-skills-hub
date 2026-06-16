@@ -244,7 +244,7 @@ class RefreshTokenService {
 
   async storeRefreshToken(userId: string, refreshToken: string) {
     await db.refreshTokens.create({
-      token: this.tokenKey(refreshToken),  // store deterministic SHA-256, indexable
+      token: this.tokenKey(refreshToken), // store deterministic SHA-256, indexable
       userId,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
@@ -297,10 +297,10 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',  // HTTPS only
-    httpOnly: true,                                  // no JS access
+    secure: process.env.NODE_ENV === 'production', // HTTPS only
+    httpOnly: true,                                 // no JS access
     maxAge: 24 * 60 * 60 * 1000,
-    sameSite: 'strict',                              // CSRF protection
+    sameSite: 'strict',                             // CSRF protection
   },
 }));
 

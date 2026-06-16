@@ -26,7 +26,7 @@ Follow this priority order:
    grep -i "worktree.*director" CLAUDE.md 2>/dev/null
    ```
 3. **Ask the user** only if neither exists: project-local `.worktrees/` (hidden) or a
-   global location like `~/.config/superpowers/worktrees/<project-name>/`.
+   global location like `~/worktrees/<project-name>/`.
 
 ### Safety verification
 
@@ -108,7 +108,7 @@ Keep them concise; don't add explanation.
 
 ### Step 4: Execute the choice
 
-**Option 1 — Merge locally:**
+**Option 1, Merge locally:**
 ```bash
 git checkout <base-branch>
 git pull
@@ -118,7 +118,7 @@ git branch -d <feature-branch>
 ```
 Then clean up the worktree.
 
-**Option 2 — Push and create PR:**
+**Option 2, Push and create PR:**
 ```bash
 git push -u origin <feature-branch>
 gh pr create --title "<title>" --body "$(cat <<'EOF'
@@ -132,10 +132,10 @@ EOF
 ```
 Keep the worktree.
 
-**Option 3 — Keep as-is:** report "Keeping branch <name>. Worktree preserved at <path>."
+**Option 3, Keep as-is:** report "Keeping branch <name>. Worktree preserved at <path>."
 Keep the worktree.
 
-**Option 4 — Discard:** confirm first. List what will be permanently deleted (branch,
+**Option 4, Discard:** confirm first. List what will be permanently deleted (branch,
 commits, worktree) and require the user to type `discard`. Only then:
 ```bash
 git checkout <base-branch>

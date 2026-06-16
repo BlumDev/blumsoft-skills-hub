@@ -21,7 +21,7 @@ Why it matters: code is read far more than written; the decode cost of a bad nam
 is paid on every read, forever.
 
 Behavior-preserving fix: rename the symbol consistently across its whole scope,
-updating every reference. The safest refactoring there is — **except** when the
+updating every reference. The safest refactoring there is, **except** when the
 name is reachable by reflection, string lookups, serialized field names, or is a
 public API name. Those are not pure renames: flag them, do not silently change.
 
@@ -35,7 +35,7 @@ Look for:
 - A name containing "and", or that needs "and" to describe honestly.
 - Mixed abstraction levels: high-level orchestration interleaved with low-level
   fiddling in one body.
-- A boolean/flag parameter that selects between two behaviors — usually two
+- A boolean/flag parameter that selects between two behaviors, usually two
   functions wearing a trench coat.
 - Long bodies, deep nesting, many parameters, or a `# now do X` comment marking a
   seam between responsibilities.
@@ -60,4 +60,4 @@ Apply when clearly worth it; do not manufacture findings.
   in fix mode only when provably unreferenced (mind reflection/dynamic dispatch).
 - **Comments.** Flag comments that restate the code or have gone stale; prefer
   self-explaining code. Never delete a comment that explains *why* (intent, a
-  workaround, a non-obvious constraint) — that kind is worth keeping.
+  workaround, a non-obvious constraint), that kind is worth keeping.

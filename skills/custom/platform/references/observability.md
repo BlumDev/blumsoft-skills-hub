@@ -83,11 +83,11 @@ Trace (Request ID: abc123)
         Span (database) [40ms]
 ```
 
-- **Trace** — end-to-end request journey.
-- **Span** — single operation within a trace.
-- **Context** — metadata propagated between services.
-- **Tags** — key-value pairs for filtering.
-- **Logs/Events** — timestamped events within a span.
+- **Trace**, end-to-end request journey.
+- **Span**, single operation within a trace.
+- **Context**, metadata propagated between services.
+- **Tags**, key-value pairs for filtering.
+- **Logs/Events**, timestamped events within a span.
 
 ## Jaeger Setup
 

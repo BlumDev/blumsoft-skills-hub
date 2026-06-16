@@ -39,11 +39,11 @@ BEFORE attempting ANY fix:
 
    Example, instrumenting each layer to find where signing breaks:
    ```bash
-   # Layer 1: Workflow — are secrets available?
+   # Layer 1: Workflow, are secrets available?
    echo "IDENTITY: ${IDENTITY:+SET}${IDENTITY:-UNSET}"
-   # Layer 2: Build script — did the env var propagate?
+   # Layer 2: Build script, did the env var propagate?
    env | grep IDENTITY || echo "IDENTITY not in environment"
-   # Layer 3: Signing script — keychain state
+   # Layer 3: Signing script, keychain state
    security find-identity -v
    # Layer 4: Actual signing
    codesign --sign "$IDENTITY" --verbose=4 "$APP"
@@ -91,11 +91,11 @@ If you catch yourself thinking any of these, return to Phase 1:
 
 ## Signals from your human partner that you're doing it wrong
 
-- "Is that not happening?" — you assumed without verifying
-- "Will it show us...?" — you should have added evidence gathering
-- "Stop guessing" — you're proposing fixes without understanding
-- "Ultrathink this" — question fundamentals, not just symptoms
-- "We're stuck?" (frustrated) — your approach isn't working
+- "Is that not happening?", you assumed without verifying
+- "Will it show us...?", you should have added evidence gathering
+- "Stop guessing", you're proposing fixes without understanding
+- "Ultrathink this", question fundamentals, not just symptoms
+- "We're stuck?" (frustrated), your approach isn't working
 
 When you see these: STOP, return to Phase 1.
 
@@ -118,7 +118,7 @@ If investigation shows the issue is truly environmental, timing-dependent, or ex
 
 ## Supporting techniques
 
-- `root-cause-tracing.md` — trace bugs backward through the call stack to the original trigger
-- `defense-in-depth.md` — add validation at multiple layers after finding root cause
-- `condition-based-waiting.md` — replace arbitrary timeouts with condition polling
-- `find-polluter.sh` — bisect a flaky / order-dependent test suite to find the test that pollutes shared state (adapt the test command for the project; the script assumes `npm test`)
+- `root-cause-tracing.md`, trace bugs backward through the call stack to the original trigger
+- `defense-in-depth.md`, add validation at multiple layers after finding root cause
+- `condition-based-waiting.md`, replace arbitrary timeouts with condition polling
+- `find-polluter.sh`, bisect a flaky / order-dependent test suite to find the test that pollutes shared state (adapt the test command for the project; the script assumes `npm test`)

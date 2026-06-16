@@ -38,131 +38,131 @@ Organized by category. Each entry: definition, root cause, impact, mitigation.
 
 ### Injection
 
-**SQL Injection** — Malicious SQL inserted into inputs to manipulate queries. Cause: no input validation, unparameterized queries. Impact: unauthorized data access/manipulation, DB compromise. Fix: parameterized queries/prepared statements, input validation, least-privilege DB accounts.
+**SQL Injection**, Malicious SQL inserted into inputs to manipulate queries. Cause: no input validation, unparameterized queries. Impact: unauthorized data access/manipulation, DB compromise. Fix: parameterized queries/prepared statements, input validation, least-privilege DB accounts.
 
-**Cross-Site Scripting (XSS)** — Malicious scripts injected into pages viewed by other users. Cause: insufficient output encoding, no input sanitization. Impact: session hijacking, credential theft, defacement. Fix: output encoding, CSP, input sanitization. (DOM-based XSS: unsafe client-side DOM manipulation with user input; fix with safe DOM APIs and CSP.)
+**Cross-Site Scripting (XSS)**, Malicious scripts injected into pages viewed by other users. Cause: insufficient output encoding, no input sanitization. Impact: session hijacking, credential theft, defacement. Fix: output encoding, CSP, input sanitization. (DOM-based XSS: unsafe client-side DOM manipulation with user input; fix with safe DOM APIs and CSP.)
 
-**Command Injection** — Arbitrary OS commands executed via the app. Cause: unsanitized input passed to a shell. Impact: full system compromise, exfiltration, lateral movement. Fix: avoid shell execution, whitelist commands, strict validation.
+**Command Injection**, Arbitrary OS commands executed via the app. Cause: unsanitized input passed to a shell. Impact: full system compromise, exfiltration, lateral movement. Fix: avoid shell execution, whitelist commands, strict validation.
 
-**XML / LDAP / XPath Injection** — Query manipulation via malicious input. Cause: improper input handling in query construction. Impact: data exposure, auth bypass, information disclosure. Fix: input validation, parameterized queries, escape special characters.
+**XML / LDAP / XPath Injection**, Query manipulation via malicious input. Cause: improper input handling in query construction. Impact: data exposure, auth bypass, information disclosure. Fix: input validation, parameterized queries, escape special characters.
 
-**Server-Side Template Injection (SSTI)** — Malicious code injected into template engines. Cause: user input embedded in template expressions. Impact: RCE, server compromise. Fix: sandbox template engines, keep user input out of templates.
+**Server-Side Template Injection (SSTI)**, Malicious code injected into template engines. Cause: user input embedded in template expressions. Impact: RCE, server compromise. Fix: sandbox template engines, keep user input out of templates.
 
 ### Authentication & session
 
-**Session Fixation** — Attacker sets the victim's session ID before login. Cause: session ID not regenerated after auth. Fix: regenerate session ID on authentication.
+**Session Fixation**, Attacker sets the victim's session ID before login. Cause: session ID not regenerated after auth. Fix: regenerate session ID on authentication.
 
-**Brute Force** — Automated password guessing. Cause: no lockout, rate limiting, or CAPTCHA. Fix: account lockout, rate limiting, MFA, CAPTCHA.
+**Brute Force**, Automated password guessing. Cause: no lockout, rate limiting, or CAPTCHA. Fix: account lockout, rate limiting, MFA, CAPTCHA.
 
-**Session Hijacking** — Stealing or predicting valid session tokens. Cause: weak token generation, insecure transmission. Fix: secure random tokens, HTTPS, HttpOnly/Secure cookie flags.
+**Session Hijacking**, Stealing or predicting valid session tokens. Cause: weak token generation, insecure transmission. Fix: secure random tokens, HTTPS, HttpOnly/Secure cookie flags.
 
-**Credential Stuffing** — Leaked credentials reused across services. Cause: password reuse, no breach detection. Fix: MFA, breach-password checks, unique-credential requirements.
+**Credential Stuffing**, Leaked credentials reused across services. Cause: password reuse, no breach detection. Fix: MFA, breach-password checks, unique-credential requirements.
 
-**Insecure "Remember Me"** — Weak persistent auth tokens. Fix: strong token generation, proper expiration, secure storage.
+**Insecure "Remember Me"**, Weak persistent auth tokens. Fix: strong token generation, proper expiration, secure storage.
 
-**CAPTCHA Bypass** — Circumventing bot detection. Fix: reCAPTCHA v3, layered bot detection, rate limiting.
+**CAPTCHA Bypass**, Circumventing bot detection. Fix: reCAPTCHA v3, layered bot detection, rate limiting.
 
-**Account Enumeration** — Different responses reveal valid accounts. Fix: uniform responses and timing.
+**Account Enumeration**, Different responses reveal valid accounts. Fix: uniform responses and timing.
 
 ### Sensitive data exposure
 
-**IDOR (Insecure Direct Object References)** — Direct access to internal objects via user-supplied references. Cause: missing authorization checks on object access. Fix: access-control validation, indirect reference maps.
+**IDOR (Insecure Direct Object References)**, Direct access to internal objects via user-supplied references. Cause: missing authorization checks on object access. Fix: access-control validation, indirect reference maps.
 
-**Data Leakage** — Inadvertent disclosure of sensitive data. Fix: DLP, encryption, access controls.
+**Data Leakage**, Inadvertent disclosure of sensitive data. Fix: DLP, encryption, access controls.
 
-**Unencrypted Data Storage** — Sensitive data stored without encryption. Fix: full-disk/database encryption, secure key management.
+**Unencrypted Data Storage**, Sensitive data stored without encryption. Fix: full-disk/database encryption, secure key management.
 
-**Information Disclosure** — System details leaked via errors/responses. Cause: verbose errors, debug in production. Fix: generic error messages, disable debug, secure logging.
+**Information Disclosure**, System details leaked via errors/responses. Cause: verbose errors, debug in production. Fix: generic error messages, disable debug, secure logging.
 
 ### Security misconfiguration
 
-**Missing Security Headers** — Absent protective HTTP headers. Impact: XSS, clickjacking, protocol downgrade. Fix: implement CSP, X-Content-Type-Options, X-Frame-Options, HSTS.
+**Missing Security Headers**, Absent protective HTTP headers. Impact: XSS, clickjacking, protocol downgrade. Fix: implement CSP, X-Content-Type-Options, X-Frame-Options, HSTS.
 
-**Default Passwords** — Unchanged vendor defaults. Fix: mandatory password changes, strong policies.
+**Default Passwords**, Unchanged vendor defaults. Fix: mandatory password changes, strong policies.
 
-**Directory Listing** — Server exposes directory contents. Fix: disable indexing, use default index files.
+**Directory Listing**, Server exposes directory contents. Fix: disable indexing, use default index files.
 
-**Unprotected API Endpoints** — APIs without auth/authz. Fix: OAuth/API keys, access controls, rate limiting.
+**Unprotected API Endpoints**, APIs without auth/authz. Fix: OAuth/API keys, access controls, rate limiting.
 
-**Open Ports and Services** — Unnecessary services exposed. Fix: port audits, firewall rules, service minimization.
+**Open Ports and Services**, Unnecessary services exposed. Fix: port audits, firewall rules, service minimization.
 
-**Misconfigured CORS** — Overly permissive cross-origin policies (wildcard origins). Fix: whitelist trusted origins, validate CORS headers.
+**Misconfigured CORS**, Overly permissive cross-origin policies (wildcard origins). Fix: whitelist trusted origins, validate CORS headers.
 
-**Unpatched Software** — Outdated, vulnerable software. Fix: patch management, vulnerability scanning, automated updates.
+**Unpatched Software**, Outdated, vulnerable software. Fix: patch management, vulnerability scanning, automated updates.
 
 ### XML processing
 
-**XXE (XML External Entity)** — Parser abused to access files or internal systems. Cause: external entity processing enabled. Impact: file disclosure, SSRF, DoS. Fix: disable external entities, use safe parsers.
+**XXE (XML External Entity)**, Parser abused to access files or internal systems. Cause: external entity processing enabled. Impact: file disclosure, SSRF, DoS. Fix: disable external entities, use safe parsers.
 
-**Entity Expansion / XML Bomb (Billion Laughs)** — Nested/recursive entities exhaust resources. Fix: limit entity expansion, restrict input size, schema validation, processing timeouts.
+**Entity Expansion / XML Bomb (Billion Laughs)**, Nested/recursive entities exhaust resources. Fix: limit entity expansion, restrict input size, schema validation, processing timeouts.
 
 ### Broken access control
 
-**Inadequate Authorization** — Access controls not properly enforced. Fix: RBAC, centralized IAM, regular access reviews.
+**Inadequate Authorization**, Access controls not properly enforced. Fix: RBAC, centralized IAM, regular access reviews.
 
-**Privilege Escalation** — Gaining access beyond intended permissions. Fix: least privilege, patching, privilege monitoring.
+**Privilege Escalation**, Gaining access beyond intended permissions. Fix: least privilege, patching, privilege monitoring.
 
-**Forceful Browsing** — URL manipulation to reach restricted resources. Fix: server-side access controls, unpredictable resource paths.
+**Forceful Browsing**, URL manipulation to reach restricted resources. Fix: server-side access controls, unpredictable resource paths.
 
-**Missing Function-Level Access Control** — Privileged functions protected only at the UI. Fix: server-side authorization for all functions, RBAC.
+**Missing Function-Level Access Control**, Privileged functions protected only at the UI. Fix: server-side authorization for all functions, RBAC.
 
 ### Insecure deserialization
 
-**RCE via Deserialization** — Code execution through malicious serialized objects. Cause: untrusted data deserialized without validation. Fix: avoid deserializing untrusted data, integrity checks, type validation/whitelisting.
+**RCE via Deserialization**, Code execution through malicious serialized objects. Cause: untrusted data deserialized without validation. Fix: avoid deserializing untrusted data, integrity checks, type validation/whitelisting.
 
-**Data Tampering** — Unauthorized modification of serialized data. Fix: digital signatures, HMAC, encryption.
+**Data Tampering**, Unauthorized modification of serialized data. Fix: digital signatures, HMAC, encryption.
 
-**Object Injection** — Malicious object instantiation during deserialization. Fix: type restrictions, class whitelisting, secure libraries.
+**Object Injection**, Malicious object instantiation during deserialization. Fix: type restrictions, class whitelisting, secure libraries.
 
 ### API security
 
-**Insecure API Endpoints** — APIs without proper controls. Fix: OAuth/JWT, HTTPS, input validation, rate limiting.
+**Insecure API Endpoints**, APIs without proper controls. Fix: OAuth/JWT, HTTPS, input validation, rate limiting.
 
-**API Key Exposure** — Leaked credentials (hardcoded keys, insecure storage). Fix: secure storage, rotation, environment variables.
+**API Key Exposure**, Leaked credentials (hardcoded keys, insecure storage). Fix: secure storage, rotation, environment variables.
 
-**Lack of Rate Limiting** — No throttling on request frequency. Impact: DoS, abuse, resource exhaustion. Fix: per-user/IP limits, throttling, DDoS protection.
+**Lack of Rate Limiting**, No throttling on request frequency. Impact: DoS, abuse, resource exhaustion. Fix: per-user/IP limits, throttling, DDoS protection.
 
-**Inadequate Input Validation** — APIs accept unvalidated input. Fix: strict validation, parameterized queries, WAF.
+**Inadequate Input Validation**, APIs accept unvalidated input. Fix: strict validation, parameterized queries, WAF.
 
-**API Abuse** — Exploiting API functionality maliciously. Fix: strong auth, behavior/anomaly analysis.
+**API Abuse**, Exploiting API functionality maliciously. Fix: strong auth, behavior/anomaly analysis.
 
 ### Communication security
 
-**Man-in-the-Middle** — Interception of communication. Cause: unencrypted channels. Fix: TLS/SSL, certificate pinning, mutual auth.
+**Man-in-the-Middle**, Interception of communication. Cause: unencrypted channels. Fix: TLS/SSL, certificate pinning, mutual auth.
 
-**Weak Transport Layer Security** — Outdated protocols (SSLv2/3), weak ciphers. Fix: TLS 1.2+, strong cipher suites, HSTS, forward secrecy, certificate validation.
+**Weak Transport Layer Security**, Outdated protocols (SSLv2/3), weak ciphers. Fix: TLS 1.2+, strong cipher suites, HSTS, forward secrecy, certificate validation.
 
-**Insecure Protocols** — Unencrypted HTTP, Telnet, FTP. Fix: HTTPS, SSH, SFTP, VPN tunnels.
+**Insecure Protocols**, Unencrypted HTTP, Telnet, FTP. Fix: HTTPS, SSH, SFTP, VPN tunnels.
 
 ### Client-side
 
-**Insecure Cross-Origin Communication** — Relaxed CORS/SOP. Fix: strict CORS, CSRF tokens, origin validation.
+**Insecure Cross-Origin Communication**, Relaxed CORS/SOP. Fix: strict CORS, CSRF tokens, origin validation.
 
-**Browser Cache Poisoning** — Manipulation of cached content. Fix: Cache-Control headers, HTTPS, integrity checks.
+**Browser Cache Poisoning**, Manipulation of cached content. Fix: Cache-Control headers, HTTPS, integrity checks.
 
-**Clickjacking** — UI redress tricking users into clicking hidden elements. Fix: X-Frame-Options, CSP frame-ancestors, frame-busting.
+**Clickjacking**, UI redress tricking users into clicking hidden elements. Fix: X-Frame-Options, CSP frame-ancestors, frame-busting.
 
-**HTML5 API Issues** — Insecure use of WebSockets, Storage, Geolocation. Fix: secure API usage, input validation, sandboxing.
+**HTML5 API Issues**, Insecure use of WebSockets, Storage, Geolocation. Fix: secure API usage, input validation, sandboxing.
 
-**MIME Sniffing** — Content-type confusion. Fix: X-Content-Type-Options: nosniff.
+**MIME Sniffing**, Content-type confusion. Fix: X-Content-Type-Options: nosniff.
 
-**CSP Bypass** — Weak CSP config defeated. Fix: strict CSP, nonces.
+**CSP Bypass**, Weak CSP config defeated. Fix: strict CSP, nonces.
 
 ### Denial of service
 
-**DDoS** — Traffic flood from many sources. Fix: DDoS protection services, rate limiting, CDN.
+**DDoS**, Traffic flood from many sources. Fix: DDoS protection services, rate limiting, CDN.
 
-**Application-Layer DoS** — Targeting app logic to exhaust resources. Fix: rate limiting, caching, WAF, code optimization.
+**Application-Layer DoS**, Targeting app logic to exhaust resources. Fix: rate limiting, caching, WAF, code optimization.
 
-**Resource Exhaustion** — Depleting CPU/memory/disk/network. Fix: resource quotas, monitoring, load balancing.
+**Resource Exhaustion**, Depleting CPU/memory/disk/network. Fix: resource quotas, monitoring, load balancing.
 
-**Slowloris** — Partial HTTP requests hold connections open. Fix: connection timeouts, request limits, reverse proxy.
+**Slowloris**, Partial HTTP requests hold connections open. Fix: connection timeouts, request limits, reverse proxy.
 
 ### SSRF
 
-**Server-Side Request Forgery** — Server manipulated into requesting internal resources. Cause: unvalidated user-controlled URLs. Impact: internal network access, data theft, cloud metadata access. Fix: URL whitelisting, network segmentation, egress filtering.
+**Server-Side Request Forgery**, Server manipulated into requesting internal resources. Cause: unvalidated user-controlled URLs. Impact: internal network access, data theft, cloud metadata access. Fix: URL whitelisting, network segmentation, egress filtering.
 
-**Blind / Time-Based Blind SSRF** — No direct response; success inferred out-of-band or via timing. Fix: allowlists, WAF, network restrictions, request timeouts, anomaly detection.
+**Blind / Time-Based Blind SSRF**, No direct response; success inferred out-of-band or via timing. Fix: allowlists, WAF, network restrictions, request timeouts, anomaly detection.
 
 ### Other notable
 
@@ -190,7 +190,7 @@ Organized by category. Each entry: definition, root cause, impact, mitigation.
 
 ---
 
-## OWASP Top 10 (2025, draft — not final)
+## OWASP Top 10 (2025, draft, not final)
 
 > Note: the 2025 list is a release candidate; ordering and categories may still shift before release. The 2021 Top 10 remains the stable reference. Treat the table below as illustrative of the expected direction, not canonical.
 
@@ -242,10 +242,10 @@ Check for: catch-all handlers that swallow errors, missing error handling on sec
 
 ### Methodology
 
-1. **Reconnaissance** — Understand the target: tech stack, entry points, data flows.
-2. **Discovery** — Identify potential issues: config review, dependency analysis, code-pattern search.
-3. **Analysis** — Validate and prioritize: eliminate false positives, score risk, map attack chains.
-4. **Reporting** — Deliver actionable findings: reproduction steps, business impact, remediation.
+1. **Reconnaissance**, Understand the target: tech stack, entry points, data flows.
+2. **Discovery**, Identify potential issues: config review, dependency analysis, code-pattern search.
+3. **Analysis**, Validate and prioritize: eliminate false positives, score risk, map attack chains.
+4. **Reporting**, Deliver actionable findings: reproduction steps, business impact, remediation.
 
 Use SAST (Semgrep, CodeQL, SonarQube), DAST (OWASP ZAP, Burp Suite), dependency scanning (Snyk, OWASP Dependency-Check), and container/infra scanning. Automated scanners miss business-logic flaws; cover those with manual testing and abuse-case analysis.
 

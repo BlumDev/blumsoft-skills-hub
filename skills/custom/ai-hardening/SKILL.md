@@ -21,20 +21,20 @@ description: >-
 # AI / LLM Hardening
 
 Defensive review of AI/LLM/agent code against the attacks that are specific to
-putting a language model in the loop. This is hardening existing code — finding
-weaknesses so they can be closed — not building attacks.
+putting a language model in the loop. This is hardening existing code, finding
+weaknesses so they can be closed, not building attacks.
 
 Classic appsec (SQLi, authz, secrets in non-AI code) belongs to the **code-audit**
 skill's `security` dimension. This skill covers what that one explicitly does not:
-the LLM attack surface. The two are complementary — for an AI service you usually
+the LLM attack surface. The two are complementary, for an AI service you usually
 want both.
 
 ## The two-channel mental model
 
 Almost every LLM vulnerability is one confusion: **the model cannot reliably tell
-instructions from data.** Anything that lands in the context window — the user
+instructions from data.** Anything that lands in the context window, the user
 message, a retrieved document, a tool's return value, a web page the agent
-fetched, a filename — can carry instructions the model may follow. So the whole
+fetched, a filename, can carry instructions the model may follow. So the whole
 game is:
 
 1. **Treat every byte the model did not get from you as untrusted**, including the
@@ -51,7 +51,7 @@ it when you start the review.
 
 - **Report (default).** Identify weaknesses, explain the attack, propose the fix.
 - **Harden (with approval).** A hardening fix *intentionally* changes behavior on
-  the malicious path — it blocks an injection, rejects a tool call, truncates a
+  the malicious path, it blocks an injection, rejects a tool call, truncates a
   runaway loop. That is the point, but it is a semantic change: apply only with
   explicit approval, keep the legitimate path working, and verify with tests where
   they exist. If a guard might reject valid input (over-blocking), say so.
@@ -61,7 +61,7 @@ it when you start the review.
 1. **Map the AI surface.** Find where the code: calls an LLM; assembles prompts
    (system + user + retrieved + tool results); defines tools/functions the model
    can call; runs or consumes an MCP server; retrieves into the context (RAG);
-   acts on model output. List these — they are your trust boundaries.
+   acts on model output. List these, they are your trust boundaries.
 2. **Trace untrusted content into the prompt.** For each thing entering the context
    window, ask: is it attacker-influenceable (user input, a fetched page, a DB row,
    a tool result, a document)? If yes, it can carry injected instructions.
@@ -81,8 +81,7 @@ Rank by: can untrusted content reach the model (reachability) × what a successf
 injection can then do (agency/blast radius). An agent that takes web content and
 can call a shell tool with no confirmation is critical. A chatbot that only ever
 returns text to the same user who typed the input is low-risk for the same flaw.
-Do not flood the report with theoretical issues on paths an attacker cannot reach
-— mark uncertain reachability as "needs confirmation".
+Do not flood the report with theoretical issues on paths an attacker cannot reach. Mark uncertain reachability as "needs confirmation".
 
 ## Report output
 
@@ -96,15 +95,15 @@ Do not flood the report with theoretical issues on paths an attacker cannot reac
 
 ## Findings
 ### Critical / High
-- `file:line` — [<threat, e.g. indirect-prompt-injection>] <title>
+- `file:line`, [<threat, e.g. indirect-prompt-injection>] <title>
   Attack: <how untrusted content reaches the model / a sink, and what it achieves>.
   Blast radius: <what the model can do once injected>.
-  Fix: <defensive change — isolation, allowlist, output validation, confirmation>.
+  Fix: <defensive change, isolation, allowlist, output validation, confirmation>.
 ### Medium / Low
 - ...
 
 ## Suggested order of attack
-1. <reduce blast radius first — clamp agency — then close injection vectors>
+1. <reduce blast radius first, clamp agency, then close injection vectors>
 ```
 
 ## Boundaries
@@ -113,5 +112,5 @@ Do not flood the report with theoretical issues on paths an attacker cannot reac
   jailbreak payloads, or injection strings beyond the minimal proof needed to show
   a finding is real.
 - Model-behavior tuning (refusals, alignment, eval of answer quality) is out of
-  scope — this is about code-level attack surface, not prompt-engineering quality.
+  scope, this is about code-level attack surface, not prompt-engineering quality.
 - Non-AI appsec: auditing existing code → code-audit `security` dimension; writing/designing new secure code → the **security** skill.

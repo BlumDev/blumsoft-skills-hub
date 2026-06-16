@@ -25,7 +25,7 @@ Build LLM applications that ground responses in external knowledge via vector da
 
 ## Safety
 
-- Redact sensitive data and enforce access controls. For multi-tenant retrieval, filter the vector query by tenant/user at query time (metadata filter) so one tenant can never retrieve another's documents — treat this as a hard security control, not a convenience.
+- Redact sensitive data and enforce access controls. For multi-tenant retrieval, filter the vector query by tenant/user at query time (metadata filter) so one tenant can never retrieve another's documents, treat this as a hard security control, not a convenience.
 - Avoid exposing source documents in responses when restricted.
 - Retrieved content is untrusted: it can carry injected instructions (indirect prompt injection) and the index can be poisoned. For RAG access-control, retrieval poisoning, and embedding leakage, harden with the **ai-hardening** skill.
 
@@ -187,7 +187,7 @@ results = vectorstore.similarity_search(
 ```python
 results = vectorstore.max_marginal_relevance_search(
     "query", k=5,
-    fetch_k=20,        # fetch 20, return top 5 diverse
+    fetch_k=20,       # fetch 20, return top 5 diverse
     lambda_mult=0.5    # 0=max diversity, 1=max relevance
 )
 ```

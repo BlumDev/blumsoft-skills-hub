@@ -1,10 +1,10 @@
 # Dimension: security
 
 Find places where untrusted input reaches a sensitive operation. This is
-**defensive** review of existing code — spotting weaknesses so they can be closed,
+**defensive** review of existing code, spotting weaknesses so they can be closed,
 not building attacks.
 
-**A security fix usually changes behavior on malicious/invalid input — that is the
+**A security fix usually changes behavior on malicious/invalid input, that is the
 point, but it means these are not pure refactorings.** Report them by default;
 apply only with explicit approval; keep valid-input behavior identical. Flag, do
 not "fix and hope".
@@ -31,7 +31,7 @@ DB rows, LLM output, anything crossing a trust boundary) to where it is used:
   alternate path. Fix: enforce server-side, per request, closest to the resource.
 - **Secrets.** Hard-coded keys/passwords/tokens; secrets logged or in error
   messages; credentials in source/config committed to the repo. Fix: move to env/
-  secret store, reference by name, scrub from logs. (Report the leak — do not print
+  secret store, reference by name, scrub from logs. (Report the leak, do not print
   the secret value in the finding.)
 - **Crypto misuse.** Home-rolled crypto; weak/Broken primitives (MD5/SHA1 for
   passwords, ECB, static IVs); plaintext password storage; `==` comparison of
@@ -44,13 +44,13 @@ DB rows, LLM output, anything crossing a trust boundary) to where it is used:
   (zip-bomb, billion-laughs) → resource exhaustion. Fix: bound inputs.
 
 Why it matters: one reachable injection or missing authz check is worth more
-attention than any number of style issues — it is a breach, not a blemish.
+attention than any number of style issues, it is a breach, not a blemish.
 
 For each finding state: the **source** of untrusted input, the **sink** it reaches,
 the **impact** if exploited, and the concrete fix. Rank by reachability and blast
-radius. If you cannot confirm the input is actually attacker-controlled, say so —
+radius. If you cannot confirm the input is actually attacker-controlled, say so , 
 mark it "needs confirmation" rather than crying wolf.
 
 **Scope note:** if the code is AI/LLM/agent code, the LLM-specific attack surface
 (prompt injection, tool abuse, insecure model-output handling) is **not** covered
-here — point the user at the **ai-hardening** skill.
+here, point the user at the **ai-hardening** skill.

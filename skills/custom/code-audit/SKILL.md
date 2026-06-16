@@ -34,7 +34,7 @@ the user names, touched or not.
 ## Dimensions
 
 Each dimension has a focused rule set in a reference file. **Load only the
-reference(s) for the dimension(s) in play** — do not read all of them every time.
+reference(s) for the dimension(s) in play**, do not read all of them every time.
 
 | Dimension | Focus | Reference |
 |---|---|---|
@@ -57,7 +57,7 @@ Parse the invocation as `code-audit [target] [dimensions...] [--fix]`.
 - **Only audit the dimension(s) the user asked for.** If they say "check naming",
   do clean-code, not a full sweep. If they name several ("security and
   robustness"), do those.
-- **If no dimension is named and none is clearly implied, ask which** — offer the
+- **If no dimension is named and none is clearly implied, ask which**, offer the
   list above plus "all". Do not silently run everything; a six-dimension report on
   an unscoped request is noise the user did not ask for.
 - "audit everything" / "full review" / "all dimensions" → run all six and
@@ -75,7 +75,7 @@ thousand-line report.
   fix. Change nothing.
 - **Fix (`--fix`).** Apply fixes under the behavior contract below, then verify.
 
-## Step 0 — Scope and detect the stack
+## Step 0, Scope and detect the stack
 
 1. Resolve `target` to concrete files. Exclude what you must never touch:
    dependencies (`node_modules`, `.venv`, `vendor`), generated code, build output,
@@ -85,7 +85,7 @@ thousand-line report.
    the surrounding code. Read a couple of neighboring files first; do not impose a
    foreign style.
 
-## Step 1 — Establish a green baseline (required before any fix)
+## Step 1, Establish a green baseline (required before any fix)
 
 You cannot prove you preserved behavior without knowing the starting state.
 Before changing anything in `--fix` mode:
@@ -101,7 +101,7 @@ Before changing anything in `--fix` mode:
    baseline and claim behavior is preserved.
 
 In report mode you need not run anything, but still note whether a safety net
-exists — it changes how risky the suggested fixes are.
+exists, it changes how risky the suggested fixes are.
 
 ## Fix mode: the behavior contract
 
@@ -131,14 +131,14 @@ In every mode:
    each. If it goes red, revert that step and report it instead. Never batch ten
    refactorings and hope.
 3. **Stay in scope.** Touch only what a finding requires. Do not reformat untouched
-   lines, reorder imports, or "improve" adjacent code — that pollutes the diff and
+   lines, reorder imports, or "improve" adjacent code, that pollutes the diff and
    hides the real change. Match existing style.
 4. **Verify at the end** and report the result explicitly.
 5. **Summarize** each change as: what, why, "verified by <command>". Anything not
    safely fixable stays a reported suggestion.
 
 If preserving behavior and applying a fix ever conflict, **preserving behavior
-wins** — downgrade that item to a reported suggestion.
+wins**, downgrade that item to a reported suggestion.
 
 ## Prioritize, do not flood
 
@@ -166,7 +166,7 @@ that matter, training the reader to ignore the report.
 
 ## Findings
 ### High
-- `path/to/file.py:line` — [<dimension>] <short title>
+- `path/to/file.py:line`, [<dimension>] <short title>
   Problem: <what>. Why it matters: <impact>.
   Fix: <concrete change>. <If security/robustness: note it changes behavior on bad input.>
 ### Medium
@@ -183,10 +183,10 @@ Keep each finding tight enough to act on without a follow-up question.
 
 ## Boundaries
 
-- Not a bug hunt on the current diff — that is `/code-review`. If you spot a bug
+- Not a bug hunt on the current diff, that is `/code-review`. If you spot a bug
   while reading, mention it as an aside; do not pivot the whole audit to it.
 - Not architecture redesign. Renaming and splitting functions is in scope;
-  re-drawing module boundaries is a design conversation — raise it, do not
+  re-drawing module boundaries is a design conversation, raise it, do not
   silently undertake it.
-- Not LLM/agent attack hardening — that is the **ai-hardening** skill.
+- Not LLM/agent attack hardening, that is the **ai-hardening** skill.
 - For *writing* new secure code or designing secure systems (vs. auditing existing code), use the **security** skill.

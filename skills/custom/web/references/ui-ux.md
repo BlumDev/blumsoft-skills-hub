@@ -54,12 +54,12 @@ Establish a clear type scale (e.g. 12/14/16/20/24/32/48) and use weight and size
 
 Build pages around a single conversion goal. Common section order:
 
-1. **Hero** — headline, subhead, one primary CTA. Choose hero-centric (one big promise) or feature-forward depending on product complexity.
-2. **Social proof** — logos, ratings, or testimonials placed early to build trust.
-3. **Features / benefits** — bento grid or alternating rows; lead with benefits, not specs.
-4. **Testimonials / case studies** — concrete outcomes.
-5. **Pricing** — clear tiers, highlight the recommended plan.
-6. **Final CTA** — repeat the primary action.
+1. **Hero**, headline, subhead, one primary CTA. Choose hero-centric (one big promise) or feature-forward depending on product complexity.
+2. **Social proof**, logos, ratings, or testimonials placed early to build trust.
+3. **Features / benefits**, bento grid or alternating rows; lead with benefits, not specs.
+4. **Testimonials / case studies**, concrete outcomes.
+5. **Pricing**, clear tiers, highlight the recommended plan.
+6. **Final CTA**, repeat the primary action.
 
 Keep one primary CTA style throughout; secondary actions visually subordinate.
 
