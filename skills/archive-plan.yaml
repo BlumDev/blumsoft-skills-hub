@@ -48,6 +48,9 @@ skills:
   - name: bootstrap
     status: active-core
     target: project-bootstrap-core
+  - name: blumsoft-deploy
+    status: inactive
+    target: platform-devops
   - name: advanced-evaluation
     status: inactive
     target: data-ai-systems
