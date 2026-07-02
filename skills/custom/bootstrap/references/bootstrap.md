@@ -22,6 +22,12 @@ Turn an idea or an existing repo into a decision-complete plan plus the minimum 
 3. `DECISIONS.md` - short ADR-style list of choices with tradeoffs and rationale.
 4. An implementation plan: 3-6 milestones, each with a verification gate (commands + smoke tests).
 
+### New-repo conventions (this machine, D:\Repos)
+- Every new project starts versioned on day one: `git init -b main` + initial commit. No unversioned folders under `D:\Repos`.
+- Folder name: kebab-case, no spaces, no umlauts.
+- Minimum files: `README.md` (purpose + run commands), `.gitignore` (env files, node_modules/venv, build output), `CLAUDE.md` stub (~5 lines: pointer to global rules + repo-specific notes).
+- `AGENTS.md`, if the repo needs one: max ~80 lines (purpose, quality bar, non-negotiables, links). Details belong in `docs/`, not in AGENTS.md.
+
 ## Existing-repo takeover
 
 Goal: get an unfamiliar repo into a working, understood state and record what you learned. Work the checklist top to bottom; do not skip the run/test steps.
