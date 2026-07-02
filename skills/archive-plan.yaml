@@ -51,6 +51,9 @@ skills:
   - name: blumsoft-deploy
     status: inactive
     target: platform-devops
+  - name: human-voice
+    status: active-core
+    target: business-growth
   - name: advanced-evaluation
     status: inactive
     target: data-ai-systems
@@ -231,3 +234,6 @@ skills:
   - name: workflow-patterns
     status: inactive
     target: project-bootstrap-core
+  - name: brand-review
+    status: active-core
+    target: business-growth
