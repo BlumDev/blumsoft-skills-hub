@@ -68,6 +68,28 @@ Run:
 ./scripts/skills/validate.ps1
 ```
 
+### `validate-skills.ps1`
+
+Complements `validate.ps1`: instead of repo wiring, it checks the **content of
+every `SKILL.md`** on disk (custom, vendor, and archive). Per skill it validates:
+
+- YAML frontmatter is present and parseable
+- required fields `name` and `description` are present and non-empty
+- files referenced from the skill (e.g. `references/*.md`, in-skill markdown
+  links) actually exist
+- `name` matches the skill folder (warning)
+- encoding health: broken UTF-8, mojibake, and `ae`/`oe`/`ue` used instead of
+  umlauts (reported only, never changed)
+
+Errors exit with code `1`; warnings are listed but pass. Add `-Strict` to make
+warnings fail too. It only reports, it never rewrites a skill.
+
+Run:
+
+```powershell
+./scripts/skills/validate-skills.ps1
+```
+
 ### `sync.ps1`
 
 Resolves a profile or bundle selection and copies only those skills to the target locations for Codex, Cursor, Antigravity, or VS Code / Copilot.
