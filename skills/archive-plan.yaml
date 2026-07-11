@@ -54,6 +54,12 @@ skills:
   - name: website-audit
     status: active-core
     target: web-product
+  - name: gen-asset
+    status: inactive
+    target: web-product
+  - name: voice
+    status: inactive
+    target: project-bootstrap-core
   - name: advanced-evaluation
     status: inactive
     target: data-ai-systems

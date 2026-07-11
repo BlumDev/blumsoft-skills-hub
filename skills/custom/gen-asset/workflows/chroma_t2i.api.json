@@ -1,0 +1,58 @@
+{
+  "10": {
+    "class_type": "UnetLoaderGGUF",
+    "inputs": { "unet_name": "Chroma1-HD-Q8_0.gguf" },
+    "_meta": { "title": "CHECKPOINT" }
+  },
+  "11": {
+    "class_type": "CLIPLoader",
+    "inputs": { "clip_name": "t5xxl_fp8_e4m3fn.safetensors", "type": "chroma" },
+    "_meta": { "title": "CLIP" }
+  },
+  "12": {
+    "class_type": "VAELoader",
+    "inputs": { "vae_name": "ae.safetensors" },
+    "_meta": { "title": "VAE" }
+  },
+  "5": {
+    "class_type": "EmptySD3LatentImage",
+    "inputs": { "width": 1024, "height": 1024, "batch_size": 1 },
+    "_meta": { "title": "LATENT" }
+  },
+  "6": {
+    "class_type": "CLIPTextEncode",
+    "inputs": { "text": "placeholder", "clip": ["11", 0] },
+    "_meta": { "title": "POSITIVE_PROMPT" }
+  },
+  "14": {
+    "class_type": "CLIPTextEncode",
+    "inputs": { "text": "", "clip": ["11", 0] },
+    "_meta": { "title": "NEGATIVE_PROMPT" }
+  },
+  "13": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 0,
+      "steps": 26,
+      "cfg": 4.0,
+      "sampler_name": "euler",
+      "scheduler": "beta",
+      "denoise": 1.0,
+      "model": ["10", 0],
+      "positive": ["6", 0],
+      "negative": ["14", 0],
+      "latent_image": ["5", 0]
+    },
+    "_meta": { "title": "SAMPLER" }
+  },
+  "8": {
+    "class_type": "VAEDecode",
+    "inputs": { "samples": ["13", 0], "vae": ["12", 0] },
+    "_meta": { "title": "DECODE" }
+  },
+  "9": {
+    "class_type": "SaveImage",
+    "inputs": { "filename_prefix": "genasset", "images": ["8", 0] },
+    "_meta": { "title": "SAVE" }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "4": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": { "ckpt_name": "juggernautXL_v8Rundiffusion.safetensors" },
+    "_meta": { "title": "CHECKPOINT" }
+  },
+  "6": {
+    "class_type": "CLIPTextEncode",
+    "inputs": { "text": "placeholder", "clip": ["4", 1] },
+    "_meta": { "title": "POSITIVE_PROMPT" }
+  },
+  "7": {
+    "class_type": "CLIPTextEncode",
+    "inputs": { "text": "", "clip": ["4", 1] },
+    "_meta": { "title": "NEGATIVE_PROMPT" }
+  },
+  "5": {
+    "class_type": "EmptyLatentImage",
+    "inputs": { "width": 1216, "height": 832, "batch_size": 1 },
+    "_meta": { "title": "LATENT" }
+  },
+  "3": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 0,
+      "steps": 32,
+      "cfg": 6.0,
+      "sampler_name": "dpmpp_2m",
+      "scheduler": "karras",
+      "denoise": 1.0,
+      "model": ["4", 0],
+      "positive": ["6", 0],
+      "negative": ["7", 0],
+      "latent_image": ["5", 0]
+    },
+    "_meta": { "title": "SAMPLER" }
+  },
+  "10": {
+    "class_type": "LatentUpscaleBy",
+    "inputs": { "upscale_method": "nearest-exact", "scale_by": 1.5, "samples": ["3", 0] },
+    "_meta": { "title": "UPSCALE" }
+  },
+  "11": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 12345,
+      "steps": 20,
+      "cfg": 6.0,
+      "sampler_name": "dpmpp_2m",
+      "scheduler": "karras",
+      "denoise": 0.45,
+      "model": ["4", 0],
+      "positive": ["6", 0],
+      "negative": ["7", 0],
+      "latent_image": ["10", 0]
+    },
+    "_meta": { "title": "SAMPLER_HIRES" }
+  },
+  "8": {
+    "class_type": "VAEDecode",
+    "inputs": { "samples": ["11", 0], "vae": ["4", 2] },
+    "_meta": { "title": "DECODE" }
+  },
+  "9": {
+    "class_type": "SaveImage",
+    "inputs": { "filename_prefix": "genasset", "images": ["8", 0] },
+    "_meta": { "title": "SAVE" }
+  }
+}
