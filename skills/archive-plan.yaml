@@ -51,6 +51,9 @@ skills:
   - name: blumsoft-deploy
     status: inactive
     target: platform-devops
+  - name: website-audit
+    status: active-core
+    target: web-product
   - name: advanced-evaluation
     status: inactive
     target: data-ai-systems

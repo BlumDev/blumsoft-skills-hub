@@ -50,6 +50,9 @@
   - name: blumsoft-deploy
     source: custom
     path: skills/custom/blumsoft-deploy
+  - name: website-audit
+    source: custom
+    path: skills/custom/website-audit
   - name: advanced-evaluation
     source: vendor-guanyang
     path: skills/vendor/guanyang/advanced-evaluation
