@@ -52,4 +52,3 @@ Sektionen: `## Offen` | `## Erledigt` | `## Verworfen`.
 - Secrets/Tokens/`.env` nie im Klartext (auch nicht in Findings/Reviews); nur per Name referenzieren.
 
 Ablage-Standard: `ai-router/docs/repo-ablage-standard.md`.
-</content>
