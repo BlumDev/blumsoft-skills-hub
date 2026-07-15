@@ -6,6 +6,7 @@ fallback_skills:
 core_skills:
   - web
   - website-audit
+  - human-voice
 extended_skills:
 compose_with:
   - engineering-core

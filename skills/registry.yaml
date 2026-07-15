@@ -59,6 +59,9 @@
   - name: voice
     source: custom
     path: skills/custom/voice
+  - name: human-voice
+    source: custom
+    path: skills/custom/human-voice
   - name: advanced-evaluation
     source: vendor-guanyang
     path: skills/vendor/guanyang/advanced-evaluation
@@ -299,3 +302,7 @@
     source: vendor-sickn33
     path: skills/vendor/sickn33/workflow-patterns
     upstream_repo: sickn33/antigravity-awesome-skills
+  - name: brand-review
+    source: vendor-anthropic
+    path: skills/vendor/anthropic/brand-review
+    upstream_repo: anthropic-cowork/marketing

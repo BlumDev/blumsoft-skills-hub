@@ -5,6 +5,8 @@ recommended_start_skill: business
 fallback_skills:
 core_skills:
   - business
+  - human-voice
+  - brand-review
 extended_skills:
 compose_with:
   - engineering-core
