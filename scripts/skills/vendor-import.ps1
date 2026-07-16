@@ -9,7 +9,10 @@ $ErrorActionPreference = "Stop"
 
 $root = Get-SkillsRepoRoot
 $registry = Get-RegistryEntries -Root $root
-$installer = "C:\Users\Marcus\.codex\skills\.system\skill-installer\scripts\install-skill-from-github.py"
+$userHome = if (-not [string]::IsNullOrWhiteSpace($HOME)) { $HOME } else { $env:USERPROFILE }
+if ([string]::IsNullOrWhiteSpace($userHome)) { throw 'Home directory not found in $HOME or $env:USERPROFILE.' }
+$codexHome = if (-not [string]::IsNullOrWhiteSpace($env:CODEX_HOME)) { $env:CODEX_HOME } else { Join-Path $userHome '.codex' }
+$installer = Join-Path $codexHome 'skills/.system/skill-installer/scripts/install-skill-from-github.py'
 if (-not (Test-Path $installer)) { throw "Installer script not found: $installer" }
 
 function Install-RepoSkills {
