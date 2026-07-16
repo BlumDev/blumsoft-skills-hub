@@ -10,7 +10,6 @@ Aus Codex-Audit 2026-07-14 (`docs/reviews/2026-07-14-codex.md`), noch nicht vali
 - [ ] 20260714-bootstrap-splat-positional Bootstrap splattet Parameter positionell statt benannt, `-WorkspaceRoot`/Bundle-ID falsch gebunden, Kopie dann Abbruch #bug (codex-audit high)
 - [ ] 20260714-vendor-import-false-provenance vendor-import aktualisiert vorhandene Skills nicht, markiert sie aber mit HEAD, Provenienz falsch #bug (high)
 - [ ] 20260714-vendor-import-unlocked-commit vendor-import ignoriert Lock-Commit und prüft py-Exitcode nicht, unreviewter HEAD/Teilimport möglich #bug (high)
-- [ ] 20260714-sync-remove-path-traversal sync übergibt ungeprüfte Namen an rekursives Remove-Item, `..`/Wildcards ermöglichen Traversal/Massenlöschung #bug (high)
 - [ ] 20260714-sync-default-targets-ignored sync liest `default_targets` nicht, Standardlauf synct zusätzlich nach Claude und ins aktuelle Repo #bug (med)
 - [ ] 20260714-bootstrap-dryrun-writes Bootstrap `-DryRun` schützt Template-Kopien nicht, Probelauf verändert das Zielprojekt #bug (med)
 - [ ] 20260714-sync-delete-before-copy sync löscht Ziel vor erfolgreicher Kopie, Abbruch hinterlässt fehlenden/teilweisen Skill #bug (med)
@@ -24,7 +23,6 @@ Aus Codex-Audit 2026-07-14 (`docs/reviews/2026-07-14-codex.md`), noch nicht vali
 - [ ] 20260714-archive-report-unknown-profile archive-report behandelt unbekanntes Profil still als leer, plausibel falscher Archivbericht #bug (low)
 - [ ] 20260714-idea-bootstrap-splatting-test Bootstrap-Parameter per Hashtable-Splatting übergeben und Multi-Bundle-Test ergänzen #idea (quick-win)
 - [ ] 20260714-idea-shouldprocess-dryrun `SupportsShouldProcess`/`-WhatIf` und vollständig nebenwirkungsfreien Dry-Run einführen #idea (quick-win)
-- [ ] 20260714-idea-id-allowlist-literalpath Skill-/Bundle-IDs per Allowlist validieren und ausschließlich `-LiteralPath` verwenden #idea (quick-win)
 - [ ] 20260714-idea-validate-profile-fields Profilfelder inkl. `default_targets` und unbekannte Properties im Validator prüfen #idea (quick-win)
 - [ ] 20260714-idea-atomic-sync Sync über temporäre Verzeichnisse, Validierung und atomaren Austausch implementieren #idea (mittel)
 - [ ] 20260714-idea-pester-edge-tests Pester-Tests für Argumentbindung, Native-Command-Fehler, Portkonflikte, doppelte IDs und böse Pfade #idea (mittel)
@@ -44,7 +42,8 @@ Aus Code-Audit 2026-06-24 (`reviews/2026-06-24-code-audit.md`), recovered, noch 
 
 ## Erledigt
 
-(noch keine)
+- [x] 20260714-sync-remove-path-traversal sync übergibt ungeprüfte Namen an rekursives Remove-Item, `..`/Wildcards ermöglichen Traversal/Massenlöschung (5e3d7f2, 2026-07-16)
+- [x] 20260714-idea-id-allowlist-literalpath Skill-/Bundle-IDs per Allowlist validieren, `-LiteralPath` in den ID-getriebenen Pfadoperationen (5e3d7f2, 2026-07-16)
 
 ## Verworfen
 
