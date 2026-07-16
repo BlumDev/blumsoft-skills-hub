@@ -4,6 +4,10 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "lib.ps1")
 
+if ($RefreshLock) {
+  throw '-RefreshLock ist ohne echten Re-Import deaktiviert; vendor-lock.json bleibt unverändert.'
+}
+
 $root = Get-SkillsRepoRoot
 $lockPath = Join-Path $root 'vendor-lock.json'
 if (-not (Test-Path $lockPath)) { throw "vendor-lock.json not found at $lockPath" }
@@ -18,13 +22,6 @@ foreach ($repo in $repos) {
   $locked = $repoProp.Value.commit
   $isOutdated = $locked -ne $current
   $changes.Add([ordered]@{repo=$repo; locked_commit=$locked; latest_commit=$current; outdated=$isOutdated}) | Out-Null
-  if ($RefreshLock) { $repoProp.Value.commit = $current }
-}
-
-if ($RefreshLock) {
-  $lock.generated_at = (Get-Date).ToUniversalTime().ToString('o')
-  $lock | ConvertTo-Json -Depth 8 | Set-Content -Path $lockPath -Encoding UTF8
-  Write-Host 'vendor-lock.json refreshed.'
 }
 
 Write-Host 'Vendor status:'
