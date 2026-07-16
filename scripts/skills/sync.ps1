@@ -61,12 +61,12 @@ foreach ($target in $Targets) {
   foreach ($skill in $skills) {
     if (-not $registry.ContainsKey($skill)) { throw "Skill not found in registry: $skill" }
     $srcPath = Join-Path $root $registry[$skill].path
-    if (-not (Test-Path $srcPath)) { throw "Source path not found for skill '$skill': $srcPath" }
-    $dstPath = Join-Path $targetDir $skill
-    if (Test-Path $dstPath) { Remove-Item -Path $dstPath -Recurse -Force }
-    Copy-Item -Path $srcPath -Destination $dstPath -Recurse -Force
+    if (-not (Test-Path -LiteralPath $srcPath)) { throw "Source path not found for skill '$skill': $srcPath" }
+    $dstPath = Resolve-SkillTargetPath -BaseDir $targetDir -SkillId $skill
+    if (Test-Path -LiteralPath $dstPath) { Remove-Item -LiteralPath $dstPath -Recurse -Force }
+    Copy-Item -LiteralPath $srcPath -Destination $dstPath -Recurse -Force
     $dstSkillMd = Join-Path $dstPath 'SKILL.md'
-    if (Test-Path $dstSkillMd) {
+    if (Test-Path -LiteralPath $dstSkillMd) {
       $changedEncoding = Convert-FileToUtf8NoBom -Path $dstSkillMd
       if ($changedEncoding) { Write-Host "  [FIX] normalized SKILL.md encoding (UTF-8 no BOM)" -ForegroundColor DarkYellow }
     }
