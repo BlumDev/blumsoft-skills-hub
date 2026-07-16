@@ -12,12 +12,11 @@ $root = Get-SkillsRepoRoot
 $archiveEntries = Get-ArchivePlanEntries -Root $root
 $bundles = Get-AllBundles -Root $root
 
-$profileSkills = @()
 $profilePath = Join-Path $root "profiles/$Profile.json"
-if (Test-Path $profilePath) {
-  $profileConfig = Get-Content -Path $profilePath -Raw | ConvertFrom-Json
-  $profileSkills = Resolve-BundleSkills -BundleIds @($profileConfig.bundle_ids) -Bundles $bundles -IncludeExtended:$false
-}
+if (-not (Test-Path $profilePath)) { throw "Profile not found: $profilePath" }
+
+$profileConfig = Get-Content -Path $profilePath -Raw | ConvertFrom-Json
+$profileSkills = Resolve-BundleSkills -BundleIds @($profileConfig.bundle_ids) -Bundles $bundles -IncludeExtended:$false
 
 $rows = foreach ($entry in $archiveEntries) {
   [PSCustomObject]@{
