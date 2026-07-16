@@ -193,20 +193,58 @@ foreach ($bundleId in ($bundles.Keys | Sort-Object)) {
   }
 }
 
+$allowedProfileProperties = @('profile_name', 'include_extended', 'bundle_ids', 'default_targets')
+$allowedProfileTargets = @('claude', 'codex', 'cursor', 'antigravity', 'vscode-copilot', 'vscode-chatgpt')
 $profilePaths = Get-ChildItem -Path (Join-Path $root 'profiles') -Filter '*.json' -File
 foreach ($profileFile in $profilePaths) {
   $profile = Get-Content -Path $profileFile.FullName -Raw | ConvertFrom-Json
-  $bundleIds = @($profile.bundle_ids)
+  $propertyNames = @($profile.PSObject.Properties.Name)
+  $profileName = if ($propertyNames -contains 'profile_name' -and -not [string]::IsNullOrWhiteSpace($profile.profile_name)) { $profile.profile_name } else { $profileFile.BaseName }
+
+  foreach ($propertyName in $propertyNames) {
+    if ($allowedProfileProperties -notcontains $propertyName) {
+      $errors.Add("Profil '$profileName' enthält unbekannte Property '$propertyName'") | Out-Null
+    }
+  }
+
+  $bundleIds = @()
+  if ($propertyNames -notcontains 'bundle_ids' -or $profile.bundle_ids -isnot [System.Array]) {
+    $errors.Add("Profil '$profileName': bundle_ids muss ein nicht leeres Array aus Strings sein") | Out-Null
+  } else {
+    $bundleIds = @($profile.bundle_ids)
+    $invalidBundleIds = @($bundleIds | Where-Object { $_ -isnot [string] -or [string]::IsNullOrWhiteSpace($_) })
+    if ($bundleIds.Count -eq 0 -or $invalidBundleIds.Count -gt 0) {
+      $errors.Add("Profil '$profileName': bundle_ids muss ein nicht leeres Array aus Strings sein") | Out-Null
+      $bundleIds = @()
+    }
+  }
+
+  if ($propertyNames -notcontains 'include_extended' -or $profile.include_extended -isnot [bool]) {
+    $errors.Add("Profil '$profileName': include_extended muss ein Boolean sein") | Out-Null
+  }
+
+  if ($propertyNames -notcontains 'default_targets' -or $profile.default_targets -isnot [System.Array] -or @($profile.default_targets).Count -eq 0) {
+    $errors.Add("Profil '$profileName': default_targets muss ein nicht leeres Array sein") | Out-Null
+  } else {
+    foreach ($target in @($profile.default_targets)) {
+      if ($target -isnot [string] -or [string]::IsNullOrWhiteSpace($target)) {
+        $errors.Add("Profil '$profileName': default_targets darf nur nicht leere Strings enthalten") | Out-Null
+      } elseif ($allowedProfileTargets -notcontains $target) {
+        $errors.Add("Profil '$profileName' enthält unbekanntes Standardziel '$target'") | Out-Null
+      }
+    }
+  }
+
   if ($bundleIds.Count -eq 0) { continue }
   try {
     $resolved = Resolve-BundleSkills -BundleIds $bundleIds -Bundles $bundles -IncludeExtended:$false
     foreach ($skill in $resolved) {
       if ($archiveMap.ContainsKey($skill) -and $archiveMap[$skill].status -eq 'archive-reference') {
-        $errors.Add("Profile '$($profile.profile_name)' includes archive-reference skill in core resolution: $skill") | Out-Null
+        $errors.Add("Profile '$profileName' includes archive-reference skill in core resolution: $skill") | Out-Null
       }
     }
   } catch {
-    $errors.Add("Profile '$($profile.profile_name)' failed to resolve: $($_.Exception.Message)") | Out-Null
+    $errors.Add("Profile '$profileName' failed to resolve: $($_.Exception.Message)") | Out-Null
   }
 }
 
