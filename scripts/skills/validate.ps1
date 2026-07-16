@@ -2,6 +2,38 @@
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "lib.ps1")
 
+function Get-FrontmatterDescription {
+  param([Parameter(Mandatory=$true)][string]$Text)
+
+  $lines = $Text -split "`r?`n"
+  if ($lines.Count -eq 0 -or $lines[0].Trim() -ne '---') { return $null }
+
+  $frontmatterEnd = -1
+  for ($i = 1; $i -lt $lines.Count; $i++) {
+    if ($lines[$i].Trim() -eq '---') { $frontmatterEnd = $i; break }
+  }
+  if ($frontmatterEnd -lt 0) { return $null }
+
+  for ($i = 1; $i -lt $frontmatterEnd; $i++) {
+    $match = [regex]::Match($lines[$i], '^description:\s*(.*)$')
+    if (-not $match.Success) { continue }
+    $value = $match.Groups[1].Value.Trim()
+    if ($value -match '^[>|][+-]?$') {
+      $blockLines = @()
+      for ($j = $i + 1; $j -lt $frontmatterEnd; $j++) {
+        $blockLine = $lines[$j]
+        if ([string]::IsNullOrWhiteSpace($blockLine)) { continue }
+        if ($blockLine -match '^\s+\S') { $blockLines += $blockLine.Trim(); continue }
+        break
+      }
+      return ($blockLines -join ' ').Trim()
+    }
+    return (Normalize-YamlValue -Value $value)
+  }
+
+  return $null
+}
+
 $root = Get-SkillsRepoRoot
 $errors = New-Object System.Collections.Generic.List[string]
 $bundles = Get-AllBundles -Root $root
@@ -91,6 +123,19 @@ foreach ($entry in $registryEntries) {
   }
   if (Test-FileHasUtf8Bom -Path $skillMd) {
     $errors.Add("SKILL.md must be UTF-8 without BOM for '$($entry.name)': $($entry.path)/SKILL.md") | Out-Null
+  }
+}
+
+# Enforce the canonical frontmatter requirement for maintainer-owned skills.
+$customSkillsDir = Join-Path $root 'skills/custom'
+if (Test-Path $customSkillsDir) {
+  foreach ($skillMd in Get-ChildItem -Path $customSkillsDir -Recurse -Filter 'SKILL.md' -File) {
+    $text = [System.IO.File]::ReadAllText($skillMd.FullName)
+    $description = Get-FrontmatterDescription -Text $text
+    if ([string]::IsNullOrWhiteSpace($description)) {
+      $relativePath = $skillMd.FullName.Substring($root.Length).TrimStart('\', '/').Replace('\', '/')
+      $errors.Add("Eigene SKILL.md benötigt YAML-Frontmatter mit einer nicht leeren description: $relativePath") | Out-Null
+    }
   }
 }
 
