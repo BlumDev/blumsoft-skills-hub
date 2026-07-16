@@ -64,12 +64,19 @@ foreach ($target in $Targets) {
     $srcPath = Join-Path $root $registry[$skill].path
     if (-not (Test-Path $srcPath)) { throw "Source path not found for skill '$skill': $srcPath" }
     $dstPath = Join-Path $targetDir $skill
-    if (Test-Path $dstPath) { Remove-Item -Path $dstPath -Recurse -Force }
-    Copy-Item -Path $srcPath -Destination $dstPath -Recurse -Force
-    $dstSkillMd = Join-Path $dstPath 'SKILL.md'
-    if (Test-Path $dstSkillMd) {
-      $changedEncoding = Convert-FileToUtf8NoBom -Path $dstSkillMd
-      if ($changedEncoding) { Write-Host "  [FIX] normalized SKILL.md encoding (UTF-8 no BOM)" -ForegroundColor DarkYellow }
+    $stagingPath = Join-Path $targetDir (".{0}.sync-{1}" -f $skill, [guid]::NewGuid().ToString('N'))
+    try {
+      Copy-Item -Path $srcPath -Destination $stagingPath -Recurse -Force
+      $stagedSkillMd = Join-Path $stagingPath 'SKILL.md'
+      if (Test-Path $stagedSkillMd) {
+        $changedEncoding = Convert-FileToUtf8NoBom -Path $stagedSkillMd
+        if ($changedEncoding) { Write-Host "  [FIX] normalized SKILL.md encoding (UTF-8 no BOM)" -ForegroundColor DarkYellow }
+      }
+
+      if (Test-Path $dstPath) { Remove-Item -Path $dstPath -Recurse -Force }
+      Move-Item -LiteralPath $stagingPath -Destination $dstPath
+    } finally {
+      if (Test-Path -LiteralPath $stagingPath) { Remove-Item -LiteralPath $stagingPath -Recurse -Force }
     }
     Write-Host "  [OK] $skill"
   }
