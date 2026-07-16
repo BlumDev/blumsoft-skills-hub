@@ -35,21 +35,21 @@ Copy-IfMissing -SrcRel 'FEATURES/feature-template.md' -DstRel 'FEATURES/feature-
 Copy-IfMissing -SrcRel '.github/copilot-instructions.md' -DstRel '.github/copilot-instructions.md'
 
 # Project-local skills for Copilot/VS Code live under the target repo in `./.github/skills`.
-$syncArgs = @(
-  '-WorkspaceRoot', $targetRoot,
-  '-Targets', 'vscode-copilot',
-  '-IncludeExtended:' + [string]([bool]$IncludeExtended),
-  '-DryRun:' + [string]([bool]$DryRun)
-)
+$syncArgs = @{
+  WorkspaceRoot = $targetRoot
+  Targets = @('vscode-copilot')
+  IncludeExtended = $IncludeExtended
+  DryRun = $DryRun
+}
 
 if ($BundleId -and $BundleId.Count -gt 0) {
-  $syncArgs += @('-BundleId', ($BundleId -join ','))
+  $syncArgs.BundleId = $BundleId
 } else {
-  $syncArgs += @('-Profile', $Profile)
+  $syncArgs.Profile = $Profile
 }
 
 if ($SyncAntigravityWorkflows) {
-  $syncArgs += @('-SyncAntigravityWorkflows')
+  $syncArgs.SyncAntigravityWorkflows = $true
 }
 
 & (Join-Path $skillsScripts 'sync.ps1') @syncArgs
