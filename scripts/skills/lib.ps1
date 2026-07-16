@@ -39,6 +39,12 @@ function Convert-FileToUtf8NoBom {
   $true
 }
 
+function Write-FileUtf8NoBom {
+  param([Parameter(Mandatory=$true)][string]$Path,[Parameter(Mandatory=$true)][string]$Content)
+  $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+  [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
+}
+
 function Get-BundleFromFile {
   param([Parameter(Mandatory=$true)][string]$Path)
 

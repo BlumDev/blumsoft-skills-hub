@@ -68,7 +68,7 @@ foreach ($entry in $registry | Where-Object { $_['source'] -like 'vendor-*' }) {
   if (-not (Test-Path $skillPath)) { continue }
   $repo = $entry['upstream_repo']
   $commit = $repoCommits[$repo]
-  Set-Content -Path (Join-Path $skillPath 'UPSTREAM.md') -Encoding UTF8 -Value @(
+  $upstream = @(
     "source_repo: $repo",
     "source_path: skills/$($entry['name'])",
     "source_commit: $commit",
@@ -76,10 +76,12 @@ foreach ($entry in $registry | Where-Object { $_['source'] -like 'vendor-*' }) {
     "local_changes: none",
     "license: MIT"
   )
+  Write-FileUtf8NoBom -Path (Join-Path $skillPath 'UPSTREAM.md') -Content (($upstream -join [Environment]::NewLine) + [Environment]::NewLine)
   $skillProp = $lock.skills.PSObject.Properties[$entry['name']]
   if ($skillProp) { $skillProp.Value.commit = $commit }
 }
 
 $lock.generated_at = (Get-Date).ToUniversalTime().ToString('o')
-$lock | ConvertTo-Json -Depth 8 | Set-Content -Path $lockPath -Encoding UTF8
+$lockJson = $lock | ConvertTo-Json -Depth 8
+Write-FileUtf8NoBom -Path $lockPath -Content ($lockJson + [Environment]::NewLine)
 Write-Host 'Vendor import complete.'
