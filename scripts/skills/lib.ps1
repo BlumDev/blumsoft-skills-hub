@@ -84,6 +84,7 @@ function Get-AllBundles {
     if ($file.Name -eq "index.yaml" -or $file.Name -eq "schema.yaml") { continue }
     $bundle = Get-BundleFromFile -Path $file.FullName
     if ([string]::IsNullOrWhiteSpace($bundle.id)) { throw "Bundle file has no id: $($file.FullName)" }
+    if ($map.ContainsKey($bundle.id)) { throw "Duplicate bundle id: $($bundle.id)" }
     $map[$bundle.id] = $bundle
   }
   $map
