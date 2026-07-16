@@ -22,6 +22,10 @@ function Copy-IfMissing {
   $dst = Join-Path $targetRoot $DstRel
   if (-not (Test-Path $src)) { throw "Template not found: $src" }
   if (Test-Path $dst) { return }
+  if ($DryRun) {
+    Write-Host "  [DRY] Würde kopieren: $src -> $dst"
+    return
+  }
   New-Item -ItemType Directory -Path (Split-Path -Parent $dst) -Force | Out-Null
   Copy-Item -Path $src -Destination $dst -Force
 }
