@@ -9,6 +9,16 @@ $ErrorActionPreference = "Stop"
 
 $root = Get-SkillsRepoRoot
 $registry = Get-RegistryEntries -Root $root
+$lockPath = Join-Path $root 'vendor-lock.json'
+if (-not (Test-Path $lockPath)) { throw "vendor-lock.json not found at $lockPath" }
+$lock = Get-Content -Path $lockPath -Raw | ConvertFrom-Json
+$repoCommits = @{}
+foreach($repo in @('guanyang/antigravity-skills','sickn33/antigravity-awesome-skills')){
+  $repoProp = $lock.repos.PSObject.Properties[$repo]
+  if (-not $repoProp -or [string]::IsNullOrWhiteSpace($repoProp.Value.commit)) { throw "Kein gesperrter Commit für Repository: $repo" }
+  $repoCommits[$repo] = $repoProp.Value.commit
+}
+
 $userHome = if (-not [string]::IsNullOrWhiteSpace($HOME)) { $HOME } else { $env:USERPROFILE }
 if ([string]::IsNullOrWhiteSpace($userHome)) { throw 'Home directory not found in $HOME or $env:USERPROFILE.' }
 $codexHome = if (-not [string]::IsNullOrWhiteSpace($env:CODEX_HOME)) { $env:CODEX_HOME } else { Join-Path $userHome '.codex' }
@@ -16,7 +26,12 @@ $installer = Join-Path $codexHome 'skills/.system/skill-installer/scripts/instal
 if (-not (Test-Path $installer)) { throw "Installer script not found: $installer" }
 
 function Install-RepoSkills {
-  param([Parameter(Mandatory=$true)][string]$Repo,[Parameter(Mandatory=$true)][string]$SourceType,[Parameter(Mandatory=$true)][string]$DestPath)
+  param(
+    [Parameter(Mandatory=$true)][string]$Repo,
+    [Parameter(Mandatory=$true)][string]$SourceType,
+    [Parameter(Mandatory=$true)][string]$DestPath,
+    [Parameter(Mandatory=$true)][string]$Commit
+  )
 
   $destRelative = [System.IO.Path]::GetRelativePath($root, $DestPath).Replace('\','/')
   $allSkills = @(
@@ -34,20 +49,12 @@ function Install-RepoSkills {
   $paths = @(); foreach($s in $skills){ $paths += "skills/$s" }
   New-Item -ItemType Directory -Path $DestPath -Force | Out-Null
   Write-Host "Installing $($skills.Count) skills from $Repo to $DestPath"
-  & py -3 $installer --repo $Repo --dest $DestPath --path $paths
+  & py -3 $installer --repo $Repo --ref $Commit --dest $DestPath --path $paths
+  if ($LASTEXITCODE -ne 0) { throw "Skill-Installer für Repository '$Repo' mit Exitcode $LASTEXITCODE fehlgeschlagen." }
 }
 
-if (-not $SkipGuanyang) { Install-RepoSkills -Repo 'guanyang/antigravity-skills' -SourceType 'vendor-guanyang' -DestPath (Join-Path $root 'skills/vendor/guanyang') }
-if (-not $SkipSickn33) { Install-RepoSkills -Repo 'sickn33/antigravity-awesome-skills' -SourceType 'vendor-sickn33' -DestPath (Join-Path $root 'skills/vendor/sickn33') }
-
-$lockPath = Join-Path $root 'vendor-lock.json'
-$lock = Get-Content -Path $lockPath -Raw | ConvertFrom-Json
-$repoCommits = @{}
-foreach($repo in @('guanyang/antigravity-skills','sickn33/antigravity-awesome-skills')){
-  $repoCommits[$repo]=Get-RepoHeadCommit -Repo $repo
-  $repoProp = $lock.repos.PSObject.Properties[$repo]
-  if($repoProp){ $repoProp.Value.commit = $repoCommits[$repo] }
-}
+if (-not $SkipGuanyang) { Install-RepoSkills -Repo 'guanyang/antigravity-skills' -SourceType 'vendor-guanyang' -DestPath (Join-Path $root 'skills/vendor/guanyang') -Commit $repoCommits['guanyang/antigravity-skills'] }
+if (-not $SkipSickn33) { Install-RepoSkills -Repo 'sickn33/antigravity-awesome-skills' -SourceType 'vendor-sickn33' -DestPath (Join-Path $root 'skills/vendor/sickn33') -Commit $repoCommits['sickn33/antigravity-awesome-skills'] }
 
 foreach ($entry in $registry | Where-Object { $_['source'] -like 'vendor-*' }) {
   $skillPath = Join-Path $root $entry['path']
