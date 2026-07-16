@@ -104,6 +104,16 @@ if (Test-Path $githubSkillsDir) {
   }
 }
 
+$customWithServerPath = Join-Path $root 'skills/custom/web/scripts/with_server.py'
+$vendorWithServerPath = Join-Path $root 'skills/vendor/guanyang/webapp-testing/scripts/with_server.py'
+if (-not (Test-Path -LiteralPath $customWithServerPath)) {
+  $errors.Add("Custom with_server.py fehlt: $customWithServerPath") | Out-Null
+} elseif (-not (Test-Path -LiteralPath $vendorWithServerPath)) {
+  $errors.Add("Vendor with_server.py fehlt: $vendorWithServerPath") | Out-Null
+} elseif ((Get-FileHash -LiteralPath $customWithServerPath -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $vendorWithServerPath -Algorithm SHA256).Hash) {
+  $errors.Add('Custom- und Vendor-Kopie von with_server.py müssen byte-identisch bleiben') | Out-Null
+}
+
 foreach ($bundleId in ($bundles.Keys | Sort-Object)) {
   $bundle = $bundles[$bundleId]
   foreach ($dep in $bundle.compose_with) { if (-not $bundles.ContainsKey($dep)) { $errors.Add("Bundle '$bundleId' references missing compose_with bundle '$dep'") | Out-Null } }
