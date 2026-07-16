@@ -8,17 +8,13 @@ IDs `YYYYMMDD-slug`, nie renumbern. Ideen = offene Einträge mit `#idea`.
 Aus Codex-Audit 2026-07-14 (`docs/reviews/2026-07-14-codex.md`), noch nicht validiert:
 
 - [ ] 20260714-sync-remove-path-traversal sync übergibt ungeprüfte Namen an rekursives Remove-Item, `..`/Wildcards ermöglichen Traversal/Massenlöschung #bug (high)
-- [ ] 20260714-idea-bootstrap-splatting-test Bootstrap-Parameter per Hashtable-Splatting übergeben und Multi-Bundle-Test ergänzen #idea (quick-win)
-- [ ] 20260714-idea-shouldprocess-dryrun `SupportsShouldProcess`/`-WhatIf` und vollständig nebenwirkungsfreien Dry-Run einführen #idea (quick-win)
 - [ ] 20260714-idea-id-allowlist-literalpath Skill-/Bundle-IDs per Allowlist validieren und ausschließlich `-LiteralPath` verwenden #idea (quick-win)
 - [ ] 20260714-idea-atomic-sync Sync über temporäre Verzeichnisse, Validierung und atomaren Austausch implementieren #idea (mittel)
-- [ ] 20260714-idea-pester-edge-tests Pester-Tests für Argumentbindung, Native-Command-Fehler, Portkonflikte, doppelte IDs und böse Pfade #idea (mittel)
 - [ ] 20260714-idea-real-yaml-parser Regex-YAML-Parser durch echten Parser plus Schema-Validierung ersetzen #idea (mittel)
 - [ ] 20260714-idea-transactional-vendor-import Vendor-Import als transaktionale, commit-genaue Pipeline mit Staging, Inhalts-Hashes und atomarem Lock-Update #idea (gross)
 
 Aus Code-Audit 2026-06-24 (`reviews/2026-06-24-code-audit.md`), recovered, noch nicht validiert:
 
-- [ ] 20260624-no-ci-validate-gate Kein CI-Gate, validate.ps1 läuft nur manuell, GitHub-Actions-Workflow ergänzen der bei PR validate.ps1 ausführt #idea (Quelle: reviews/2026-06-24-code-audit.md)
 - [ ] 20260624-legacy-wrapper-bundles-sunset 8 Legacy-Wrapper-Bundles (leere core_skills, delegieren nur via compose_with) verursachen dauerhaften Pflegeaufwand, Sunset-Plan sobald keine externen Referenzen mehr auf die alten IDs zeigen #idea (Quelle: reviews/2026-06-24-code-audit.md)
 - [ ] 20260624-vendor-notebooklm-robustness Geerbte Vendor-Robustheitsmängel in notebooklm-Skripten (bare except fängt KeyboardInterrupt/SystemExit, unvollständiges Playwright-Cleanup), geerbt (MIT), nicht selbst fixen, ggf. Upstream-Issue/PR #bug (Quelle: reviews/2026-06-24-code-audit.md)
 
@@ -46,6 +42,13 @@ Codex-Work-Orders Welle B, Chunks 1-4 (`ai-router/logs/tmp/wo-codex-skillshub-1.
 - [x] 20260624-withserver-custom-shell-true with_server.py (custom) startete den Server via subprocess Popen shell=True mit ungeprüftem --server-Kommando (Command-Injection-Muster) (a487e5f, 2026-07-16)
 - [x] 20260624-setcontent-utf8-bom Set-Content -Encoding UTF8 schreibt ein BOM und verletzt die No-BOM-Policy; vendor-import.ps1 (UPSTREAM.md, vendor-lock.json) auf UTF8Encoding(false)-Helfer umgestellt, der Schreibpfad in update-vendor.ps1 entfiel bereits durch die unlocked-commit-Korrektur (09b0643, 2026-07-16)
 - [x] 20260624-skillmd-frontmatter-schema Kein durchgesetztes SKILL.md-Frontmatter-Schema, validate.ps1 prüft nur Existenz/BOM statt Frontmatter-Struktur, mindestens für skills/custom nicht-leere description erzwungen (61012ec, 2026-07-16)
+
+Codex-Work-Orders Welle B, Chunk 5 (`ai-router/logs/tmp/wo-codex-skillshub-5.out.md`), 2026-07-16:
+
+- [x] 20260624-no-ci-validate-gate Kein CI-Gate, validate.ps1 lief nur manuell, GitHub-Actions-Workflow validiert jetzt bei jedem Pull Request auf windows-latest (2793ea5, 2026-07-16)
+- [x] 20260714-idea-shouldprocess-dryrun `SupportsShouldProcess`/`-WhatIf` ersetzt die Ad-hoc-DryRun-Zweige in bootstrap-project.ps1 und sync.ps1, Staging-Kopieransatz aus 2692b22 bleibt erhalten (ab07328, 2026-07-16)
+- [x] 20260714-idea-bootstrap-splatting-test Pester-Regressionstest für Bootstrap-Parameter-Splatting (mehrere `-BundleId`, benannte Sync-Parameter) ergänzt (88cca11, 2026-07-16)
+- [x] 20260714-idea-pester-edge-tests Pester-Edge-Case-Suite für vendor-import-Exitcode, doppelte Bundle-IDs, unsichere Skill-Namen und with_server-Portkonflikt ergänzt (68a5fe0, 2026-07-16)
 
 ## Verworfen
 
