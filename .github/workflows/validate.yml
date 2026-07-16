@@ -1,0 +1,17 @@
+name: Skills Hub validieren
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Repository validieren
+        shell: pwsh
+        run: ./scripts/skills/validate.ps1
