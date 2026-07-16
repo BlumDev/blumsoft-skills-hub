@@ -17,11 +17,13 @@ Single server:
 python scripts/with_server.py --server "npm run dev" --port 5173 -- python your_automation.py
 ```
 
+Use `--server` for normal commands, which run as an argument list without a shell. Use `--shell-server` only for trusted, operator-authored commands that require shell syntax such as `cd` or `&&`.
+
 Multiple servers (e.g. backend + frontend):
 ```bash
 python scripts/with_server.py \
-  --server "cd backend && python server.py" --port 3000 \
-  --server "cd frontend && npm run dev" --port 5173 \
+  --shell-server "cd backend && python server.py" --port 3000 \
+  --shell-server "cd frontend && npm run dev" --port 5173 \
   -- python your_automation.py
 ```
 
