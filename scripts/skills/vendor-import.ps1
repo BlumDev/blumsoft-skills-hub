@@ -25,6 +25,12 @@ $codexHome = if (-not [string]::IsNullOrWhiteSpace($env:CODEX_HOME)) { $env:CODE
 $installer = Join-Path $codexHome 'skills/.system/skill-installer/scripts/install-skill-from-github.py'
 if (-not (Test-Path $installer)) { throw "Installer script not found: $installer" }
 
+$preExistingSkills = @{}
+foreach ($entry in $registry | Where-Object { $_['source'] -like 'vendor-*' }) {
+  $skillPath = Join-Path $root $entry['path']
+  if (Test-Path $skillPath) { $preExistingSkills[$entry['name']] = $true }
+}
+
 function Install-RepoSkills {
   param(
     [Parameter(Mandatory=$true)][string]$Repo,
@@ -57,6 +63,7 @@ if (-not $SkipGuanyang) { Install-RepoSkills -Repo 'guanyang/antigravity-skills'
 if (-not $SkipSickn33) { Install-RepoSkills -Repo 'sickn33/antigravity-awesome-skills' -SourceType 'vendor-sickn33' -DestPath (Join-Path $root 'skills/vendor/sickn33') -Commit $repoCommits['sickn33/antigravity-awesome-skills'] }
 
 foreach ($entry in $registry | Where-Object { $_['source'] -like 'vendor-*' }) {
+  if ($preExistingSkills.ContainsKey($entry['name'])) { continue }
   $skillPath = Join-Path $root $entry['path']
   if (-not (Test-Path $skillPath)) { continue }
   $repo = $entry['upstream_repo']
