@@ -1,3 +1,4 @@
+[CmdletBinding(SupportsShouldProcess)]
 param(
   [Parameter(Mandatory = $true)][string]$ProjectRoot,
   [string]$Profile = 'project-starter',
@@ -9,6 +10,7 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+if ($DryRun) { $WhatIfPreference = $true }
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $skillsScripts = Join-Path $repoRoot 'scripts/skills'
@@ -17,15 +19,14 @@ $targetRoot = (Resolve-Path $ProjectRoot).Path
 $templateRoot = Join-Path $repoRoot 'templates/project'
 
 function Copy-IfMissing {
+  [CmdletBinding(SupportsShouldProcess)]
   param([Parameter(Mandatory = $true)][string]$SrcRel, [Parameter(Mandatory = $true)][string]$DstRel)
   $src = Join-Path $templateRoot $SrcRel
   $dst = Join-Path $targetRoot $DstRel
   if (-not (Test-Path $src)) { throw "Template not found: $src" }
   if (Test-Path $dst) { return }
-  if ($DryRun) {
-    Write-Host "  [DRY] Würde kopieren: $src -> $dst"
-    return
-  }
+  if (-not $PSCmdlet.ShouldProcess($dst, "Vorlage '$SrcRel' kopieren")) { return }
+
   New-Item -ItemType Directory -Path (Split-Path -Parent $dst) -Force | Out-Null
   Copy-Item -Path $src -Destination $dst -Force
 }
@@ -44,6 +45,7 @@ $syncArgs = @{
   Targets = @('vscode-copilot')
   IncludeExtended = $IncludeExtended
   DryRun = $DryRun
+  WhatIf = [bool]$WhatIfPreference
 }
 
 if ($BundleId -and $BundleId.Count -gt 0) {

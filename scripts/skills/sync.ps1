@@ -1,4 +1,5 @@
-﻿param(
+﻿[CmdletBinding(SupportsShouldProcess)]
+param(
   [string]$Profile = 'freelancer-fullstack',
   [string[]]$BundleId,
   [switch]$IncludeExtended,
@@ -11,6 +12,7 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "lib.ps1")
+if ($DryRun) { $WhatIfPreference = $true }
 
 $root = Get-SkillsRepoRoot
 $resolvedWorkspaceRoot = if ([string]::IsNullOrWhiteSpace($WorkspaceRoot)) { $root } else { $WorkspaceRoot }
@@ -50,20 +52,14 @@ foreach ($target in $Targets) {
   $targetDir = $targetMap[$target]
   Write-Host "`nTarget: $target -> $targetDir"
 
-  if ($DryRun) {
-    foreach ($skill in $skills) {
-      if (-not $registry.ContainsKey($skill)) { Write-Host "  [MISS] $skill not in registry" -ForegroundColor Yellow; continue }
-      Write-Host "  [DRY] $skill <= $($registry[$skill].path)"
-    }
-    continue
-  }
-
-  New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
   foreach ($skill in $skills) {
     if (-not $registry.ContainsKey($skill)) { throw "Skill not found in registry: $skill" }
     $srcPath = Join-Path $root $registry[$skill].path
     if (-not (Test-Path $srcPath)) { throw "Source path not found for skill '$skill': $srcPath" }
     $dstPath = Join-Path $targetDir $skill
+    if (-not $PSCmdlet.ShouldProcess($dstPath, "Skill '$skill' aus '$srcPath' synchronisieren")) { continue }
+
+    New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
     $stagingPath = Join-Path $targetDir (".{0}.sync-{1}" -f $skill, [guid]::NewGuid().ToString('N'))
     try {
       Copy-Item -Path $srcPath -Destination $stagingPath -Recurse -Force
@@ -89,9 +85,8 @@ if ($SyncAntigravityWorkflows) {
 
   $workflowFiles = Get-ChildItem -Path $workflowSrcDir -Filter '*.md' -File
   Write-Host "`nAntigravity workflows -> $workflowDstDir"
-  if ($DryRun) {
-    foreach ($wf in $workflowFiles) { Write-Host "  [DRY] $($wf.Name)" }
-  } else {
+
+  if ($PSCmdlet.ShouldProcess($workflowDstDir, 'Antigravity-Workflows synchronisieren')) {
     New-Item -ItemType Directory -Path $workflowDstDir -Force | Out-Null
     foreach ($wf in $workflowFiles) {
       Copy-Item -Path $wf.FullName -Destination (Join-Path $workflowDstDir $wf.Name) -Force
