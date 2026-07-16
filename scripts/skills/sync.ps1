@@ -24,6 +24,7 @@ if ($BundleId -and $BundleId.Count -gt 0) {
 } elseif (Test-Path $profilePath) {
   $p = Get-Content -Path $profilePath -Raw | ConvertFrom-Json
   $bundleIds = @($p.bundle_ids)
+  if (-not $PSBoundParameters.ContainsKey('Targets')) { $Targets = @($p.default_targets) }
   if (-not $IncludeExtended) { $IncludeExtended = [bool]$p.include_extended }
 } else {
   throw "Profile not found and no -BundleId provided: $profilePath"
