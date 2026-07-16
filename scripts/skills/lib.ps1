@@ -190,8 +190,16 @@ function Get-ArchivePlanEntries {
 
 function Get-RepoHeadCommit {
   param([Parameter(Mandatory=$true)][string]$Repo)
-  $repoInfo = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo"
-  $branch = $repoInfo.default_branch
-  $commit = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/commits/$branch"
-  $commit.sha
+  $headers = @{ Accept = "application/vnd.github+json" }
+  if (-not [string]::IsNullOrWhiteSpace($env:GITHUB_TOKEN)) {
+    $headers.Authorization = "Bearer $($env:GITHUB_TOKEN)"
+  }
+  try {
+    $repoInfo = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo" -Headers $headers -TimeoutSec 30
+    $branch = $repoInfo.default_branch
+    $commit = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/commits/$branch" -Headers $headers -TimeoutSec 30
+    $commit.sha
+  } catch {
+    throw "GitHub-API-Abfrage für Repository '$Repo' fehlgeschlagen. Netzwerkzugriff, Rate-Limit und GITHUB_TOKEN prüfen."
+  }
 }
