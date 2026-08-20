@@ -5,20 +5,22 @@ IDs `YYYYMMDD-slug`, nie renumbern. Ideen = offene Einträge mit `#idea`.
 
 ## Offen
 
-Aus Codex-Audit 2026-07-14 (`docs/reviews/2026-07-14-codex.md`), noch nicht validiert:
+Aus Codex-Audit 2026-07-14 (`docs/reviews/2026-07-14-codex.md`), am 2026-08-18 gegen den Code validiert (`docs/reviews/2026-08-18-reconcile.md`), alle fünf bestätigt offen:
 
-- [ ] 20260714-sync-remove-path-traversal sync übergibt ungeprüfte Namen an rekursives Remove-Item, `..`/Wildcards ermöglichen Traversal/Massenlöschung #bug (high)
-- [ ] 20260714-idea-id-allowlist-literalpath Skill-/Bundle-IDs per Allowlist validieren und ausschließlich `-LiteralPath` verwenden #idea (quick-win)
-- [ ] 20260714-idea-atomic-sync Sync über temporäre Verzeichnisse, Validierung und atomaren Austausch implementieren #idea (mittel)
-- [ ] 20260714-idea-real-yaml-parser Regex-YAML-Parser durch echten Parser plus Schema-Validierung ersetzen #idea (mittel)
-- [ ] 20260714-idea-transactional-vendor-import Vendor-Import als transaktionale, commit-genaue Pipeline mit Staging, Inhalts-Hashes und atomarem Lock-Update #idea (gross)
+- [ ] 20260714-sync-remove-path-traversal sync übergibt ungeprüfte Namen an rekursives Remove-Item, `..`/Wildcards ermöglichen Traversal/Massenlöschung #bug (high, bestätigt 2026-08-18: `scripts/skills/sync.ps1:72` löscht weiter mit `-Path`, keine Namensprüfung; die Staging-Kopie fängt die beiden Testfälle nur wegen der Windows-Pfadregeln ab)
+- [ ] 20260714-idea-id-allowlist-literalpath Skill-/Bundle-IDs per Allowlist validieren und ausschließlich `-LiteralPath` verwenden #idea (quick-win, bestätigt 2026-08-18: keine Allowlist im Repo, `-Path` weiter in `sync.ps1:58,62,65,72`, `vendor-import.ps1:52,56`, `bootstrap-project.ps1:30-31`)
+- [ ] 20260714-idea-atomic-sync Sync über temporäre Verzeichnisse, Validierung und atomaren Austausch implementieren #idea (mittel, Rest bestätigt 2026-08-18: Staging existiert seit 2692b22 in `sync.ps1:63-76`, offen bleiben der echte atomare Austausch statt Löschen plus Verschieben in `sync.ps1:72-73` und die Validierung des Stagings)
+- [ ] 20260714-idea-real-yaml-parser Regex-YAML-Parser durch echten Parser plus Schema-Validierung ersetzen #idea (mittel, bestätigt 2026-08-18: `lib.ps1:60-80`, `lib.ps1:140-154`, `lib.ps1:177-191` parsen weiter zeilenweise)
+- [ ] 20260714-idea-transactional-vendor-import Vendor-Import als transaktionale, commit-genaue Pipeline mit Staging, Inhalts-Hashes und atomarem Lock-Update #idea (gross, Rest bestätigt 2026-08-18: gesperrter Commit und Exitcode-Prüfung sind da, es fehlen Staging, Inhalts-Hashes und der atomare Lock-Schreibvorgang in `vendor-import.ps1:56-58,84-86`)
 
-Aus Code-Audit 2026-06-24 (`reviews/2026-06-24-code-audit.md`), recovered, noch nicht validiert:
+Aus Code-Audit 2026-06-24 (`reviews/2026-06-24-code-audit.md`), recovered, am 2026-08-18 gegen den Code validiert (`docs/reviews/2026-08-18-reconcile.md`), beide bestätigt offen:
 
-- [ ] 20260624-legacy-wrapper-bundles-sunset 8 Legacy-Wrapper-Bundles (leere core_skills, delegieren nur via compose_with) verursachen dauerhaften Pflegeaufwand, Sunset-Plan sobald keine externen Referenzen mehr auf die alten IDs zeigen #idea (Quelle: reviews/2026-06-24-code-audit.md)
-- [ ] 20260624-vendor-notebooklm-robustness Geerbte Vendor-Robustheitsmängel in notebooklm-Skripten (bare except fängt KeyboardInterrupt/SystemExit, unvollständiges Playwright-Cleanup), geerbt (MIT), nicht selbst fixen, ggf. Upstream-Issue/PR #bug (Quelle: reviews/2026-06-24-code-audit.md)
+- [ ] 20260624-legacy-wrapper-bundles-sunset 8 Legacy-Wrapper-Bundles (`bundles/index.yaml:23-46`) delegieren via compose_with und verursachen Pflegeaufwand, Sunset-Plan sobald keine externen Referenzen mehr auf die alten IDs zeigen #idea (Quelle: reviews/2026-06-24-code-audit.md, korrigiert 2026-08-18: die core_skills sind nicht mehr leer, jeder Wrapper trägt genau einen Skill; die Sunset-Bedingung ist nicht erfüllt, `templates/project/.github/copilot-instructions.md:7,10` verweist noch auf `essentials` und `project-kickoff`)
+- [ ] 20260624-vendor-notebooklm-robustness Geerbte Vendor-Robustheitsmängel in notebooklm-Skripten (bare except fängt KeyboardInterrupt/SystemExit, unvollständiges Playwright-Cleanup), geerbt (MIT), nicht selbst fixen, ggf. Upstream-Issue/PR #bug (Quelle: reviews/2026-06-24-code-audit.md, bestätigt 2026-08-18: `ask_question.py:96,132,153,180,186`, `browser_utils.py:75`, Cleanup nur der Page in `browser_session.py:77-80,224-231`)
 
 ## Erledigt
+
+Der Reconcile vom 2026-08-18 hat diese Einträge stichprobenartig gegen den Code gehalten, alle geprüften sind tatsächlich umgesetzt (Belege in `docs/reviews/2026-08-18-reconcile.md`).
 
 Codex-Work-Orders Welle B, Chunks 1-4 (`ai-router/logs/tmp/wo-codex-skillshub-1..4.out.md`), 2026-07-16:
 
