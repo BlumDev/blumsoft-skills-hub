@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-label="Bundle-first Ablauf des Skills Hub von der Pflege bis zum Sync">
+  <defs>
+    <marker id="hub-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M1 1l8 4-8 4z" fill="#2563eb"/>
+    </marker>
+    <marker id="hub-arrow-back" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M1 1l8 4-8 4z" fill="#1d4ed8"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="600" fill="#f7f8fa"/>
+
+  <g font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+    <text x="40" y="31" fill="#6b7280" font-size="13" font-weight="700" letter-spacing="1">SOURCE OF TRUTH</text>
+    <text x="420" y="31" fill="#6b7280" font-size="13" font-weight="700" letter-spacing="1">SCRIPTS/SKILLS/</text>
+    <text x="760" y="31" fill="#6b7280" font-size="13" font-weight="700" letter-spacing="1">SYNC-ZIELE</text>
+
+    <rect x="40" y="45" width="300" height="500" rx="10" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
+
+    <rect x="65" y="75" width="250" height="140" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+    <rect x="65" y="75" width="250" height="38" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+    <path d="M65 103v10h250v-10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+    <text x="85" y="101" fill="#1d4ed8" font-size="18" font-weight="700">skills/</text>
+    <text x="85" y="137" fill="#1f2933" font-size="14">Kanonische Skill-Ordner</text>
+    <text x="85" y="164" fill="#1f2933" font-size="14">Registry</text>
+    <text x="85" y="191" fill="#1f2933" font-size="14">Archive-Plan</text>
+
+    <rect x="65" y="260" width="115" height="105" rx="10" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
+    <text x="82" y="292" fill="#1f2933" font-size="16" font-weight="700">bundles/</text>
+    <text x="82" y="319" fill="#6b7280" font-size="13">kuratierte</text>
+    <text x="82" y="339" fill="#6b7280" font-size="13">Gruppen</text>
+
+    <rect x="200" y="260" width="115" height="135" rx="10" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
+    <text x="217" y="292" fill="#1f2933" font-size="16" font-weight="700">profiles/</text>
+    <text x="217" y="319" fill="#6b7280" font-size="13">Vorauswahl</text>
+    <text x="217" y="346" fill="#6b7280" font-size="12">Standard:</text>
+    <text x="217" y="368" fill="#1d4ed8" font-size="11" font-weight="700">freelancer-fullstack</text>
+
+    <path d="M150 215v25h-27v20" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#hub-arrow)"/>
+    <path d="M230 215v25h28v20" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#hub-arrow)"/>
+
+    <rect x="420" y="65" width="220" height="70" rx="10" fill="#ffffff" stroke="#16a34a" stroke-width="2"/>
+    <circle cx="451" cy="100" r="13" fill="#ffffff" stroke="#16a34a" stroke-width="2"/>
+    <path d="M444 100l5 5 9-11" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="478" y="106" fill="#1f2933" font-size="18" font-weight="700">validate.ps1</text>
+
+    <rect x="420" y="170" width="220" height="70" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+    <circle cx="451" cy="205" r="13" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+    <path d="M443 199h5l4 6h7M443 211h5l4-6" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="478" y="211" fill="#1f2933" font-size="18" font-weight="700">resolve.ps1</text>
+
+    <rect x="420" y="275" width="220" height="70" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+    <circle cx="451" cy="310" r="13" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+    <path d="M443 307a8 8 0 0 1 13-4l2 2M459 313a8 8 0 0 1-13 4l-2-2" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/>
+    <text x="478" y="316" fill="#1f2933" font-size="18" font-weight="700">sync.ps1</text>
+
+    <rect x="420" y="410" width="220" height="70" rx="10" fill="#ffffff" stroke="#1d4ed8" stroke-width="2"/>
+    <circle cx="451" cy="445" r="13" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+    <path d="M451 437v15M445 446l6 6 6-6" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="478" y="451" fill="#1f2933" font-size="18" font-weight="700">import.ps1</text>
+
+    <rect x="420" y="515" width="220" height="55" rx="10" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
+    <text x="447" y="549" fill="#1f2933" font-size="16" font-weight="700">archive-report.ps1</text>
+
+    <path d="M315 112h105" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#hub-arrow)"/>
+    <path d="M530 135v35" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#hub-arrow)"/>
+    <path d="M180 312h185v-107h55" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#hub-arrow)"/>
+    <path d="M315 327h75V220h30" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#hub-arrow)"/>
+    <path d="M530 240v35" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#hub-arrow)"/>
+    <path d="M315 188h82v354h23" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#hub-arrow)"/>
+
+    <rect x="745" y="45" width="415" height="500" rx="10" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
+
+    <rect x="790" y="70" width="325" height="48" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+    <text x="812" y="101" fill="#1f2933" font-size="16" font-weight="700">claude</text>
+
+    <rect x="790" y="132" width="325" height="48" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+    <text x="812" y="163" fill="#1f2933" font-size="16" font-weight="700">codex</text>
+
+    <rect x="790" y="194" width="325" height="48" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+    <text x="812" y="225" fill="#1f2933" font-size="16" font-weight="700">cursor</text>
+
+    <rect x="790" y="256" width="325" height="48" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+    <text x="812" y="287" fill="#1f2933" font-size="16" font-weight="700">antigravity</text>
+
+    <rect x="790" y="318" width="325" height="48" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+    <text x="812" y="349" fill="#1f2933" font-size="16" font-weight="700">vscode-copilot</text>
+
+    <text x="790" y="396" fill="#6b7280" font-size="12">Global: claude, codex, cursor, antigravity</text>
+    <text x="790" y="416" fill="#6b7280" font-size="12">Projektlokal: vscode-copilot</text>
+
+    <rect x="790" y="449" width="325" height="58" rx="10" fill="#f7f8fa" stroke="#e5e7eb" stroke-width="2" stroke-dasharray="7 6"/>
+    <text x="812" y="473" fill="#6b7280" font-size="12" font-weight="700">OPTIONAL</text>
+    <text x="812" y="495" fill="#1f2933" font-size="15">antigravity workflows</text>
+
+    <path d="M640 310h100" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+    <path d="M740 94v248" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+    <path d="M740 94h50M740 156h50M740 218h50M740 280h50M740 342h50" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#hub-arrow)"/>
+    <path d="M1115 280h20v198h-20" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#hub-arrow)"/>
+
+    <path d="M790 445H640" fill="none" stroke="#1d4ed8" stroke-width="2.5" marker-end="url(#hub-arrow-back)"/>
+    <text x="665" y="433" fill="#1d4ed8" font-size="12" font-weight="700">von den Zielen</text>
+
+    <path d="M420 445h-48V145h-57" fill="none" stroke="#1d4ed8" stroke-width="2.5" marker-end="url(#hub-arrow-back)"/>
+    <rect x="346" y="356" width="52" height="64" rx="10" fill="#f7f8fa" stroke="#e5e7eb"/>
+    <text x="362" y="374" fill="#1d4ed8" font-size="12" font-weight="700" transform="rotate(90 362 374)">Rückweg</text>
+  </g>
+</svg>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" role="img" aria-label="Noch kein Bundle ausgewählt">
+  <g fill="#ffffff" stroke="#cbd5e1" stroke-width="3">
+    <rect x="35" y="49" width="82" height="68" rx="12"/>
+    <rect x="35" y="143" width="82" height="68" rx="12"/>
+    <rect x="139" y="96" width="82" height="68" rx="12"/>
+  </g>
+  <g fill="none" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round">
+    <path d="M55 73h42"/>
+    <path d="M55 86h26"/>
+    <path d="M55 167h42"/>
+    <path d="M55 180h26"/>
+    <path d="M159 120h42"/>
+    <path d="M159 133h26"/>
+  </g>
+  <rect x="249" y="51" width="116" height="158" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="3" stroke-dasharray="10 9"/>
+  <path d="M278 130h58M307 101v58" fill="none" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+  <g transform="rotate(-7 245 174)">
+    <rect x="194" y="135" width="102" height="78" rx="13" fill="#eff6ff" stroke="#2563eb" stroke-width="3"/>
+    <path d="M217 160h54M217 176h34" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <g fill="#e5e7eb">
+    <circle cx="23" cy="28" r="3"/>
+    <circle cx="146" cy="35" r="4"/>
+    <circle cx="233" cy="27" r="3"/>
+    <circle cx="379" cy="31" r="4"/>
+    <circle cx="374" cy="228" r="3"/>
+    <circle cx="151" cy="229" r="4"/>
+    <circle cx="24" cy="235" r="3"/>
+  </g>
+</svg>
