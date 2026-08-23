@@ -1,3 +1,10 @@
+---
+status: wartung
+track: infra
+next_step: "Skills bei Bedarf pflegen, optional eine CI-Validierung ergänzen"
+updated: 2026-08-23
+---
+
 # Backlog
 
 Einzige Workflow-Wahrheit dieses Repos. Format/Regeln: siehe `../AGENTS.md`.
