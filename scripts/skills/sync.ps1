@@ -55,21 +55,21 @@ foreach ($target in $Targets) {
   foreach ($skill in $skills) {
     if (-not $registry.ContainsKey($skill)) { throw "Skill not found in registry: $skill" }
     $srcPath = Join-Path $root $registry[$skill].path
-    if (-not (Test-Path $srcPath)) { throw "Source path not found for skill '$skill': $srcPath" }
-    $dstPath = Join-Path $targetDir $skill
+    if (-not (Test-Path -LiteralPath $srcPath)) { throw "Source path not found for skill '$skill': $srcPath" }
+    $dstPath = Resolve-SkillTargetPath -BaseDir $targetDir -SkillId $skill
     if (-not $PSCmdlet.ShouldProcess($dstPath, "Skill '$skill' aus '$srcPath' synchronisieren")) { continue }
 
     New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
     $stagingPath = Join-Path $targetDir (".{0}.sync-{1}" -f $skill, [guid]::NewGuid().ToString('N'))
     try {
-      Copy-Item -Path $srcPath -Destination $stagingPath -Recurse -Force
+      Copy-Item -LiteralPath $srcPath -Destination $stagingPath -Recurse -Force
       $stagedSkillMd = Join-Path $stagingPath 'SKILL.md'
-      if (Test-Path $stagedSkillMd) {
+      if (Test-Path -LiteralPath $stagedSkillMd) {
         $changedEncoding = Convert-FileToUtf8NoBom -Path $stagedSkillMd
         if ($changedEncoding) { Write-Host "  [FIX] normalized SKILL.md encoding (UTF-8 no BOM)" -ForegroundColor DarkYellow }
       }
 
-      if (Test-Path $dstPath) { Remove-Item -Path $dstPath -Recurse -Force }
+      if (Test-Path -LiteralPath $dstPath) { Remove-Item -LiteralPath $dstPath -Recurse -Force }
       Move-Item -LiteralPath $stagingPath -Destination $dstPath
     } finally {
       if (Test-Path -LiteralPath $stagingPath) { Remove-Item -LiteralPath $stagingPath -Recurse -Force }

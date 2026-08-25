@@ -6,6 +6,54 @@ function Get-SkillsRepoRoot {
   (Resolve-Path (Join-Path $StartPath "..\..")).Path
 }
 
+# Skill and bundle ids become path segments during sync, so they are restricted to
+# lowercase letters, digits and hyphens. That excludes path separators, '..', drive
+# letters, alternate data streams and wildcards structurally, instead of blacklisting
+# them one by one.
+# -cmatch, not -match: PowerShell matches case-insensitively by default, so [a-z] alone
+# would accept 'EVIL'. \z, not $: in .NET '$' also matches before a trailing newline.
+function Test-SkillId {
+  param([Parameter(Mandatory=$true)][AllowEmptyString()][AllowNull()][string]$Id)
+  if ([string]::IsNullOrEmpty($Id)) { return $false }
+  $Id -cmatch '^[a-z0-9][a-z0-9-]*\z'
+}
+
+function Assert-SkillId {
+  param(
+    [Parameter(Mandatory=$true)][AllowEmptyString()][AllowNull()][string]$Id,
+    [string]$Context = "id"
+  )
+  if (-not (Test-SkillId -Id $Id)) {
+    throw "Invalid $Context '$Id': only lowercase letters, digits and hyphens are allowed (no path separators, no '..', no drive letters, no wildcards)."
+  }
+  $Id
+}
+
+# Resolves <BaseDir>/<SkillId> and proves the result really is below BaseDir before a
+# caller deletes or overwrites it. Uses GetFullPath rather than Resolve-Path because on a
+# first sync the target legitimately does not exist yet.
+function Resolve-SkillTargetPath {
+  param(
+    [Parameter(Mandatory=$true)][string]$BaseDir,
+    [Parameter(Mandatory=$true)][AllowEmptyString()][AllowNull()][string]$SkillId
+  )
+
+  Assert-SkillId -Id $SkillId -Context "skill id" | Out-Null
+
+  $sep = [System.IO.Path]::DirectorySeparatorChar
+  $baseFull = [System.IO.Path]::GetFullPath($BaseDir)
+  $basePrefix = $baseFull.TrimEnd($sep) + $sep
+  $candidate = [System.IO.Path]::GetFullPath((Join-Path $baseFull $SkillId))
+
+  # Compare against the separator-terminated base: a plain prefix check would also accept
+  # a sibling directory like '<base>-evil'.
+  if (-not $candidate.StartsWith($basePrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+    throw "Refusing to touch a path outside the skills target directory: '$candidate' is not below '$baseFull'."
+  }
+
+  $candidate
+}
+
 function Normalize-YamlValue {
   param([string]$Value)
   $v = $Value.Trim()
@@ -74,7 +122,9 @@ function Get-BundleFromFile {
     }
 
     if ($trim -match '^- (.+)$' -and $activeList) {
-      $bundle[$activeList] += (Normalize-YamlValue -Value $matches[1])
+      $item = Normalize-YamlValue -Value $matches[1]
+      Assert-SkillId -Id $item -Context "$activeList entry in $Path" | Out-Null
+      $bundle[$activeList] += $item
       continue
     }
   }
@@ -90,6 +140,7 @@ function Get-AllBundles {
     if ($file.Name -eq "index.yaml" -or $file.Name -eq "schema.yaml") { continue }
     $bundle = Get-BundleFromFile -Path $file.FullName
     if ([string]::IsNullOrWhiteSpace($bundle.id)) { throw "Bundle file has no id: $($file.FullName)" }
+    Assert-SkillId -Id $bundle.id -Context "bundle id in $($file.FullName)" | Out-Null
     if ($map.ContainsKey($bundle.id)) { throw "Duplicate bundle id: $($bundle.id)" }
     $map[$bundle.id] = $bundle
   }
@@ -143,7 +194,9 @@ function Get-RegistryEntries {
 
     if ($trim -match '^- name:\s*(.+)$') {
       if ($current) { $entries.Add($current) | Out-Null }
-      $current = [ordered]@{name=(Normalize-YamlValue -Value $matches[1]); source=""; path=""; upstream_repo=""}
+      $name = Normalize-YamlValue -Value $matches[1]
+      Assert-SkillId -Id $name -Context "skill name in $path" | Out-Null
+      $current = [ordered]@{name=$name; source=""; path=""; upstream_repo=""}
       continue
     }
 

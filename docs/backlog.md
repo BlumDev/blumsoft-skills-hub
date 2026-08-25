@@ -18,8 +18,6 @@ IDs `YYYYMMDD-slug`, nie renumbern. Ideen = offene Einträge mit `#idea`.
 
 Aus Codex-Audit 2026-07-14 (`docs/reviews/2026-07-14-codex.md`), noch nicht validiert:
 
-- [ ] 20260714-sync-remove-path-traversal sync übergibt ungeprüfte Namen an rekursives Remove-Item, `..`/Wildcards ermöglichen Traversal/Massenlöschung #bug (high)
-- [ ] 20260714-idea-id-allowlist-literalpath Skill-/Bundle-IDs per Allowlist validieren und ausschließlich `-LiteralPath` verwenden #idea (quick-win)
 - [ ] 20260714-idea-atomic-sync Sync über temporäre Verzeichnisse, Validierung und atomaren Austausch implementieren #idea (mittel)
 - [ ] 20260714-idea-real-yaml-parser Regex-YAML-Parser durch echten Parser plus Schema-Validierung ersetzen #idea (mittel)
 - [ ] 20260714-idea-transactional-vendor-import Vendor-Import als transaktionale, commit-genaue Pipeline mit Staging, Inhalts-Hashes und atomarem Lock-Update #idea (gross)
@@ -60,6 +58,11 @@ Codex-Work-Orders Welle B, Chunk 5 (`ai-router/logs/tmp/wo-codex-skillshub-5.out
 - [x] 20260714-idea-shouldprocess-dryrun `SupportsShouldProcess`/`-WhatIf` ersetzt die Ad-hoc-DryRun-Zweige in bootstrap-project.ps1 und sync.ps1, Staging-Kopieransatz aus 2692b22 bleibt erhalten (ab07328, 2026-07-16)
 - [x] 20260714-idea-bootstrap-splatting-test Pester-Regressionstest für Bootstrap-Parameter-Splatting (mehrere `-BundleId`, benannte Sync-Parameter) ergänzt (88cca11, 2026-07-16)
 - [x] 20260714-idea-pester-edge-tests Pester-Edge-Case-Suite für vendor-import-Exitcode, doppelte Bundle-IDs, unsichere Skill-Namen und with_server-Portkonflikt ergänzt (68a5fe0, 2026-07-16)
+
+Security-Session Careful-Fixes (Branch `security/careful-fixes`, gemergt 2026-08-25):
+
+- [x] 20260714-sync-remove-path-traversal sync übergibt ungeprüfte Namen an rekursives Remove-Item, `..`/Wildcards ermöglichen Traversal/Massenlöschung (5e3d7f2, 2026-07-16)
+- [x] 20260714-idea-id-allowlist-literalpath Skill-/Bundle-IDs per Allowlist validieren, `-LiteralPath` in den ID-getriebenen Pfadoperationen (5e3d7f2, 2026-07-16)
 
 ## Verworfen
 
