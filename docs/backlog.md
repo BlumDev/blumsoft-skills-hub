@@ -16,6 +16,8 @@ IDs `YYYYMMDD-slug`, nie renumbern. Ideen = offene Einträge mit `#idea`.
 
 - [ ] 20260824-reconcile Reconcile 2026-08-24 (gpt-5.6-sol): 10 von 25 Review-Findings offen, 15 behoben, siehe docs/reviews/2026-08-24-reconcile.md #note
 
+- [ ] 20260825-pester-alt-suiten-pwsh76 Alt-Testsuiten (bootstrap-project, tooling-edge) verlieren unter pwsh 7.6.5 ihre Top-Level-Variablen in It-Blöcken, 7 Tests rot unabhängig vom Code-Stand (auch auf unverändertem main), Setup nach BeforeAll/BeforeDiscovery verlagern; CI führt nur validate.ps1 aus und ist nicht betroffen #bug (Merge-Session 2026-08-25)
+
 Aus Codex-Audit 2026-07-14 (`docs/reviews/2026-07-14-codex.md`), noch nicht validiert:
 
 - [ ] 20260714-idea-atomic-sync Sync über temporäre Verzeichnisse, Validierung und atomaren Austausch implementieren #idea (mittel)
@@ -63,6 +65,7 @@ Security-Session Careful-Fixes (Branch `security/careful-fixes`, gemergt 2026-08
 
 - [x] 20260714-sync-remove-path-traversal sync übergibt ungeprüfte Namen an rekursives Remove-Item, `..`/Wildcards ermöglichen Traversal/Massenlöschung (5e3d7f2, 2026-07-16)
 - [x] 20260714-idea-id-allowlist-literalpath Skill-/Bundle-IDs per Allowlist validieren, `-LiteralPath` in den ID-getriebenen Pfadoperationen (5e3d7f2, 2026-07-16)
+- [x] 20260825-merge-careful-fixes Branch security/careful-fixes nach main gemergt, Guard in mains Staging/ShouldProcess-Sync eingepasst, Guard-Suite 32/32 grün (a2390a3, 2026-08-25)
 
 ## Verworfen
 
