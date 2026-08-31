@@ -12,6 +12,8 @@ IDs `YYYYMMDD-slug`, nie renumbern. Ideen = offene Einträge mit `#idea`.
 
 ## Offen
 
+- [ ] 20260831-cursor-audit Zweitmeinungs-Audit 2026-08-31 (cursor-grok-4.6-high): 3 neue Findings (0 high / 3 medium), alle im gen-asset-Tooling (Upscale-Dateinamens-Kollision, Poll-Schleife ignoriert status=error, Seed erreicht SAMPLER_HIRES nicht); zwei davon vom Koordinator am Code bestätigt, siehe docs/reviews/2026-08-31-cursor-audit.md #note
+
 - [ ] 20260825-zweitmeinung-audit Zweitmeinungs-Audit 2026-08-25 (cursor-grok-4.6-high): 6 neue Findings (0 high / 5 medium / 1 low), siehe docs/reviews/2026-08-25-cursor-audit.md #note
 
 - [ ] 20260824-reconcile Reconcile 2026-08-24 (gpt-5.6-sol): 10 von 25 Review-Findings offen, 15 behoben, siehe docs/reviews/2026-08-24-reconcile.md #note
