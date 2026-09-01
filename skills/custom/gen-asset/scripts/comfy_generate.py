@@ -90,6 +90,12 @@ def inject(workflow, args):
             inp["seed"] = args.seed
             if args.steps is not None and "steps" in inp:
                 inp["steps"] = args.steps
+        elif title == "SAMPLER_HIRES":
+            # Second pass of the hires workflows. Without this it kept the seed baked into
+            # the template, so --seed only moved the first pass and neither seed iteration
+            # nor reproduction reached the finished image. Same seed as the base pass, like
+            # a hires fix. --steps stays out: the second pass runs deliberately fewer steps.
+            inp["seed"] = args.seed
         elif title == "CHECKPOINT" and args.checkpoint:
             if "ckpt_name" in inp:
                 inp["ckpt_name"] = args.checkpoint
