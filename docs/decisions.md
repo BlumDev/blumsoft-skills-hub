@@ -115,39 +115,3 @@ fehl. Ein künftiges CI-Gate muss Pester 5 explizit installieren. Die Systeminst
 **Entscheidung.** Option 3, `SKILLSHUB_SYNC_FAULT=between-moves` wirft zwischen den Umbenennungen. Option 1 hängt an einem Zeitfenster von Mikrosekunden und wäre im CI ein Flake-Generator. Option 2 prüft eine Textkopie statt des laufenden Skripts und bricht bei jeder Umformatierung. Der Hook ist eine Zeile, steht sichtbar im Ablauf und führt in einen Pfad, der die Installation nachweislich intakt lässt.
 
 **Trade-off.** Produktionscode trägt einen Testschalter. Die Variable ist eindeutig benannt und sonst nirgends belegt. Wer sie setzt, bekommt einen abgebrochenen Sync mit wiederhergestelltem Skill, keinen Schaden. Der innere `try`/`catch` um den zweiten Move ist im selben Zug entfallen: er machte dasselbe wie der Restore im `finally`, zwei Kopien derselben Logik driften auseinander.
-
-## 2026-09-01: Skill-Austausch per Rename statt per Move-Item
-
-**Kontext.** `sync.ps1` löschte das Zielverzeichnis und verschob erst danach die fertige Staging-Kopie an seine Stelle (Finding `20260901-sync-non-atomic-replace`). Zwischen Löschen und Verschieben lag ein Fenster, in dem ein Abbruch den Skill komplett entfernt hinterließ. Das Staging aus `2692b22` deckte nur die Kopierphase ab, nicht den Austausch.
-
-**Optionen.**
-1. Reihenfolge umdrehen: erst das Ziel wegbenennen, dann die neue Version an seine Stelle verschieben, beides mit `Move-Item`.
-2. Dasselbe, aber mit `[System.IO.Directory]::Move`.
-3. Beim Austausch weiterhin löschen und nur die Fehlerbehandlung verbessern.
-
-**Entscheidung.** Option 2, plus Restore der alten Version, falls der zweite Schritt scheitert. Ausschlaggebend war eine Messung an einer gesperrten Datei im Zielverzeichnis (offener Handle ohne Freigabe): `Move-Item` verschiebt Verzeichnisse rekursiv und ließ Quelle und Ziel danach beide halb gefüllt zurück, `[System.IO.Directory]::Move` scheiterte folgenlos und ließ die Quelle vollständig stehen. Option 1 hätte das Fenster also nur verschoben statt geschlossen. Staging- und Backup-Pfad hängen jetzt an `$dstPath`, weil die .NET-Methode relative Pfade gegen das Prozess-Arbeitsverzeichnis auflöst, das in PowerShell von `Get-Location` abweichen kann.
-
-**Trade-off und Restrisiken.**
-- Der Rename ist nur auf demselben Volume atomar. Staging, Backup und Ziel liegen im selben Ordner, damit ist das gegeben, solange niemand einzelne Skills auf ein anderes Volume verlinkt.
-- Das Entsorgen der alten Version läuft mit `-ErrorAction SilentlyContinue`: ein bereits erfolgreicher Austausch darf nicht nachträglich am Aufräumen scheitern. Preis: bei gesperrten Dateien bleibt ein `.<skill>.old-<guid>`-Ordner liegen, auf den eine Warnung hinweist.
-- Ein Absturz genau zwischen den beiden Renames hinterlässt das Ziel weg und das Backup da. Das ist der verbleibende Rest des Findings, jetzt aber ohne Datenverlust und mit einem sprechenden Ordnernamen daneben.
-
-## 2026-09-01: Doppelte Sync-Ziele deduplizieren statt einen Alias streichen
-
-**Kontext.** `codex` und `vscode-chatgpt` zeigen beide auf `~/.codex/skills`, und die ausgelieferten Profile führen beide in `default_targets` (Finding `20260901-sync-target-collision`). Jeder Skill wurde damit zweimal in denselben Ordner kopiert und ausgetauscht.
-
-**Optionen.** Einen der beiden Namen aus `$targetMap` und den Profilen entfernen, oder zur Laufzeit nach aufgelöstem Zielordner deduplizieren.
-
-**Entscheidung.** Dedup. Beide Namen sind legitime Aliase: die ChatGPT-Erweiterung in VS Code liest denselben Ordner wie die Codex-CLI. Wer `-Targets vscode-chatgpt` aufruft, meint etwas Richtiges und soll keinen Fehler bekommen. Der Dedup wirkt zusätzlich auf jede künftige Alias-Konstellation und auf Profile, die ein Ziel versehentlich doppelt listen.
-
-**Trade-off.** Welcher der beiden Namen im Log erscheint, hängt an der Reihenfolge in `default_targets`, der zweite wird als übersprungen ausgewiesen. Kommt je ein Ziel dazu, das denselben Ordner mit anderem Inhalt bespielen soll, trägt die Deduplikation nicht mehr.
-
-## 2026-09-01: Der Lauf ohne `-Apply` bleibt ohne Nebenwirkung
-
-**Kontext.** `setup-from-profile.ps1` rief `vendor-import.ps1` unbedingt auf, bevor es überhaupt zur `-Apply`-Weiche kam (Finding `20260901-setup-from-profile-apply-misleading`). Nur `sync.ps1` bekam `-DryRun`. Ein als Vorschau gedachter Lauf lud damit fehlende Vendor-Skills nach und schrieb `vendor-lock.json` und `UPSTREAM.md`.
-
-**Optionen.** `vendor-import.ps1` einen eigenen Dry-Run-Modus geben, oder den Import im Vorschau-Pfad auslassen.
-
-**Entscheidung.** Auslassen und benennen. Ein Dry-Run-Modus für `vendor-import.ps1` müsste jede der drei Schreibstellen einzeln abfangen, und das Skript steht ohnehin für einen größeren Umbau an (`20260714-idea-transactional-vendor-import`). `validate.ps1` läuft weiter in beiden Pfaden: es liest nur, und die Vendor-Skills, die es prüft, liegen im Repo, der ausgelassene Import macht es also nicht rot.
-
-**Trade-off.** Auf einer Maschine, der ein Vendor-Skill tatsächlich fehlt, meldet die Vorschau jetzt einen Validierungsfehler statt ihn stillschweigend durch einen Download zu heilen. Das ist beabsichtigt: die Vorschau soll den Zustand zeigen, nicht ändern.
