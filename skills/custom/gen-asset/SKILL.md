@@ -110,6 +110,8 @@ Alle kommerziell frei nutzbar. Für realistische Menschen/Haut und Anime/NSFW Ch
 
    Für FLUX `--workflow ...\flux_schnell_t2i.api.json` und `--negative ""`.
    Optional `--checkpoint`, `--lora`, `--lora-strength`, `--seed`, `--steps`.
+   In den Hires-Workflows setzt `--seed` beide Sampler-Pässe, `--steps` nur den
+   Basis-Pass: der Hires-Pass behält seine bewusst kürzeren Steps.
    Stdout des Skripts = finaler Bildpfad.
 4. **Verify-Loop (Pflicht).** Das erzeugte PNG mit dem `Read`-Tool öffnen
    (Vision) und gegen die Anforderung prüfen:
