@@ -47,7 +47,7 @@ Write-Host "Bundles: $($bundleIds -join ', ')"
 Write-Host "Include extended: $([bool]$IncludeExtended)"
 Write-Host "Skill count: $($skills.Count)"
 
-# 'codex' und 'vscode-chatgpt' sind Aliase auf denselben Ordner (~/.codex/skills), und die
+# 'codex' und 'vscode-chatgpt' sind Aliase auf denselben Ordner (~/.codex/skills). Die
 # Profile listen beide in default_targets. Ohne Dedup läuft jeder Skill zweimal durch
 # Kopieren und Ersetzen, also doppelte Arbeit plus ein zweites Austauschfenster ohne Nutzen.
 $syncedTargetDirs = [System.Collections.Generic.Dictionary[string,string]]::new([System.StringComparer]::OrdinalIgnoreCase)
@@ -72,8 +72,8 @@ foreach ($target in $Targets) {
 
     New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
     # Staging und Backup hängen an $dstPath statt an $targetDir: [System.IO.Directory]::Move löst
-    # relative Pfade gegen das Prozess-Arbeitsverzeichnis auf, das von Get-Location abweichen kann,
-    # und $dstPath kommt bereits absolut aus Resolve-SkillTargetPath.
+    # relative Pfade gegen das Prozess-Arbeitsverzeichnis auf, das von Get-Location abweichen
+    # kann. $dstPath kommt bereits absolut aus Resolve-SkillTargetPath.
     $dstParent = [System.IO.Path]::GetDirectoryName($dstPath)
     $stagingPath = Join-Path $dstParent (".{0}.sync-{1}" -f $skill, [guid]::NewGuid().ToString('N'))
     $backupPath = $null
