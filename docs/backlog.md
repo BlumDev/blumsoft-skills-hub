@@ -49,6 +49,13 @@ Wartungs-Session 2026-09-01 (Findings aus den Reviews 2026-08-24, 2026-08-25 und
 - [x] 20260901-upscale-input-filename-collision upscale.py kopierte die Eingabe unter festem Namen in ComfyUIs geteilten Input-Ordner, gleicher Basename oder paralleler Lauf überschrieb die fremde Eingabe (b223786, 2026-09-01)
 - [x] 20260831-cursor-audit Zweitmeinungs-Audit 2026-08-31 (cursor-grok-4.6-high): alle 3 Findings behoben, siehe die drei 20260901-Einträge zum gen-asset-Tooling (b223786, 2026-09-01)
 
+Verify der Runde-2-Commits (`docs/reviews/2026-09-01-cursor-verify.md`, cursor-grok-4.6-high, Basis daef7d0..main): 5 Commits sauber, 3 Findings, alle drei am Code bestätigt und mit Mutationsprobe belegt:
+
+- [x] 20260901-sync-backup-deleted-in-finally Das `finally` des Skill-Austauschs löschte das Backup, sobald `$backupPath` gesetzt war; ein Abbruch zwischen den beiden Umbenennungen (Strg+C läuft durch finally ohne catch) nahm Staging und Backup mit und ließ das Ziel leer zurück. Restore jetzt im finally, Löschen erst bei nachgewiesenem Ziel, Testzugang über den Fault-Hook `SKILLSHUB_SYNC_FAULT` (fb163c6, 2026-09-01)
+- [x] 20260901-upscale-input-not-cleaned-up upscale.py entfernte seine Kopie im geteilten ComfyUI-Input auf keinem Pfad, mit den eindeutigen Namen aus b223786 sammelt sich eine Datei je Lauf an; main() räumt jetzt im finally auf, OSError gefangen (8071b34, 2026-09-01)
+- [x] 20260901-decisions-duplicate-adrs Die drei ADRs der Wartungs-Session standen doppelt in decisions.md, beide Kopien aus 5335314; zweite Kopie entfernt, erste unverändert, bewusste Ausnahme von append-only im Commit begründet (4010295, 2026-09-01)
+- [x] 20260901-cursor-verify Verify-Lauf 20260901T120648-8b95f3 selbst: Report angelegt, Triage am Code, kein Rework an den fünf sauberen Commits (21a12a0, 2026-09-01)
+
 ## Verworfen
 
 (keine)
