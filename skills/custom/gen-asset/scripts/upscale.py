@@ -109,57 +109,69 @@ def main():
         sys.exit(f"Eingabebild nicht gefunden: {a.image}")
     os.makedirs(COMFY_INPUT, exist_ok=True)
     fname = input_filename(a.image)
-    shutil.copy(a.image, os.path.join(COMFY_INPUT, fname))
+    staged_input = os.path.join(COMFY_INPUT, fname)
+    shutil.copy(a.image, staged_input)
+    try:
+        with open(a.workflow, "r", encoding="utf-8") as f:
+            wf = json.load(f)
+        for node in wf.values():
+            title = node.get("_meta", {}).get("title", "")
+            inp = node.get("inputs", {})
+            if title == "INPUT_IMAGE":
+                inp["image"] = fname
+            elif title == "UPSCALE":
+                inp["upscale_by"] = a.upscale_by
+                inp["denoise"] = a.denoise
+                inp["seed"] = a.seed
+            elif title == "POSITIVE_PROMPT" and a.prompt:
+                inp["text"] = a.prompt
+            elif title == "CHECKPOINT" and a.checkpoint:
+                inp["ckpt_name"] = a.checkpoint
 
-    with open(a.workflow, "r", encoding="utf-8") as f:
-        wf = json.load(f)
-    for node in wf.values():
-        title = node.get("_meta", {}).get("title", "")
-        inp = node.get("inputs", {})
-        if title == "INPUT_IMAGE":
-            inp["image"] = fname
-        elif title == "UPSCALE":
-            inp["upscale_by"] = a.upscale_by
-            inp["denoise"] = a.denoise
-            inp["seed"] = a.seed
-        elif title == "POSITIVE_PROMPT" and a.prompt:
-            inp["text"] = a.prompt
-        elif title == "CHECKPOINT" and a.checkpoint:
-            inp["ckpt_name"] = a.checkpoint
+        cid = str(uuid.uuid4())
+        resp = api(a.url, "/prompt", {"prompt": wf, "client_id": cid})
+        pid = resp.get("prompt_id")
+        if not pid:
+            sys.exit(f"Keine prompt_id erhalten: {resp}")
+        print(f"queued {pid} seed={a.seed} upscale_by={a.upscale_by} denoise={a.denoise}", file=sys.stderr)
 
-    cid = str(uuid.uuid4())
-    resp = api(a.url, "/prompt", {"prompt": wf, "client_id": cid})
-    pid = resp.get("prompt_id")
-    if not pid:
-        sys.exit(f"Keine prompt_id erhalten: {resp}")
-    print(f"queued {pid} seed={a.seed} upscale_by={a.upscale_by} denoise={a.denoise}", file=sys.stderr)
-
-    img = None
-    deadline = a.timeout / 1.5
-    polls = 0
-    while polls < deadline:
-        time.sleep(1.5)
-        polls += 1
-        hist = api(a.url, f"/history/{pid}")
-        entry = hist.get(pid)
-        if not entry:
-            continue
-        for no in entry.get("outputs", {}).values():
-            if no.get("images"):
-                img = no["images"][0]
+        img = None
+        deadline = a.timeout / 1.5
+        polls = 0
+        while polls < deadline:
+            time.sleep(1.5)
+            polls += 1
+            hist = api(a.url, f"/history/{pid}")
+            entry = hist.get(pid)
+            if not entry:
+                continue
+            for no in entry.get("outputs", {}).values():
+                if no.get("images"):
+                    img = no["images"][0]
+                    break
+            if img:
                 break
-        if img:
-            break
-        # A failed prompt lands in the history right away and never grows images. Without
-        # this check the loop sat out the full timeout and reported a timeout instead of
-        # the error ComfyUI already knew about.
-        failure = execution_error(entry)
-        if failure:
-            sys.exit(f"ComfyUI-Fehler bei prompt_id={pid}: {failure}")
-    if not img:
-        sys.exit(f"Timeout nach {a.timeout}s: kein Bild.")
-    download(a.url, img, a.out)
-    print(a.out)
+            # A failed prompt lands in the history right away and never grows images. Without
+            # this check the loop sat out the full timeout and reported a timeout instead of
+            # the error ComfyUI already knew about.
+            failure = execution_error(entry)
+            if failure:
+                sys.exit(f"ComfyUI-Fehler bei prompt_id={pid}: {failure}")
+        if not img:
+            sys.exit(f"Timeout nach {a.timeout}s: kein Bild.")
+        download(a.url, img, a.out)
+        print(a.out)
+    finally:
+        # COMFY_INPUT is shared with every other run and with ComfyUI itself, so the copy has
+        # to go on every path: success, reported error and timeout alike. The unique name of
+        # each run turns a leftover into a pile, one file per upscale.
+        # Best effort on purpose: after a timeout ComfyUI may still be reading the file, which
+        # holds it open on Windows, and a failed cleanup must not turn a finished upscale into
+        # an error.
+        try:
+            os.remove(staged_input)
+        except OSError:
+            pass
 
 
 if __name__ == "__main__":

@@ -54,6 +54,12 @@ FAILED_HISTORY_ENTRY = {
     },
 }
 
+# The same shape once a prompt finished: an entry carrying the image download() fetches.
+SUCCESS_HISTORY_ENTRY = {
+    'outputs': {'9': {'images': [{'filename': 'hero_00001_.png', 'subfolder': '', 'type': 'output'}]}},
+    'status': {'status_str': 'success', 'completed': True},
+}
+
 
 def workflow(name):
     with open(GEN_ASSET / 'workflows' / name, encoding='utf-8') as fh:
@@ -141,16 +147,33 @@ class ExecutionErrorTests(unittest.TestCase):
                     self.assertIsNone(module.execution_error(entry))
 
 
-def stub_api(history_entry, polls):
-    """Replacement for the scripts' api(): answers every call from memory and records polls."""
+def stub_api(history_entry, polls, on_prompt=None):
+    """Replacement for the scripts' api(): answers every call from memory and records polls.
+
+    on_prompt fires while the prompt is queued, the moment the real ComfyUI would read the
+    input file. That is the only window in which a run's copy of it exists.
+    """
     def api(base, path, payload=None, timeout=600):
         if path == '/system_stats':
             return {}
         if path == '/prompt':
+            if on_prompt:
+                on_prompt()
             return {'prompt_id': 'p1'}
         polls.append(path)
         return {'p1': history_entry}
     return api
+
+
+def fake_download(base, image, out_path):
+    """Stand-in for download(): writes what a real /view call would deliver."""
+    with open(out_path, 'wb') as fh:
+        fh.write(b'upscaled')
+
+
+def staged_inputs(folder):
+    """Everything in the stand-in for ComfyUI's shared input folder, name -> bytes."""
+    return {name: (Path(folder) / name).read_bytes() for name in sorted(os.listdir(folder))}
 
 
 class PollLoopTests(unittest.TestCase):
@@ -214,8 +237,11 @@ class UpscaleInputFileTests(unittest.TestCase):
         # The input folder is shared by every run and by the ComfyUI instance itself. Two
         # images called hero.png used to end up as the same file there, so the second run
         # overwrote the input of the first one while that was still working on it.
+        # Measured while the prompt is queued, because every run now removes its copy again:
+        # after the run there is nothing left to compare, during it there is.
         with tempfile.TemporaryDirectory() as tmp:
             comfy_input = os.path.join(tmp, 'comfy-input')
+            staged = []
             for folder in ('out', 'projekt'):
                 source = os.path.join(tmp, folder, 'hero.png')
                 os.makedirs(os.path.dirname(source))
@@ -224,21 +250,63 @@ class UpscaleInputFileTests(unittest.TestCase):
 
                 argv = ['upscale.py', '--image', source,
                         '--out', os.path.join(tmp, folder + '_2x.png'), '--timeout', '6']
-                with mock.patch.object(upscale, 'api', stub_api(FAILED_HISTORY_ENTRY, [])), \
+                api = stub_api(FAILED_HISTORY_ENTRY, [],
+                               on_prompt=lambda: staged.append(staged_inputs(comfy_input)))
+                with mock.patch.object(upscale, 'api', api), \
                         mock.patch.object(upscale, 'COMFY_INPUT', comfy_input), \
                         mock.patch.object(sys, 'argv', argv), \
                         contextlib.redirect_stderr(io.StringIO()):
                     with self.assertRaises(SystemExit):
                         upscale.main()
 
-            copied = sorted(os.listdir(comfy_input))
-            self.assertEqual(len(copied), 2, 'the second run must not overwrite the first input file')
+            self.assertEqual([len(snapshot) for snapshot in staged], [1, 1])
+            (first_name, first_bytes), (second_name, second_bytes) = (
+                next(iter(snapshot.items())) for snapshot in staged
+            )
+            self.assertNotEqual(first_name, second_name,
+                                'the second run must not reuse the input file name of the first')
+            self.assertEqual([first_bytes, second_bytes], [b'out', b'projekt'])
 
-            contents = set()
-            for name in copied:
-                with open(os.path.join(comfy_input, name), 'rb') as fh:
-                    contents.add(fh.read())
-            self.assertEqual(contents, {b'out', b'projekt'})
+
+class UpscaleInputCleanupTests(unittest.TestCase):
+    """The copy in the shared input folder belongs to one run and must not outlive it."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.tmp = tmp.name
+        self.comfy_input = os.path.join(self.tmp, 'comfy-input')
+        self.source = os.path.join(self.tmp, 'hero.png')
+        with open(self.source, 'wb') as fh:
+            fh.write(b'not really a png')
+        self.out = os.path.join(self.tmp, 'hero_2x.png')
+
+    @contextlib.contextmanager
+    def patched(self, history_entry):
+        argv = ['upscale.py', '--image', self.source, '--out', self.out, '--timeout', '6']
+        with mock.patch.object(upscale, 'api', stub_api(history_entry, [])), \
+                mock.patch.object(upscale, 'COMFY_INPUT', self.comfy_input), \
+                mock.patch.object(upscale, 'download', fake_download), \
+                mock.patch.object(sys, 'argv', argv), \
+                contextlib.redirect_stdout(io.StringIO()), \
+                contextlib.redirect_stderr(io.StringIO()):
+            yield
+
+    def test_removes_the_copy_after_a_successful_run(self):
+        with self.patched(SUCCESS_HISTORY_ENTRY):
+            upscale.main()
+
+        self.assertTrue(os.path.exists(self.out), 'the run must have produced its output')
+        self.assertEqual(os.listdir(self.comfy_input), [],
+                         'a finished run leaves nothing behind in the shared input folder')
+
+    def test_removes_the_copy_when_comfyui_reports_an_error(self):
+        with self.patched(FAILED_HISTORY_ENTRY):
+            with self.assertRaises(SystemExit):
+                upscale.main()
+
+        self.assertEqual(os.listdir(self.comfy_input), [],
+                         'the error path must clean up too, it is the one that repeats')
 
 
 if __name__ == '__main__':
