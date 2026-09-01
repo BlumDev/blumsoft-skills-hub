@@ -51,6 +51,17 @@ def download(base, image, out_path):
         f.write(blob)
 
 
+def input_filename(image_path):
+    """Name for the copy of the input image in ComfyUI's shared input folder.
+
+    The random part keeps runs apart. With the plain basename, upscaling out\\hero.png and
+    projekt\\hero.png (or two jobs in parallel) wrote the same file, so the second run
+    overwrote the first one's input and a job still running read foreign pixels and saved
+    them as its upscale result.
+    """
+    return "upscale_src_%s_%s" % (uuid.uuid4().hex[:8], os.path.basename(image_path))
+
+
 def execution_error(entry):
     """A readable message if ComfyUI reported a failed run, else None.
 
@@ -97,7 +108,7 @@ def main():
     if not os.path.exists(a.image):
         sys.exit(f"Eingabebild nicht gefunden: {a.image}")
     os.makedirs(COMFY_INPUT, exist_ok=True)
-    fname = "upscale_src_" + os.path.basename(a.image)
+    fname = input_filename(a.image)
     shutil.copy(a.image, os.path.join(COMFY_INPUT, fname))
 
     with open(a.workflow, "r", encoding="utf-8") as f:

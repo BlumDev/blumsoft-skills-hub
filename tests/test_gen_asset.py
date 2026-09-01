@@ -141,18 +141,20 @@ class ExecutionErrorTests(unittest.TestCase):
                     self.assertIsNone(module.execution_error(entry))
 
 
+def stub_api(history_entry, polls):
+    """Replacement for the scripts' api(): answers every call from memory and records polls."""
+    def api(base, path, payload=None, timeout=600):
+        if path == '/system_stats':
+            return {}
+        if path == '/prompt':
+            return {'prompt_id': 'p1'}
+        polls.append(path)
+        return {'p1': history_entry}
+    return api
+
+
 class PollLoopTests(unittest.TestCase):
     """main() end to end against a stubbed HTTP layer, no ComfyUI is started or contacted."""
-
-    def _fake_api(self, history_entry, counter):
-        def api(base, path, payload=None, timeout=600):
-            if path == '/system_stats':
-                return {}
-            if path == '/prompt':
-                return {'prompt_id': 'p1'}
-            counter.append(path)
-            return {'p1': history_entry}
-        return api
 
     def test_comfy_generate_aborts_on_a_failed_prompt(self):
         polls = []
@@ -166,7 +168,7 @@ class PollLoopTests(unittest.TestCase):
                 # polls instead of the 600 the default would run through.
                 '--timeout', '6',
             ]
-            with mock.patch.object(comfy_generate, 'api', self._fake_api(FAILED_HISTORY_ENTRY, polls)), \
+            with mock.patch.object(comfy_generate, 'api', stub_api(FAILED_HISTORY_ENTRY, polls)), \
                     mock.patch.object(sys, 'argv', argv), \
                     contextlib.redirect_stderr(io.StringIO()):
                 with self.assertRaises(SystemExit) as raised:
@@ -186,7 +188,7 @@ class PollLoopTests(unittest.TestCase):
             argv = ['upscale.py', '--image', source, '--out', os.path.join(tmp, 'hero_2x.png'),
                     '--timeout', '6']
 
-            with mock.patch.object(upscale, 'api', self._fake_api(FAILED_HISTORY_ENTRY, polls)), \
+            with mock.patch.object(upscale, 'api', stub_api(FAILED_HISTORY_ENTRY, polls)), \
                     mock.patch.object(upscale, 'COMFY_INPUT', comfy_input), \
                     mock.patch.object(sys, 'argv', argv), \
                     contextlib.redirect_stderr(io.StringIO()):
@@ -195,6 +197,48 @@ class PollLoopTests(unittest.TestCase):
 
             self.assertIn('checkpoint not found', str(raised.exception))
             self.assertEqual(len(polls), 1, 'the run must end on the first poll, not on the timeout')
+
+
+class UpscaleInputFileTests(unittest.TestCase):
+    def test_input_name_is_unique_and_stays_a_bare_filename(self):
+        first = upscale.input_filename(os.path.join('out', 'hero.png'))
+        second = upscale.input_filename(os.path.join('projekt', 'hero.png'))
+
+        self.assertNotEqual(first, second)
+        for name in (first, second):
+            self.assertTrue(name.startswith('upscale_src_'), name)
+            self.assertTrue(name.endswith('hero.png'), name)
+            self.assertEqual(os.path.basename(name), name, 'no path segment may leak into the name')
+
+    def test_two_runs_with_the_same_basename_keep_separate_input_files(self):
+        # The input folder is shared by every run and by the ComfyUI instance itself. Two
+        # images called hero.png used to end up as the same file there, so the second run
+        # overwrote the input of the first one while that was still working on it.
+        with tempfile.TemporaryDirectory() as tmp:
+            comfy_input = os.path.join(tmp, 'comfy-input')
+            for folder in ('out', 'projekt'):
+                source = os.path.join(tmp, folder, 'hero.png')
+                os.makedirs(os.path.dirname(source))
+                with open(source, 'wb') as fh:
+                    fh.write(folder.encode())
+
+                argv = ['upscale.py', '--image', source,
+                        '--out', os.path.join(tmp, folder + '_2x.png'), '--timeout', '6']
+                with mock.patch.object(upscale, 'api', stub_api(FAILED_HISTORY_ENTRY, [])), \
+                        mock.patch.object(upscale, 'COMFY_INPUT', comfy_input), \
+                        mock.patch.object(sys, 'argv', argv), \
+                        contextlib.redirect_stderr(io.StringIO()):
+                    with self.assertRaises(SystemExit):
+                        upscale.main()
+
+            copied = sorted(os.listdir(comfy_input))
+            self.assertEqual(len(copied), 2, 'the second run must not overwrite the first input file')
+
+            contents = set()
+            for name in copied:
+                with open(os.path.join(comfy_input, name), 'rb') as fh:
+                    contents.add(fh.read())
+            self.assertEqual(contents, {b'out', b'projekt'})
 
 
 if __name__ == '__main__':
