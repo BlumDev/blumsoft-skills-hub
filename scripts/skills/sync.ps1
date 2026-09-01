@@ -94,19 +94,29 @@ foreach ($target in $Targets) {
         $backupPath = Join-Path $dstParent (".{0}.old-{1}" -f $skill, [guid]::NewGuid().ToString('N'))
         [System.IO.Directory]::Move($dstPath, $backupPath)
       }
-      try {
-        [System.IO.Directory]::Move($stagingPath, $dstPath)
-      } catch {
-        # Die neue Version kam nicht an, also die alte zurückholen statt eine Lücke zu hinterlassen.
-        if ($backupPath -and (Test-Path -LiteralPath $backupPath)) {
+      # Test-Haken für genau dieses Abbruchfenster (siehe tests/skills/sync-targets.Tests.ps1).
+      # Zwischen den beiden Umbenennungen läuft kein Kommando, das sich von außen ersetzen ließe,
+      # der Zustand "Ziel weg, Backup da" ist ohne den Haken nicht deterministisch herstellbar.
+      if ($env:SKILLSHUB_SYNC_FAULT -eq 'between-moves') { throw "SKILLSHUB_SYNC_FAULT: injizierter Fehler zwischen den Umbenennungen" }
+      [System.IO.Directory]::Move($stagingPath, $dstPath)
+    } finally {
+      # Reihenfolge zählt. Das Backup ist Restore-Quelle, solange der neue Stand nicht am Ziel
+      # liegt, und erst danach Müll. Ein Abbruch zwischen den beiden Umbenennungen (Strg+C wirft
+      # PipelineStoppedException, dann läuft finally ohne catch) hinterlässt den Skill allein im
+      # Backup: wird hier bedingungslos gelöscht, sind Ziel und beide Fassungen weg.
+      $targetPresent = Test-Path -LiteralPath $dstPath
+      if ($backupPath -and -not $targetPresent -and (Test-Path -LiteralPath $backupPath)) {
+        try {
           [System.IO.Directory]::Move($backupPath, $dstPath)
           $backupPath = $null
+          $targetPresent = $true
+          Write-Host "  [WARN] Austausch abgebrochen, alte Version wiederhergestellt: $skill" -ForegroundColor DarkYellow
+        } catch {
+          Write-Host "  [ERR] Austausch abgebrochen, Restore fehlgeschlagen, alte Version liegt unter: $backupPath" -ForegroundColor Red
         }
-        throw
       }
-    } finally {
       if (Test-Path -LiteralPath $stagingPath) { Remove-Item -LiteralPath $stagingPath -Recurse -Force }
-      if ($backupPath -and (Test-Path -LiteralPath $backupPath)) {
+      if ($backupPath -and $targetPresent -and (Test-Path -LiteralPath $backupPath)) {
         # Der Austausch ist durch, das Entsorgen der alten Version ist nur noch Aufräumarbeit und
         # darf einen bereits erfolgreichen Sync nicht nachträglich scheitern lassen.
         Remove-Item -LiteralPath $backupPath -Recurse -Force -ErrorAction SilentlyContinue

@@ -103,6 +103,19 @@ fehl. Ein künftiges CI-Gate muss Pester 5 explizit installieren. Die Systeminst
 
 **Trade-off.** Auf einer Maschine, der ein Vendor-Skill tatsächlich fehlt, meldet die Vorschau jetzt einen Validierungsfehler statt ihn stillschweigend durch einen Download zu heilen. Das ist beabsichtigt: die Vorschau soll den Zustand zeigen, nicht ändern.
 
+## 2026-09-01: Ein Fault-Hook in sync.ps1, um das Abbruchfenster zu testen
+
+**Kontext.** Der Verify der Session (`docs/reviews/2026-09-01-cursor-verify.md`, Finding 1) zeigte, dass das `finally` des Skill-Austauschs das Backup löschte, sobald `$backupPath` gesetzt war. Genau im Fenster zwischen den beiden Umbenennungen liegt der Skill aber nur im Backup. Ein Strg+C führt dann durch `finally` ohne `catch`: Ziel leer, beide Fassungen weg. Der Fix (Restore im `finally`, Löschen erst bei nachgewiesenem Ziel) braucht einen Test, der genau diesen Zwischenzustand herstellt. Zwischen den beiden `[System.IO.Directory]::Move`-Aufrufen steht jedoch kein Kommando, das sich per Funktion überschreiben ließe. Beide sind statische .NET-Aufrufe.
+
+**Optionen.**
+1. Timing: einen zweiten Prozess auf das Staging-Verzeichnis warten lassen und dort eine Datei sperren.
+2. Den `finally`-Block als Text aus `sync.ps1` extrahieren und im Test separat ausführen.
+3. Einen Fault-Hook per Umgebungsvariable in `sync.ps1`.
+
+**Entscheidung.** Option 3, `SKILLSHUB_SYNC_FAULT=between-moves` wirft zwischen den Umbenennungen. Option 1 hängt an einem Zeitfenster von Mikrosekunden und wäre im CI ein Flake-Generator. Option 2 prüft eine Textkopie statt des laufenden Skripts und bricht bei jeder Umformatierung. Der Hook ist eine Zeile, steht sichtbar im Ablauf und führt in einen Pfad, der die Installation nachweislich intakt lässt.
+
+**Trade-off.** Produktionscode trägt einen Testschalter. Die Variable ist eindeutig benannt und sonst nirgends belegt. Wer sie setzt, bekommt einen abgebrochenen Sync mit wiederhergestelltem Skill, keinen Schaden. Der innere `try`/`catch` um den zweiten Move ist im selben Zug entfallen: er machte dasselbe wie der Restore im `finally`, zwei Kopien derselben Logik driften auseinander.
+
 ## 2026-09-01: Skill-Austausch per Rename statt per Move-Item
 
 **Kontext.** `sync.ps1` löschte das Zielverzeichnis und verschob erst danach die fertige Staging-Kopie an seine Stelle (Finding `20260901-sync-non-atomic-replace`). Zwischen Löschen und Verschieben lag ein Fenster, in dem ein Abbruch den Skill komplett entfernt hinterließ. Das Staging aus `2692b22` deckte nur die Kopierphase ab, nicht den Austausch.

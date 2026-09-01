@@ -46,25 +46,31 @@ core_skills:
             Root        = $tmp
             Sync        = Join-Path $repo 'scripts/skills/sync.ps1'
             FakeHome    = $fakeHome
+            SkillSource = Join-Path $repo 'skills/custom/harmless'
             InstalledAt = Join-Path $fakeHome '.codex/skills/harmless'
         }
     }
 
-    # Runs the real sync.ps1 in its own pwsh whose home directory is the fixture.
+    # Runs the real sync.ps1 in its own pwsh whose home directory is the fixture. -Fault reaches
+    # the script through SKILLSHUB_SYNC_FAULT, its documented fault injection hook.
     function Invoke-FixtureSync {
         param(
             [Parameter(Mandatory = $true)][psobject]$Fixture,
-            [Parameter(Mandatory = $true)][string[]]$Targets
+            [Parameter(Mandatory = $true)][string[]]$Targets,
+            [string]$Fault
         )
 
         $originalProfile = $env:USERPROFILE
+        $originalFault = $env:SKILLSHUB_SYNC_FAULT
         try {
             $env:USERPROFILE = $Fixture.FakeHome
+            $env:SKILLSHUB_SYNC_FAULT = $Fault
             $command = "& '$($Fixture.Sync)' -BundleId 'only' -Targets $($Targets -join ',')"
             $output = & $script:PwshExe -NoProfile -NonInteractive -Command $command 2>&1
             $exitCode = $LASTEXITCODE
         } finally {
             $env:USERPROFILE = $originalProfile
+            $env:SKILLSHUB_SYNC_FAULT = $originalFault
         }
 
         [pscustomobject]@{
@@ -133,5 +139,38 @@ Describe 'sync.ps1 replace failure' {
         } finally {
             $handle.Dispose()
         }
+    }
+}
+
+Describe 'sync.ps1 interrupted between the two renames' {
+    AfterEach {
+        if ($script:fixture) {
+            Remove-Item -LiteralPath $script:fixture.Root -Recurse -Force -ErrorAction SilentlyContinue
+            $script:fixture = $null
+        }
+    }
+
+    It 'restores the old version when the run dies after the target was moved to the backup' {
+        # The window the rename based swap left open: the target is already gone, the skill lives
+        # only in .<skill>.old-<guid>. Ctrl+C runs finally without running catch, and a finally that
+        # deletes the backup unconditionally takes the last copy with it. The fault hook produces
+        # exactly that state; the assertion is that the installation survives it.
+        $script:fixture = New-SyncFixture
+        (Invoke-FixtureSync -Fixture $script:fixture -Targets @('codex')).ExitCode | Should -Be 0
+
+        # A changed source makes the restore provable: whatever ends up at the target must be the
+        # old text, not the staged new one that never made it out of staging.
+        Set-Content -Path (Join-Path $script:fixture.SkillSource 'SKILL.md') -Value '# harmless v2'
+
+        $result = Invoke-FixtureSync -Fixture $script:fixture -Targets @('codex') -Fault 'between-moves'
+
+        $result.ExitCode | Should -Not -Be 0 -Because 'the injected fault must not be swallowed'
+        Test-Path -LiteralPath (Join-Path $script:fixture.InstalledAt 'SKILL.md') | Should -BeTrue -Because 'an abort between the renames must not consume the installed skill'
+        (Get-Content -LiteralPath (Join-Path $script:fixture.InstalledAt 'SKILL.md') -Raw).Trim() | Should -Be '# harmless'
+        (Get-Content -LiteralPath (Join-Path $script:fixture.InstalledAt 'zz-payload.txt') -Raw).Trim() | Should -Be 'must survive a failed replace'
+
+        # Restore consumes the backup and the staging copy is dropped, so nothing is left behind.
+        $leftovers = @(Get-ChildItem -LiteralPath (Split-Path -Parent $script:fixture.InstalledAt) -Force | Where-Object { $_.Name -ne 'harmless' })
+        $leftovers.Count | Should -Be 0 -Because "no staging or backup directory may stay: $($leftovers.Name -join ', ')"
     }
 }
