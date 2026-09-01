@@ -51,6 +51,27 @@ def download(base, image, out_path):
         f.write(blob)
 
 
+def execution_error(entry):
+    """A readable message if ComfyUI reported a failed run, else None.
+
+    Anything unexpected in the history entry counts as 'keep waiting': a wrong abort would
+    kill a healthy run, a missed one only falls back to the timeout that was there before.
+    Older ComfyUI builds ship no 'status' at all, which lands in the same branch.
+    """
+    status = entry.get("status")
+    if not isinstance(status, dict) or status.get("status_str") != "error":
+        return None
+    for message in status.get("messages") or []:
+        if not (isinstance(message, (list, tuple)) and len(message) >= 2):
+            continue
+        name, payload = message[0], message[1]
+        if name == "execution_error" and isinstance(payload, dict):
+            node = payload.get("node_type") or payload.get("node_id") or "?"
+            detail = payload.get("exception_message") or payload.get("exception_type") or ""
+            return ("Node %s: %s" % (node, detail)).strip()
+    return "status=error ohne Detailmeldung"
+
+
 def main():
     p = argparse.ArgumentParser(description="ComfyUI UltimateSDUpscale")
     p.add_argument("--image", required=True, help="input image to upscale")
@@ -118,6 +139,12 @@ def main():
                 break
         if img:
             break
+        # A failed prompt lands in the history right away and never grows images. Without
+        # this check the loop sat out the full timeout and reported a timeout instead of
+        # the error ComfyUI already knew about.
+        failure = execution_error(entry)
+        if failure:
+            sys.exit(f"ComfyUI-Fehler bei prompt_id={pid}: {failure}")
     if not img:
         sys.exit(f"Timeout nach {a.timeout}s: kein Bild.")
     download(a.url, img, a.out)

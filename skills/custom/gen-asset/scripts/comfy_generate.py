@@ -74,6 +74,27 @@ def embedded_workflow(png_path):
     sys.exit(f"Kein eingebetteter Workflow im PNG: {png_path}")
 
 
+def execution_error(entry):
+    """A readable message if ComfyUI reported a failed run, else None.
+
+    Anything unexpected in the history entry counts as 'keep waiting': a wrong abort would
+    kill a healthy run, a missed one only falls back to the timeout that was there before.
+    Older ComfyUI builds ship no 'status' at all, which lands in the same branch.
+    """
+    status = entry.get("status")
+    if not isinstance(status, dict) or status.get("status_str") != "error":
+        return None
+    for message in status.get("messages") or []:
+        if not (isinstance(message, (list, tuple)) and len(message) >= 2):
+            continue
+        name, payload = message[0], message[1]
+        if name == "execution_error" and isinstance(payload, dict):
+            node = payload.get("node_type") or payload.get("node_id") or "?"
+            detail = payload.get("exception_message") or payload.get("exception_type") or ""
+            return ("Node %s: %s" % (node, detail)).strip()
+    return "status=error ohne Detailmeldung"
+
+
 def inject(workflow, args):
     """Set parameters on nodes, matched by their _meta.title marker."""
     for node in workflow.values():
@@ -177,6 +198,12 @@ def main():
                 break
         if image:
             break
+        # A failed prompt (missing checkpoint, OOM, node error) lands in the history right
+        # away and never grows images. Without this check the loop sat out the full timeout
+        # and then reported a timeout instead of the error ComfyUI already knew about.
+        failure = execution_error(entry)
+        if failure:
+            sys.exit(f"ComfyUI-Fehler bei prompt_id={prompt_id}: {failure}")
     if not image:
         sys.exit(f"Timeout nach {args.timeout}s: kein Bild im History-Output.")
 

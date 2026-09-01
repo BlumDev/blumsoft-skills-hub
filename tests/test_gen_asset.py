@@ -7,10 +7,16 @@ Importing them is side effect free, main() sits behind the __main__ guard.
   python -m unittest tests.test_gen_asset
 """
 import argparse
+import contextlib
 import importlib.util
+import io
 import json
+import os
 from pathlib import Path
+import sys
+import tempfile
 import unittest
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,6 +33,26 @@ def load_script(name):
 
 
 comfy_generate = load_script('comfy_generate.py')
+upscale = load_script('upscale.py')
+
+# What /history/<id> returns once a prompt died on ComfyUI's side: an entry that exists,
+# carries a status and will never grow images.
+FAILED_HISTORY_ENTRY = {
+    'outputs': {},
+    'status': {
+        'status_str': 'error',
+        'completed': False,
+        'messages': [
+            ['execution_start', {'prompt_id': 'p1'}],
+            ['execution_error', {
+                'node_id': '4',
+                'node_type': 'CheckpointLoaderSimple',
+                'exception_type': 'FileNotFoundError',
+                'exception_message': 'checkpoint not found',
+            }],
+        ],
+    },
+}
 
 
 def workflow(name):
@@ -82,6 +108,93 @@ class InjectSeedTests(unittest.TestCase):
                 nodes = by_title(comfy_generate.inject(workflow(name), cli_args(seed=7)))
                 self.assertEqual(nodes['SAMPLER']['seed'], 7)
                 self.assertNotIn('SAMPLER_HIRES', nodes)
+
+
+class ExecutionErrorTests(unittest.TestCase):
+    """Both scripts carry their own copy of the helper, so both are checked."""
+
+    def test_names_node_and_message_of_a_failed_run(self):
+        for module in (comfy_generate, upscale):
+            with self.subTest(module=module.__name__):
+                message = module.execution_error(FAILED_HISTORY_ENTRY)
+                self.assertIn('CheckpointLoaderSimple', message)
+                self.assertIn('checkpoint not found', message)
+
+    def test_reports_a_failed_run_that_carries_no_detail(self):
+        for module in (comfy_generate, upscale):
+            with self.subTest(module=module.__name__):
+                entry = {'outputs': {}, 'status': {'status_str': 'error', 'messages': None}}
+                self.assertTrue(module.execution_error(entry))
+
+    def test_keeps_waiting_on_anything_that_is_not_a_reported_error(self):
+        # A wrong abort would kill a healthy run, so every unclear shape must return None.
+        healthy = (
+            {'outputs': {}},                                        # queued, no status yet
+            {'outputs': {}, 'status': {'status_str': 'success'}},   # done, images read elsewhere
+            {'outputs': {}, 'status': {}},                          # status without a verdict
+            {'outputs': {}, 'status': None},                        # unexpected shape
+            {'outputs': {}, 'status': 'error'},                     # status not a dict
+        )
+        for module in (comfy_generate, upscale):
+            for entry in healthy:
+                with self.subTest(module=module.__name__, entry=entry):
+                    self.assertIsNone(module.execution_error(entry))
+
+
+class PollLoopTests(unittest.TestCase):
+    """main() end to end against a stubbed HTTP layer, no ComfyUI is started or contacted."""
+
+    def _fake_api(self, history_entry, counter):
+        def api(base, path, payload=None, timeout=600):
+            if path == '/system_stats':
+                return {}
+            if path == '/prompt':
+                return {'prompt_id': 'p1'}
+            counter.append(path)
+            return {'p1': history_entry}
+        return api
+
+    def test_comfy_generate_aborts_on_a_failed_prompt(self):
+        polls = []
+        with tempfile.TemporaryDirectory() as tmp:
+            argv = [
+                'comfy_generate.py',
+                '--workflow', str(GEN_ASSET / 'workflows/sdxl_t2i.api.json'),
+                '--prompt', 'a red apple',
+                '--out', os.path.join(tmp, 'out.png'),
+                # Short timeout on purpose: without the fix this bounds the test at four
+                # polls instead of the 600 the default would run through.
+                '--timeout', '6',
+            ]
+            with mock.patch.object(comfy_generate, 'api', self._fake_api(FAILED_HISTORY_ENTRY, polls)), \
+                    mock.patch.object(sys, 'argv', argv), \
+                    contextlib.redirect_stderr(io.StringIO()):
+                with self.assertRaises(SystemExit) as raised:
+                    comfy_generate.main()
+
+            self.assertIn('checkpoint not found', str(raised.exception))
+            self.assertEqual(len(polls), 1, 'the run must end on the first poll, not on the timeout')
+            self.assertFalse(os.path.exists(os.path.join(tmp, 'out.png')))
+
+    def test_upscale_aborts_on_a_failed_prompt(self):
+        polls = []
+        with tempfile.TemporaryDirectory() as tmp:
+            source = os.path.join(tmp, 'hero.png')
+            with open(source, 'wb') as fh:
+                fh.write(b'not really a png')
+            comfy_input = os.path.join(tmp, 'comfy-input')
+            argv = ['upscale.py', '--image', source, '--out', os.path.join(tmp, 'hero_2x.png'),
+                    '--timeout', '6']
+
+            with mock.patch.object(upscale, 'api', self._fake_api(FAILED_HISTORY_ENTRY, polls)), \
+                    mock.patch.object(upscale, 'COMFY_INPUT', comfy_input), \
+                    mock.patch.object(sys, 'argv', argv), \
+                    contextlib.redirect_stderr(io.StringIO()):
+                with self.assertRaises(SystemExit) as raised:
+                    upscale.main()
+
+            self.assertIn('checkpoint not found', str(raised.exception))
+            self.assertEqual(len(polls), 1, 'the run must end on the first poll, not on the timeout')
 
 
 if __name__ == '__main__':
