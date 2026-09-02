@@ -111,6 +111,7 @@ def main():
     fname = input_filename(a.image)
     staged_input = os.path.join(COMFY_INPUT, fname)
     shutil.copy(a.image, staged_input)
+    keep_staged = False
     try:
         with open(a.workflow, "r", encoding="utf-8") as f:
             wf = json.load(f)
@@ -136,12 +137,25 @@ def main():
         print(f"queued {pid} seed={a.seed} upscale_by={a.upscale_by} denoise={a.denoise}", file=sys.stderr)
 
         img = None
-        deadline = a.timeout / 1.5
-        polls = 0
-        while polls < deadline:
-            time.sleep(1.5)
-            polls += 1
-            hist = api(a.url, f"/history/{pid}")
+        # Wall clock, not a poll count. The old loop counted 1.5s sleeps and left the HTTP call
+        # itself unbounded (api() defaults to 900s), so a single hanging /history poll stretched
+        # the run far past --timeout. Each poll now gets the remaining budget as its socket timeout.
+        deadline = time.monotonic() + a.timeout
+        while True:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                break
+            time.sleep(min(1.5, remaining))
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                break
+            try:
+                hist = api(a.url, f"/history/{pid}", timeout=min(30.0, remaining))
+            except OSError as exc:  # timeout, reset connection, ComfyUI restarting
+                # A single failed poll must not kill a healthy run; the wall clock above still
+                # ends the loop on time.
+                print(f"Poll fehlgeschlagen, weiter: {exc}", file=sys.stderr)
+                continue
             entry = hist.get(pid)
             if not entry:
                 continue
@@ -158,20 +172,28 @@ def main():
             if failure:
                 sys.exit(f"ComfyUI-Fehler bei prompt_id={pid}: {failure}")
         if not img:
-            sys.exit(f"Timeout nach {a.timeout}s: kein Bild.")
+            # The timeout says nothing about the job: it may still be queued, and ComfyUI has
+            # not opened the input yet. Deleting the copy here left the job without its image,
+            # LoadImage then failed and the GPU work was gone. So the copy stays, named in the
+            # message, and the caller removes it once the job is really over.
+            keep_staged = True
+            sys.exit(
+                f"Timeout nach {a.timeout}s: kein Bild. Job {pid} kann noch in der Queue stehen, "
+                f"die Eingabekopie bleibt deshalb liegen: {staged_input}"
+            )
         download(a.url, img, a.out)
         print(a.out)
     finally:
-        # COMFY_INPUT is shared with every other run and with ComfyUI itself, so the copy has
-        # to go on every path: success, reported error and timeout alike. The unique name of
+        # COMFY_INPUT is shared with every other run and with ComfyUI itself, so the copy has to
+        # go once this run is really over: success and reported error alike. The unique name of
         # each run turns a leftover into a pile, one file per upscale.
-        # Best effort on purpose: after a timeout ComfyUI may still be reading the file, which
-        # holds it open on Windows, and a failed cleanup must not turn a finished upscale into
-        # an error.
-        try:
-            os.remove(staged_input)
-        except OSError:
-            pass
+        # Best effort on purpose: ComfyUI may still hold the file open, which blocks the delete
+        # on Windows, and a failed cleanup must not turn a finished upscale into an error.
+        if not keep_staged:
+            try:
+                os.remove(staged_input)
+            except OSError:
+                pass
 
 
 if __name__ == "__main__":

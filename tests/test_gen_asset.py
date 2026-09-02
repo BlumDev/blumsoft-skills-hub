@@ -60,6 +60,10 @@ SUCCESS_HISTORY_ENTRY = {
     'status': {'status_str': 'success', 'completed': True},
 }
 
+# A prompt ComfyUI has accepted but not finished: no images, no verdict. The poll loop must
+# keep waiting on this one and end on its own budget.
+QUEUED_HISTORY_ENTRY = {'outputs': {}}
+
 
 def workflow(name):
     with open(GEN_ASSET / 'workflows' / name, encoding='utf-8') as fh:
@@ -165,6 +169,40 @@ def stub_api(history_entry, polls, on_prompt=None):
     return api
 
 
+class FakeClock:
+    """Deterministic stand-in for the time module: nothing really sleeps, the clock just moves.
+
+    Both scripts reach the clock through their module level `time`, so replacing that name
+    makes the poll loop measurable without waiting for it.
+    """
+
+    def __init__(self):
+        self.now = 0.0
+
+    def monotonic(self):
+        return self.now
+
+    def sleep(self, seconds):
+        self.now += seconds
+
+
+def slow_poll_api(history_entry, clock, poll_cost, polls):
+    """api() replacement whose /history call burns poll_cost seconds of the fake wall clock.
+
+    Records the timeout each poll was given, which is what a hanging ComfyUI would be able to
+    block for.
+    """
+    def api(base, path, payload=None, timeout=600):
+        if path == '/system_stats':
+            return {}
+        if path == '/prompt':
+            return {'prompt_id': 'p1'}
+        polls.append(timeout)
+        clock.now += poll_cost
+        return {'p1': history_entry}
+    return api
+
+
 def fake_download(base, image, out_path):
     """Stand-in for download(): writes what a real /view call would deliver."""
     with open(out_path, 'wb') as fh:
@@ -220,6 +258,58 @@ class PollLoopTests(unittest.TestCase):
 
             self.assertIn('checkpoint not found', str(raised.exception))
             self.assertEqual(len(polls), 1, 'the run must end on the first poll, not on the timeout')
+
+
+class PollBudgetTests(unittest.TestCase):
+    """--timeout is a wall clock: it bounds the whole run and every single poll inside it.
+
+    The loop used to count 1.5s sleeps and hand the HTTP call no timeout at all, so it ran for
+    --timeout/1.5 polls of up to api()'s default (600s / 900s) each.
+    """
+
+    def run_until_timeout(self, module, argv, clock, polls, poll_cost):
+        api = slow_poll_api(QUEUED_HISTORY_ENTRY, clock, poll_cost, polls)
+        with mock.patch.object(module, 'api', api), \
+                mock.patch.object(module, 'time', clock), \
+                mock.patch.object(sys, 'argv', argv), \
+                contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit) as raised:
+                module.main()
+        return raised.exception
+
+    def assert_budget_kept(self, exception, clock, polls, budget):
+        self.assertIn(f'Timeout nach {budget:g}s', str(exception))
+        self.assertTrue(all(t <= budget for t in polls),
+                        f'no single poll may be allowed to block longer than the budget: {polls}')
+        self.assertEqual(len(polls), 1, 'a poll that eats the budget leaves room for no other')
+        self.assertLessEqual(clock.now, budget + 1.5, 'the run must end when --timeout says so')
+
+    def test_comfy_generate_keeps_the_timeout_budget(self):
+        clock, polls = FakeClock(), []
+        with tempfile.TemporaryDirectory() as tmp:
+            argv = [
+                'comfy_generate.py',
+                '--workflow', str(GEN_ASSET / 'workflows/sdxl_t2i.api.json'),
+                '--prompt', 'a red apple',
+                '--out', os.path.join(tmp, 'out.png'),
+                '--timeout', '6',
+            ]
+            exception = self.run_until_timeout(comfy_generate, argv, clock, polls, poll_cost=4.0)
+
+        self.assert_budget_kept(exception, clock, polls, budget=6.0)
+
+    def test_upscale_keeps_the_timeout_budget(self):
+        clock, polls = FakeClock(), []
+        with tempfile.TemporaryDirectory() as tmp:
+            source = os.path.join(tmp, 'hero.png')
+            with open(source, 'wb') as fh:
+                fh.write(b'not really a png')
+            argv = ['upscale.py', '--image', source, '--out', os.path.join(tmp, 'hero_2x.png'),
+                    '--timeout', '6']
+            with mock.patch.object(upscale, 'COMFY_INPUT', os.path.join(tmp, 'comfy-input')):
+                exception = self.run_until_timeout(upscale, argv, clock, polls, poll_cost=4.0)
+
+        self.assert_budget_kept(exception, clock, polls, budget=6.0)
 
 
 class UpscaleInputFileTests(unittest.TestCase):
@@ -307,6 +397,20 @@ class UpscaleInputCleanupTests(unittest.TestCase):
 
         self.assertEqual(os.listdir(self.comfy_input), [],
                          'the error path must clean up too, it is the one that repeats')
+
+    def test_keeps_the_copy_when_the_run_times_out(self):
+        # A timeout says nothing about the job: it can still be sitting in ComfyUI's queue,
+        # and ComfyUI opens the input only once it starts. Removing the copy here made the
+        # queued job fail later in LoadImage and threw the GPU work away.
+        clock = FakeClock()
+        with self.patched(QUEUED_HISTORY_ENTRY), mock.patch.object(upscale, 'time', clock):
+            with self.assertRaises(SystemExit) as raised:
+                upscale.main()
+
+        staged = os.listdir(self.comfy_input)
+        self.assertEqual(len(staged), 1, 'the queued job still needs its input image')
+        self.assertIn(staged[0], str(raised.exception),
+                      'the timeout message must name the file it deliberately left behind')
 
 
 if __name__ == '__main__':
