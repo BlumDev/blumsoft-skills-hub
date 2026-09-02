@@ -34,6 +34,7 @@ def load_script(name):
 
 comfy_generate = load_script('comfy_generate.py')
 upscale = load_script('upscale.py')
+ledger = load_script('ledger.py')
 
 # What /history/<id> returns once a prompt died on ComfyUI's side: an entry that exists,
 # carries a status and will never grow images.
@@ -264,6 +265,56 @@ class PollLoopTests(unittest.TestCase):
 
             self.assertIn('checkpoint not found', str(raised.exception))
             self.assertEqual(len(polls), 1, 'the run must end on the first poll, not on the timeout')
+
+
+class LedgerFindTests(unittest.TestCase):
+    """One half written JSONL line must not take the whole recall index down."""
+
+    def find(self, path, **overrides):
+        args = argparse.Namespace(vertical=None, tag=None, min_rating=None, limit=10)
+        for key, value in overrides.items():
+            setattr(args, key, value)
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch.object(ledger, 'LEDGER', path), \
+                contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            ledger.cmd_find(args)
+        return out.getvalue(), err.getvalue()
+
+    def write_ledger(self, tmp, *lines):
+        path = os.path.join(tmp, 'ledger.jsonl')
+        with open(path, 'w', encoding='utf-8') as fh:
+            fh.write(''.join(line + '\n' for line in lines))
+        return path
+
+    def test_a_truncated_line_does_not_hide_the_intact_entries(self):
+        # An add killed mid-append leaves exactly this behind. json.loads on it used to raise
+        # and every later find died with a JSONDecodeError, however many good lines there were.
+        with tempfile.TemporaryDirectory() as tmp:
+            path = self.write_ledger(
+                tmp,
+                json.dumps({'image': 'first.png', 'rating': 5, 'vertical': 'winzer'}),
+                '{"image": "half-written.png", "rating"',
+                json.dumps({'image': 'second.png', 'rating': 4, 'vertical': 'winzer'}),
+            )
+            out, err = self.find(path)
+
+        self.assertIn('first.png', out)
+        self.assertIn('second.png', out)
+        self.assertNotIn('half-written.png', out)
+        self.assertIn('Zeile 2', err, 'the skipped line has to be named, not swallowed')
+
+    def test_filters_still_apply_to_what_survived(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = self.write_ledger(
+                tmp,
+                json.dumps({'image': 'winzer.png', 'rating': 5, 'vertical': 'winzer'}),
+                '}broken{',
+                json.dumps({'image': 'food.png', 'rating': 5, 'vertical': 'food'}),
+            )
+            out, _ = self.find(path, vertical='winzer')
+
+        self.assertIn('winzer.png', out)
+        self.assertNotIn('food.png', out)
 
 
 class PollBudgetTests(unittest.TestCase):
