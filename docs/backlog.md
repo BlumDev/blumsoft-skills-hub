@@ -12,6 +12,8 @@ IDs `YYYYMMDD-slug`, nie renumbern. Ideen = offene Einträge mit `#idea`.
 
 ## Offen
 
+- [ ] 20260902-cursor-lesewelle Lesewelle 2026-09-02 (cursor-grok-4.6-high): 10 Test-Lücken, 6 Vereinfachungen, 6 Modul-Findings (0 high / 4 medium / 2 low), siehe docs/reviews/2026-09-02-cursor-lesewelle.md #note
+
 - [ ] 20260825-zweitmeinung-audit Zweitmeinungs-Audit 2026-08-25 (cursor-grok-4.6-high): 6 neue Findings (0 high / 5 medium / 1 low), siehe docs/reviews/2026-08-25-cursor-audit.md #note
 
 - [ ] 20260824-reconcile Reconcile 2026-08-24 (gpt-5.6-sol): 10 von 25 Review-Findings offen, 15 behoben, siehe docs/reviews/2026-08-24-reconcile.md #note
