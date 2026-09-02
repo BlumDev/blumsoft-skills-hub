@@ -115,3 +115,40 @@ fehl. Ein künftiges CI-Gate muss Pester 5 explizit installieren. Die Systeminst
 **Entscheidung.** Option 3, `SKILLSHUB_SYNC_FAULT=between-moves` wirft zwischen den Umbenennungen. Option 1 hängt an einem Zeitfenster von Mikrosekunden und wäre im CI ein Flake-Generator. Option 2 prüft eine Textkopie statt des laufenden Skripts und bricht bei jeder Umformatierung. Der Hook ist eine Zeile, steht sichtbar im Ablauf und führt in einen Pfad, der die Installation nachweislich intakt lässt.
 
 **Trade-off.** Produktionscode trägt einen Testschalter. Die Variable ist eindeutig benannt und sonst nirgends belegt. Wer sie setzt, bekommt einen abgebrochenen Sync mit wiederhergestelltem Skill, keinen Schaden. Der innere `try`/`catch` um den zweiten Move ist im selben Zug entfallen: er machte dasselbe wie der Restore im `finally`, zwei Kopien derselben Logik driften auseinander.
+
+## 2026-09-02: Der Timeout-Pfad von upscale.py räumt seine Eingabe NICHT weg
+
+**Kontext.** Seit 8071b34 entfernt `upscale.py` seine Kopie im geteilten ComfyUI-Input auf jedem Pfad, damit sich nicht pro Lauf eine Datei ansammelt. Der Befund `20260902-upscale-cleanup-removes-queued-input` aus der Lesewelle zeigt die Kehrseite: ein Timeout sagt nichts über den Job. Steht der noch in der Queue, hat ComfyUI die Datei noch gar nicht geöffnet, das Löschen gelingt also und LoadImage scheitert später. Die GPU-Arbeit ist dann verloren, obwohl der Job lief.
+
+**Optionen.**
+1. Kopie auch nach Timeout entfernen (Stand vor dem Fix).
+2. Den Prompt vor dem Aufräumen per `/interrupt` bzw. `/queue`-Delete abbrechen, dann löschen.
+3. Die Kopie auf dem Timeout-Pfad liegen lassen und im Fehlertext benennen.
+
+**Entscheidung.** Option 3. Option 1 opfert einen laufenden Job für eine aufgeräumte Festplatte, das ist die falsche Richtung. Option 2 wäre sauber, braucht aber zwei zusätzliche API-Aufrufe samt Fehlerbehandlung und trifft eine Entscheidung, die dem Aufrufer gehört: ein Timeout heisst nicht zwingend, dass er den Job nicht mehr will. Option 3 kostet eine Datei je Timeout, nennt sie im Abbruchtext und lässt den Job unangetastet.
+
+**Trade-off.** Wer häufig in den Timeout läuft, sammelt Dateien im Input-Ordner. Sie tragen den eindeutigen `upscale_src_`-Präfix aus b223786, sind also erkennbar und der Fehlertext nennt jede einzeln. Erfolg und gemeldeter Fehler räumen weiter auf, das sind die häufigen Fälle.
+
+## 2026-09-02: upscale.py stagt über das Dateisystem, nicht über die ComfyUI-API
+
+**Kontext.** `COMFY_INPUT` war fest auf die lokale Stability-Matrix-Installation codiert, während `--url`/`COMFYUI_URL` frei konfigurierbar blieb (Finding `20260902-upscale-comfy-input-hardcoded`). Auf eine andere Instanz gerichtet kopierte das Skript lokal, der Server suchte die Datei bei sich und der Lauf konnte nur in den 1200s-Timeout laufen.
+
+**Optionen.**
+1. Das Bild über ComfyUIs `/upload/image` hochladen, dann ist der Ordner egal.
+2. Den Ordner konfigurierbar machen und einen nicht-lokalen Host ohne Angabe ablehnen.
+
+**Entscheidung.** Option 2. Option 1 ist der saubere Weg für echte Fernnutzung, verlangt aber einen multipart/form-data-Body von Hand: die Skripte sind bewusst stdlib-only, `urllib` bringt dafür nichts mit. Der reale Anwendungsfall ist eine lokale Instanz, der Fehlerfall eine Fehlkonfiguration. Genau die fängt `--input-dir` (env `COMFYUI_INPUT`, gleiches Muster wie `--url`) ab, und ohne Angabe wird ein nicht-lokaler Host mit Begründung abgelehnt statt stumm ins Leere zu kopieren.
+
+**Trade-off.** Eine ComfyUI-Instanz auf einer anderen Maschine bleibt nur nutzbar, wenn ihr Input-Ordner hier als Pfad erreichbar ist (Netzlaufwerk, Mount). Ein reiner HTTP-Tunnel reicht nicht. Das ist ehrlicher als vorher: der Lauf scheitert jetzt sofort mit dem Grund statt nach zwanzig Minuten mit einem Timeout.
+
+## 2026-09-02: website-audit behält Port und Pfade fest und erzwingt stattdessen Exklusivität
+
+**Kontext.** Der Skill startet Edge auf Debug-Port 9222 mit Profil `$env:TEMP\edge-lh` und schreibt den Lighthouse-Report nach `$env:TEMP\lh-report`. Alle drei Namen sind hart codiert und die Warteschleife akzeptierte jeden Prozess, der auf 9222 antwortet (Finding `20260902-website-audit-debug-port-collision`). Ein abgestürzter Vorlauf oder ein Parallellauf liess Lighthouse damit die falsche Session messen bzw. den Report überschreiben.
+
+**Optionen.**
+1. Freien Port und eindeutige Profil- und Report-Pfade je Lauf erzeugen.
+2. Die festen Namen behalten und im ersten Schritt sicherstellen, dass kein zweiter Lauf aktiv ist.
+
+**Entscheidung.** Option 2. Option 1 scheitert an der Ablaufform des Skills: jeder Block ist ein eigener Tool-Call und der Shell-State überlebt den Call nicht (der Skill sagt das in Schritt b2 selbst). Ein zufälliger Port müsste also über eine Datei weitergereicht werden, deren Name wieder fest wäre. Statt die Kollision aufzulösen macht Schritt a die Voraussetzung explizit: antwortet auf 9222 schon jemand, bricht der Lauf ab, Profil-Reste eines Absturzes werden beendet und ein alter Report wird gelöscht, bevor gemessen wird.
+
+**Trade-off.** Zwei Audits gleichzeitig auf derselben Maschine sind nicht mehr möglich, sie waren es faktisch vorher auch nicht, nur ohne Warnung. Ein fremder Chrome- oder Edge-Debug-Port auf 9222 blockiert den Audit ebenfalls, was richtig ist: den hätte der Lauf sonst vermessen.
