@@ -2,7 +2,7 @@
 status: wartung
 track: infra
 next_step: "Skills bei Bedarf pflegen, optional eine CI-Validierung ergänzen"
-updated: 2026-09-01
+updated: 2026-09-02
 ---
 
 # Backlog
@@ -18,25 +18,25 @@ IDs `YYYYMMDD-slug`, nie renumbern. Ideen = offene Einträge mit `#idea`.
 
 - [ ] 20260825-pester-alt-suiten-pwsh76 Alt-Testsuiten (bootstrap-project, tooling-edge) verlieren unter pwsh 7.6.5 ihre Top-Level-Variablen in It-Blöcken, 7 Tests rot unabhängig vom Code-Stand (auch auf unverändertem main), Setup nach BeforeAll/BeforeDiscovery verlagern; CI führt nur validate.ps1 aus und ist nicht betroffen #bug (Merge-Session 2026-08-25)
 
-Aus Codex-Audit 2026-07-14 (`docs/reviews/2026-07-14-codex.md`), noch nicht validiert:
+Aus Codex-Audit 2026-07-14 (`docs/reviews/2026-07-14-codex.md`), am 2026-08-18 gegen den Code validiert (`docs/reviews/2026-08-18-reconcile.md`, Basis 4dcd9fd). Zwei der fünf damals bestätigt offenen Punkte sind inzwischen erledigt (siehe `## Erledigt`), diese drei bleiben offen, Belege am Merge-Stand 2026-09-02 nachgezogen:
 
-- [ ] 20260714-idea-atomic-sync Sync über temporäre Verzeichnisse, Validierung und atomaren Austausch implementieren #idea (mittel)
-- [ ] 20260714-idea-real-yaml-parser Regex-YAML-Parser durch echten Parser plus Schema-Validierung ersetzen #idea (mittel)
-- [ ] 20260714-idea-transactional-vendor-import Vendor-Import als transaktionale, commit-genaue Pipeline mit Staging, Inhalts-Hashes und atomarem Lock-Update #idea (gross)
+- [ ] 20260714-idea-atomic-sync Sync über temporäre Verzeichnisse, Validierung und atomaren Austausch implementieren #idea (mittel, Rest bestätigt 2026-09-02: Staging und atomarer Austausch sind da (`sync.ps1:78-101`, zwei Umbenennungen statt Löschen plus Verschieben, 633c2dd und fb163c6), offen bleibt allein die Validierung des Stagings, `sync.ps1:82-86` normalisiert nur die Kodierung der `SKILL.md`)
+- [ ] 20260714-idea-real-yaml-parser Regex-YAML-Parser durch echten Parser plus Schema-Validierung ersetzen #idea (mittel, bestätigt 2026-09-02: `lib.ps1:96-133` (Bundles), `lib.ps1:185-210` (Registry) und `lib.ps1:222-248` (Archivplan) parsen weiter zeilenweise)
+- [ ] 20260714-idea-transactional-vendor-import Vendor-Import als transaktionale, commit-genaue Pipeline mit Staging, Inhalts-Hashes und atomarem Lock-Update #idea (gross, Rest bestätigt 2026-09-02: gesperrter Commit und Exitcode-Prüfung sind da, es fehlen Staging, Inhalts-Hashes und der atomare Lock-Schreibvorgang in `vendor-import.ps1:56-58,84-86`)
 
-Aus Code-Audit 2026-06-24 (`reviews/2026-06-24-code-audit.md`), recovered, noch nicht validiert:
+Aus Code-Audit 2026-06-24 (`reviews/2026-06-24-code-audit.md`), recovered, am 2026-08-18 gegen den Code validiert (`docs/reviews/2026-08-18-reconcile.md`), beide bestätigt offen:
 
-- [ ] 20260624-legacy-wrapper-bundles-sunset 8 Legacy-Wrapper-Bundles (leere core_skills, delegieren nur via compose_with) verursachen dauerhaften Pflegeaufwand, Sunset-Plan sobald keine externen Referenzen mehr auf die alten IDs zeigen #idea (Quelle: reviews/2026-06-24-code-audit.md)
-- [ ] 20260624-vendor-notebooklm-robustness Geerbte Vendor-Robustheitsmängel in notebooklm-Skripten (bare except fängt KeyboardInterrupt/SystemExit, unvollständiges Playwright-Cleanup), geerbt (MIT), nicht selbst fixen, ggf. Upstream-Issue/PR #bug (Quelle: reviews/2026-06-24-code-audit.md)
+- [ ] 20260624-legacy-wrapper-bundles-sunset 8 Legacy-Wrapper-Bundles (`bundles/index.yaml:23-46`) delegieren via compose_with und verursachen Pflegeaufwand, Sunset-Plan sobald keine externen Referenzen mehr auf die alten IDs zeigen #idea (Quelle: reviews/2026-06-24-code-audit.md, korrigiert 2026-08-18: die core_skills sind nicht mehr leer, jeder Wrapper trägt genau einen Skill; die Sunset-Bedingung ist nicht erfüllt, `templates/project/.github/copilot-instructions.md:7,10` verweist noch auf `essentials` und `project-kickoff`)
+- [ ] 20260624-vendor-notebooklm-robustness Geerbte Vendor-Robustheitsmängel in notebooklm-Skripten (bare except fängt KeyboardInterrupt/SystemExit, unvollständiges Playwright-Cleanup), geerbt (MIT), nicht selbst fixen, ggf. Upstream-Issue/PR #bug (Quelle: reviews/2026-06-24-code-audit.md, bestätigt 2026-08-18: `ask_question.py:96,132,153,180,186`, `browser_utils.py:75`, Cleanup nur der Page in `browser_session.py:77-80,224-231`)
 
 ## Erledigt
 
-Ältere Einträge liegen in `archive/backlog-archive.md` (Archiv-Regel der AGENTS.md).
+Ältere Einträge liegen in `archive/backlog-archive.md` (Archiv-Regel der AGENTS.md). Der Reconcile vom 2026-08-18 hat die damals hier stehenden Einträge stichprobenartig gegen den Code gehalten, alle geprüften sind tatsächlich umgesetzt (Belege in `docs/reviews/2026-08-18-reconcile.md`); inzwischen sind sie ins Archiv gewandert.
 
-Security-Session Careful-Fixes (Branch `security/careful-fixes`, gemergt 2026-08-25):
+Security-Session Careful-Fixes (Branch `security/careful-fixes`, gemergt 2026-08-25). Der Reconcile vom 2026-08-18 führte diese beiden Punkte noch als offen, richtig für seine Basis 4dcd9fd: der Fix lag zu dem Zeitpunkt erst auf dem Branch, main erreichte er über a2390a3:
 
-- [x] 20260714-sync-remove-path-traversal sync übergibt ungeprüfte Namen an rekursives Remove-Item, `..`/Wildcards ermöglichen Traversal/Massenlöschung (5e3d7f2, 2026-07-16)
-- [x] 20260714-idea-id-allowlist-literalpath Skill-/Bundle-IDs per Allowlist validieren, `-LiteralPath` in den ID-getriebenen Pfadoperationen (5e3d7f2, 2026-07-16)
+- [x] 20260714-sync-remove-path-traversal sync übergibt ungeprüfte Namen an rekursives Remove-Item, `..`/Wildcards ermöglichen Traversal/Massenlöschung (5e3d7f2, 2026-07-16; verifiziert 2026-09-02: `Test-SkillId`/`Assert-SkillId`/`Resolve-SkillTargetPath` in `lib.ps1:15-55`, `sync.ps1` arbeitet durchgehend mit `-LiteralPath`)
+- [x] 20260714-idea-id-allowlist-literalpath Skill-/Bundle-IDs per Allowlist validieren, `-LiteralPath` in den ID-getriebenen Pfadoperationen (5e3d7f2, 2026-07-16; verifiziert 2026-09-02: Allowlist `^[a-z0-9][a-z0-9-]*\z` mit `-cmatch` in `lib.ps1:15-19`, beim YAML-Einlesen erzwungen)
 - [x] 20260825-merge-careful-fixes Branch security/careful-fixes nach main gemergt, Guard in mains Staging/ShouldProcess-Sync eingepasst, Guard-Suite 32/32 grün (a2390a3, 2026-08-25)
 
 Wartungs-Session 2026-09-01 (Findings aus den Reviews 2026-08-24, 2026-08-25 und 2026-08-31; jeder Fix mit Regressionstest, jeder Test gegen daef7d0 gegengeprüft):
