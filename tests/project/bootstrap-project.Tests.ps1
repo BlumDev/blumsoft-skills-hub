@@ -1,9 +1,12 @@
-Describe 'bootstrap-project.ps1 argument binding' {
-  BeforeAll {
-    $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
-    $script:BootstrapSourcePath = Join-Path $script:RepoRoot 'scripts/project/bootstrap-project.ps1'
-  }
+# Pester 5 executes the file top level during Discovery only; variables assigned there are
+# gone once the It/BeforeEach bodies run (pwsh 7.6.5 + Pester 5.9 make that visible, the paths
+# arrive as $null and Copy-Item dies on -LiteralPath). Setup therefore lives in BeforeAll.
+BeforeAll {
+  $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
+  $script:BootstrapSourcePath = Join-Path $script:RepoRoot 'scripts/project/bootstrap-project.ps1'
+}
 
+Describe 'bootstrap-project.ps1 argument binding' {
   BeforeEach {
     $fixtureRoot = Join-Path $TestDrive 'repo'
     $projectScriptDir = Join-Path $fixtureRoot 'scripts/project'
@@ -17,6 +20,8 @@ Describe 'bootstrap-project.ps1 argument binding' {
     New-Item -ItemType Directory -Path $projectRoot -Force | Out-Null
 
     Copy-Item -LiteralPath $script:BootstrapSourcePath -Destination $projectScriptDir
+    # -Path, not -LiteralPath: the trailing * has to expand. With -LiteralPath the fixture
+    # stayed empty and bootstrap-project.ps1 died on "Template not found".
     Copy-Item -Path (Join-Path $script:RepoRoot 'templates/project/*') -Destination $templateRoot -Recurse
     Set-Content -LiteralPath (Join-Path $skillsScriptDir 'sync.ps1') -Encoding utf8NoBOM -Value @'
 [CmdletBinding(SupportsShouldProcess)]
@@ -75,11 +80,6 @@ $global:BootstrapSyncInvocation = [pscustomobject]@{
 }
 
 Describe 'bootstrap-project.ps1 Copy-IfMissing' {
-  BeforeAll {
-    $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
-    $script:BootstrapSourcePath = Join-Path $script:RepoRoot 'scripts/project/bootstrap-project.ps1'
-  }
-
   BeforeEach {
     $fixtureRoot = Join-Path $TestDrive 'copy-if-missing-repo'
     $projectScriptDir = Join-Path $fixtureRoot 'scripts/project'

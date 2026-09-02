@@ -183,12 +183,25 @@ def main():
     print(f"queued prompt_id={prompt_id} seed={args.seed}", file=sys.stderr)
 
     image = None
-    deadline = args.timeout / 1.5
-    polls = 0
-    while polls < deadline:
-        time.sleep(1.5)
-        polls += 1
-        history = api(args.url, f"/history/{prompt_id}")
+    # Wall clock, not a poll count. The old loop counted 1.5s sleeps and left the HTTP call
+    # itself unbounded (api() defaults to 600s), so a single hanging /history poll stretched the
+    # run far past --timeout. Each poll now gets the remaining budget as its own socket timeout.
+    deadline = time.monotonic() + args.timeout
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            break
+        time.sleep(min(1.5, remaining))
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            break
+        try:
+            history = api(args.url, f"/history/{prompt_id}", timeout=min(30.0, remaining))
+        except OSError as exc:  # timeout, reset connection, ComfyUI restarting
+            # A single failed poll must not kill a healthy run; the wall clock above still
+            # ends the loop on time.
+            print(f"Poll fehlgeschlagen, weiter: {exc}", file=sys.stderr)
+            continue
         entry = history.get(prompt_id)
         if not entry:
             continue

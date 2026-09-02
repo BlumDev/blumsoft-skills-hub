@@ -96,11 +96,31 @@ Harness-Preview und ein normaler Chrome/Edge-Launch sind unzuverlässig (docken
 an eine laufende Instanz an). Stattdessen Edge mit eigenem Profil und Debug-Port
 starten und Lighthouse per `--port` andocken. Alle Befehle in **PowerShell**.
 
-**a) Edge headless im Hintergrund starten:**
+Port `9222`, Profil `$env:TEMP\edge-lh` und Report `$env:TEMP\lh-report` sind fest,
+weil der Shell-State zwischen zwei Tool-Calls nicht überlebt (siehe b2) und jeder
+Block die Werte selbst kennen muss. Daraus folgt: es darf immer nur EIN Lauf
+gleichzeitig aktiv sein. Schritt a erzwingt das, sonst misst Lighthouse die Session
+eines Vorlaufs oder liest dessen Report.
+
+**a) Alten Stand ausschließen, dann Edge headless im Hintergrund starten:**
 
 ```powershell
 $edge = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 if (-not (Test-Path $edge)) { $edge = "C:\Program Files\Microsoft\Edge\Application\msedge.exe" }
+
+# Antwortet auf 9222 schon jemand, gehört die Session nicht diesem Lauf: abbrechen statt
+# blind andocken (die Warteschleife in b würde jeden Prozess auf dem Port akzeptieren).
+try { Invoke-RestMethod 'http://127.0.0.1:9222/json/version' -TimeoutSec 1 | Out-Null; $busy = $true }
+catch { $busy = $false }
+if ($busy) { throw 'Auf 9222 läuft bereits eine Debug-Session: erst Schritt e ausführen oder den parallelen Lauf abwarten.' }
+
+# Reste eines abgestürzten Vorlaufs: Prozesse halten sonst das Profil, ein alter Report
+# würde in Schritt d als Ergebnis dieses Laufs gelesen.
+Get-CimInstance Win32_Process -Filter "Name='msedge.exe'" |
+  Where-Object { $_.CommandLine -like '*edge-lh*' } |
+  ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
+Remove-Item "$env:TEMP\lh-report.report.json","$env:TEMP\lh-report.report.html" -Force -ErrorAction SilentlyContinue
+
 Start-Process $edge -ArgumentList '--headless=new','--remote-debugging-port=9222',"--user-data-dir=$env:TEMP\edge-lh",'--no-first-run','--disable-extensions','about:blank'
 ```
 
@@ -114,7 +134,7 @@ $ok = $false
     catch { Start-Sleep -Milliseconds 500 }
   }
 }
-if (-not $ok) { Write-Error 'Edge-Debug-Port nicht erreichbar' }
+if (-not $ok) { throw 'Edge-Debug-Port nicht erreichbar' }
 ```
 
 **b2) Node/npx sicherstellen** (diese Maschine nutzt **fnm**; in der

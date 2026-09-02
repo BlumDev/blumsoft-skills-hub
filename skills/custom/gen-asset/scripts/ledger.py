@@ -22,6 +22,7 @@ import argparse
 import json
 import os
 import struct
+import sys
 
 LEDGER = os.path.join(os.path.dirname(__file__), "..", "reference", "ledger.jsonl")
 
@@ -104,10 +105,18 @@ def cmd_find(args):
         return
     rows = []
     with open(LEDGER, "r", encoding="utf-8") as fh:
-        for line in fh:
+        for number, line in enumerate(fh, 1):
             line = line.strip()
-            if line:
+            if not line:
+                continue
+            try:
                 rows.append(json.loads(line))
+            except ValueError:
+                # An add killed mid-append (or two adds racing) leaves half a line behind.
+                # Parsing it used to raise and take every intact entry above and below it
+                # with it, so the whole index was gone until someone edited the file by hand.
+                print(f"Zeile {number} übersprungen, kein gültiges JSON: {LEDGER}",
+                      file=sys.stderr)
     if args.vertical:
         rows = [r for r in rows if (r.get("vertical") or "").lower() == args.vertical.lower()]
     if args.tag:

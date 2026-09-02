@@ -1,24 +1,35 @@
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
-$vendorImportPath = Join-Path $repoRoot 'scripts/skills/vendor-import.ps1'
-$libPath = Join-Path $repoRoot 'scripts/skills/lib.ps1'
-$syncSourcePath = Join-Path $repoRoot 'scripts/skills/sync.ps1'
-$pythonCommand = Get-Command python -ErrorAction SilentlyContinue
+# Pester 5 executes the file top level during Discovery only; variables assigned there are
+# gone once the It bodies run (pwsh 7.6.5 + Pester 5.9 make that visible, the paths arrive as
+# $null). Data the Discovery phase needs (-TestCases, -Skip) therefore lives in
+# BeforeDiscovery, everything the It bodies read in BeforeAll.
+BeforeDiscovery {
+  $discoveryRepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
+  $pythonCommand = Get-Command python -ErrorAction SilentlyContinue
 
-$unsafeSkillCases = @(
-  @{ SkillName = '../outside' }
-  @{ SkillName = '*' }
-)
-$serverHelperCases = @(
-  @{ Name = 'custom'; Path = Join-Path $repoRoot 'skills/custom/web/scripts/with_server.py' }
-  @{ Name = 'vendor'; Path = Join-Path $repoRoot 'skills/vendor/guanyang/webapp-testing/scripts/with_server.py' }
-)
+  $unsafeSkillCases = @(
+    @{ SkillName = '../outside' }
+    @{ SkillName = '*' }
+  )
+  $serverHelperCases = @(
+    @{ Name = 'custom'; Path = Join-Path $discoveryRepoRoot 'skills/custom/web/scripts/with_server.py' }
+    @{ Name = 'vendor'; Path = Join-Path $discoveryRepoRoot 'skills/vendor/guanyang/webapp-testing/scripts/with_server.py' }
+  )
+}
+
+BeforeAll {
+  $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
+  $script:VendorImportPath = Join-Path $script:RepoRoot 'scripts/skills/vendor-import.ps1'
+  $script:LibPath = Join-Path $script:RepoRoot 'scripts/skills/lib.ps1'
+  $script:SyncSourcePath = Join-Path $script:RepoRoot 'scripts/skills/sync.ps1'
+  $script:PythonCommand = Get-Command python -ErrorAction SilentlyContinue
+}
 
 Describe 'vendor-import.ps1 native command handling' {
   It 'throws when the skill installer returns a nonzero exit code' {
     $tokens = $null
     $parseErrors = $null
     $ast = [System.Management.Automation.Language.Parser]::ParseFile(
-      $vendorImportPath,
+      $script:VendorImportPath,
       [ref]$tokens,
       [ref]$parseErrors
     )
@@ -70,7 +81,7 @@ Describe 'vendor-import.ps1 native command handling' {
 
 Describe 'Get-AllBundles duplicate handling' {
   It 'rejects duplicate bundle IDs' {
-    . $libPath
+    . $script:LibPath
     $fixtureRoot = Join-Path $TestDrive 'duplicate-bundles'
     $bundleDir = Join-Path $fixtureRoot 'bundles'
     New-Item -ItemType Directory -Path $bundleDir -Force | Out-Null
@@ -102,8 +113,8 @@ Describe 'sync.ps1 unsafe skill names' {
     $sentinelPath = Join-Path $targetSkillDir 'sentinel.txt'
 
     New-Item -ItemType Directory -Path $fixtureScripts -Force | Out-Null
-    Copy-Item -LiteralPath $libPath -Destination $fixtureScripts
-    Copy-Item -LiteralPath $syncSourcePath -Destination $fixtureScripts
+    Copy-Item -LiteralPath $script:LibPath -Destination $fixtureScripts
+    Copy-Item -LiteralPath $script:SyncSourcePath -Destination $fixtureScripts
     New-Item -ItemType Directory -Path (Join-Path $fixtureRoot 'bundles') -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $fixtureRoot 'bundles/test-bundle.yaml') -Encoding utf8NoBOM -Value @(
       'id: test-bundle'
@@ -145,7 +156,7 @@ Describe 'with_server.py occupied port handling' {
     $commandScript = Join-Path $TestDrive "$Name-command.py"
     $markerLiteral = ConvertTo-Json -InputObject $markerPath -Compress
     Set-Content -LiteralPath $commandScript -Encoding utf8NoBOM -Value "from pathlib import Path`nPath($markerLiteral).write_text('ran', encoding='utf-8')"
-    $serverCommand = '"{0}" -c "pass"' -f $pythonCommand.Source.Replace('"', '\"')
+    $serverCommand = '"{0}" -c "pass"' -f $script:PythonCommand.Source.Replace('"', '\"')
     $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, 0)
     $listener.Start()
     $exitCode = $null
@@ -153,7 +164,7 @@ Describe 'with_server.py occupied port handling' {
     try {
       $port = ([System.Net.IPEndPoint]$listener.LocalEndpoint).Port
       $PSNativeCommandUseErrorActionPreference = $false
-      $null = & $pythonCommand.Source $Path --server $serverCommand --port $port --timeout 1 -- $pythonCommand.Source $commandScript 2>&1
+      $null = & $script:PythonCommand.Source $Path --server $serverCommand --port $port --timeout 1 -- $script:PythonCommand.Source $commandScript 2>&1
       $exitCode = $LASTEXITCODE
     } finally {
       $PSNativeCommandUseErrorActionPreference = $previousNativePreference

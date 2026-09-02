@@ -44,7 +44,13 @@ with sync_playwright() as p:
 
 1. Inspect the rendered DOM:
    ```python
-   page.screenshot(path='/tmp/inspect.png', full_page=True)
+   import tempfile
+   from pathlib import Path
+
+   # tempfile.gettempdir(), not a literal '/tmp': that path does not exist on Windows and
+   # Playwright aborts the recon with a FileNotFoundError before a single selector is read.
+   shot = Path(tempfile.gettempdir()) / 'inspect.png'
+   page.screenshot(path=shot, full_page=True)
    content = page.content()
    page.locator('button').all()
    ```

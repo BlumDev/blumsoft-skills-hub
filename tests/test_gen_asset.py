@@ -34,6 +34,7 @@ def load_script(name):
 
 comfy_generate = load_script('comfy_generate.py')
 upscale = load_script('upscale.py')
+ledger = load_script('ledger.py')
 
 # What /history/<id> returns once a prompt died on ComfyUI's side: an entry that exists,
 # carries a status and will never grow images.
@@ -59,6 +60,10 @@ SUCCESS_HISTORY_ENTRY = {
     'outputs': {'9': {'images': [{'filename': 'hero_00001_.png', 'subfolder': '', 'type': 'output'}]}},
     'status': {'status_str': 'success', 'completed': True},
 }
+
+# A prompt ComfyUI has accepted but not finished: no images, no verdict. The poll loop must
+# keep waiting on this one and end on its own budget.
+QUEUED_HISTORY_ENTRY = {'outputs': {}}
 
 
 def workflow(name):
@@ -165,6 +170,40 @@ def stub_api(history_entry, polls, on_prompt=None):
     return api
 
 
+class FakeClock:
+    """Deterministic stand-in for the time module: nothing really sleeps, the clock just moves.
+
+    Both scripts reach the clock through their module level `time`, so replacing that name
+    makes the poll loop measurable without waiting for it.
+    """
+
+    def __init__(self):
+        self.now = 0.0
+
+    def monotonic(self):
+        return self.now
+
+    def sleep(self, seconds):
+        self.now += seconds
+
+
+def slow_poll_api(history_entry, clock, poll_cost, polls):
+    """api() replacement whose /history call burns poll_cost seconds of the fake wall clock.
+
+    Records the timeout each poll was given, which is what a hanging ComfyUI would be able to
+    block for.
+    """
+    def api(base, path, payload=None, timeout=600):
+        if path == '/system_stats':
+            return {}
+        if path == '/prompt':
+            return {'prompt_id': 'p1'}
+        polls.append(timeout)
+        clock.now += poll_cost
+        return {'p1': history_entry}
+    return api
+
+
 def fake_download(base, image, out_path):
     """Stand-in for download(): writes what a real /view call would deliver."""
     with open(out_path, 'wb') as fh:
@@ -172,7 +211,13 @@ def fake_download(base, image, out_path):
 
 
 def staged_inputs(folder):
-    """Everything in the stand-in for ComfyUI's shared input folder, name -> bytes."""
+    """Everything in the stand-in for ComfyUI's shared input folder, name -> bytes.
+
+    A folder that does not exist counts as empty: for a run that stages somewhere else the
+    absence is exactly what has to be measured.
+    """
+    if not os.path.isdir(folder):
+        return {}
     return {name: (Path(folder) / name).read_bytes() for name in sorted(os.listdir(folder))}
 
 
@@ -222,6 +267,108 @@ class PollLoopTests(unittest.TestCase):
             self.assertEqual(len(polls), 1, 'the run must end on the first poll, not on the timeout')
 
 
+class LedgerFindTests(unittest.TestCase):
+    """One half written JSONL line must not take the whole recall index down."""
+
+    def find(self, path, **overrides):
+        args = argparse.Namespace(vertical=None, tag=None, min_rating=None, limit=10)
+        for key, value in overrides.items():
+            setattr(args, key, value)
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch.object(ledger, 'LEDGER', path), \
+                contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            ledger.cmd_find(args)
+        return out.getvalue(), err.getvalue()
+
+    def write_ledger(self, tmp, *lines):
+        path = os.path.join(tmp, 'ledger.jsonl')
+        with open(path, 'w', encoding='utf-8') as fh:
+            fh.write(''.join(line + '\n' for line in lines))
+        return path
+
+    def test_a_truncated_line_does_not_hide_the_intact_entries(self):
+        # An add killed mid-append leaves exactly this behind. json.loads on it used to raise
+        # and every later find died with a JSONDecodeError, however many good lines there were.
+        with tempfile.TemporaryDirectory() as tmp:
+            path = self.write_ledger(
+                tmp,
+                json.dumps({'image': 'first.png', 'rating': 5, 'vertical': 'winzer'}),
+                '{"image": "half-written.png", "rating"',
+                json.dumps({'image': 'second.png', 'rating': 4, 'vertical': 'winzer'}),
+            )
+            out, err = self.find(path)
+
+        self.assertIn('first.png', out)
+        self.assertIn('second.png', out)
+        self.assertNotIn('half-written.png', out)
+        self.assertIn('Zeile 2', err, 'the skipped line has to be named, not swallowed')
+
+    def test_filters_still_apply_to_what_survived(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = self.write_ledger(
+                tmp,
+                json.dumps({'image': 'winzer.png', 'rating': 5, 'vertical': 'winzer'}),
+                '}broken{',
+                json.dumps({'image': 'food.png', 'rating': 5, 'vertical': 'food'}),
+            )
+            out, _ = self.find(path, vertical='winzer')
+
+        self.assertIn('winzer.png', out)
+        self.assertNotIn('food.png', out)
+
+
+class PollBudgetTests(unittest.TestCase):
+    """--timeout is a wall clock: it bounds the whole run and every single poll inside it.
+
+    The loop used to count 1.5s sleeps and hand the HTTP call no timeout at all, so it ran for
+    --timeout/1.5 polls of up to api()'s default (600s / 900s) each.
+    """
+
+    def run_until_timeout(self, module, argv, clock, polls, poll_cost):
+        api = slow_poll_api(QUEUED_HISTORY_ENTRY, clock, poll_cost, polls)
+        with mock.patch.object(module, 'api', api), \
+                mock.patch.object(module, 'time', clock), \
+                mock.patch.object(sys, 'argv', argv), \
+                contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit) as raised:
+                module.main()
+        return raised.exception
+
+    def assert_budget_kept(self, exception, clock, polls, budget):
+        self.assertIn(f'Timeout nach {budget:g}s', str(exception))
+        self.assertTrue(all(t <= budget for t in polls),
+                        f'no single poll may be allowed to block longer than the budget: {polls}')
+        self.assertEqual(len(polls), 1, 'a poll that eats the budget leaves room for no other')
+        self.assertLessEqual(clock.now, budget + 1.5, 'the run must end when --timeout says so')
+
+    def test_comfy_generate_keeps_the_timeout_budget(self):
+        clock, polls = FakeClock(), []
+        with tempfile.TemporaryDirectory() as tmp:
+            argv = [
+                'comfy_generate.py',
+                '--workflow', str(GEN_ASSET / 'workflows/sdxl_t2i.api.json'),
+                '--prompt', 'a red apple',
+                '--out', os.path.join(tmp, 'out.png'),
+                '--timeout', '6',
+            ]
+            exception = self.run_until_timeout(comfy_generate, argv, clock, polls, poll_cost=4.0)
+
+        self.assert_budget_kept(exception, clock, polls, budget=6.0)
+
+    def test_upscale_keeps_the_timeout_budget(self):
+        clock, polls = FakeClock(), []
+        with tempfile.TemporaryDirectory() as tmp:
+            source = os.path.join(tmp, 'hero.png')
+            with open(source, 'wb') as fh:
+                fh.write(b'not really a png')
+            argv = ['upscale.py', '--image', source, '--out', os.path.join(tmp, 'hero_2x.png'),
+                    '--timeout', '6']
+            with mock.patch.object(upscale, 'COMFY_INPUT', os.path.join(tmp, 'comfy-input')):
+                exception = self.run_until_timeout(upscale, argv, clock, polls, poll_cost=4.0)
+
+        self.assert_budget_kept(exception, clock, polls, budget=6.0)
+
+
 class UpscaleInputFileTests(unittest.TestCase):
     def test_input_name_is_unique_and_stays_a_bare_filename(self):
         first = upscale.input_filename(os.path.join('out', 'hero.png'))
@@ -268,6 +415,72 @@ class UpscaleInputFileTests(unittest.TestCase):
             self.assertEqual([first_bytes, second_bytes], [b'out', b'projekt'])
 
 
+class UpscaleInputDirTests(unittest.TestCase):
+    """The staging folder has to belong to the ComfyUI behind --url, not to this machine."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.tmp = tmp.name
+        self.source = os.path.join(self.tmp, 'hero.png')
+        with open(self.source, 'wb') as fh:
+            fh.write(b'not really a png')
+        self.local_input = os.path.join(self.tmp, 'local-comfy-input')
+
+    def run_main(self, argv, staged, watch=None):
+        # Snapshot taken while the prompt is queued: that is the only window in which a run's
+        # copy exists, every path removes it again.
+        folder = watch or self.local_input
+        api = stub_api(FAILED_HISTORY_ENTRY, [],
+                       on_prompt=lambda: staged.append(staged_inputs(folder)))
+        with mock.patch.object(upscale, 'api', api), \
+                mock.patch.object(upscale, 'COMFY_INPUT', self.local_input), \
+                mock.patch.object(sys, 'argv', argv), \
+                contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit) as raised:
+                upscale.main()
+        return raised.exception
+
+    def test_refuses_a_remote_url_without_an_input_dir(self):
+        # The old code copied into the local folder no matter what --url said. The remote
+        # server never saw the file, so the run only ever ended in its 1200s timeout.
+        staged = []
+        exception = self.run_main(
+            ['upscale.py', '--image', self.source, '--out', os.path.join(self.tmp, 'o.png'),
+             '--url', 'http://gpu-box:8188', '--timeout', '6'],
+            staged,
+        )
+
+        self.assertIn('--input-dir', str(exception))
+        self.assertEqual(staged, [], 'no prompt may be submitted for a folder the server cannot read')
+        self.assertFalse(os.path.exists(self.local_input),
+                         'nothing may be staged into the local folder for a remote instance')
+
+    def test_input_dir_lets_a_remote_url_stage_where_the_server_reads(self):
+        remote_input = os.path.join(self.tmp, 'mounted-comfy-input')
+        staged = []
+        self.run_main(
+            ['upscale.py', '--image', self.source, '--out', os.path.join(self.tmp, 'o.png'),
+             '--url', 'http://gpu-box:8188', '--input-dir', remote_input, '--timeout', '6'],
+            staged, watch=remote_input,
+        )
+
+        self.assertEqual([len(snapshot) for snapshot in staged], [1],
+                         'the copy has to land in the folder --input-dir names')
+        self.assertFalse(os.path.exists(self.local_input), 'the local default must stay untouched')
+
+    def test_a_local_url_still_uses_the_installation_default(self):
+        staged = []
+        self.run_main(
+            ['upscale.py', '--image', self.source, '--out', os.path.join(self.tmp, 'o.png'),
+             '--timeout', '6'],
+            staged,
+        )
+
+        self.assertEqual([len(snapshot) for snapshot in staged], [1],
+                         'the default path must keep staging into COMFY_INPUT')
+
+
 class UpscaleInputCleanupTests(unittest.TestCase):
     """The copy in the shared input folder belongs to one run and must not outlive it."""
 
@@ -307,6 +520,20 @@ class UpscaleInputCleanupTests(unittest.TestCase):
 
         self.assertEqual(os.listdir(self.comfy_input), [],
                          'the error path must clean up too, it is the one that repeats')
+
+    def test_keeps_the_copy_when_the_run_times_out(self):
+        # A timeout says nothing about the job: it can still be sitting in ComfyUI's queue,
+        # and ComfyUI opens the input only once it starts. Removing the copy here made the
+        # queued job fail later in LoadImage and threw the GPU work away.
+        clock = FakeClock()
+        with self.patched(QUEUED_HISTORY_ENTRY), mock.patch.object(upscale, 'time', clock):
+            with self.assertRaises(SystemExit) as raised:
+                upscale.main()
+
+        staged = os.listdir(self.comfy_input)
+        self.assertEqual(len(staged), 1, 'the queued job still needs its input image')
+        self.assertIn(staged[0], str(raised.exception),
+                      'the timeout message must name the file it deliberately left behind')
 
 
 if __name__ == '__main__':
