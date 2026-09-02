@@ -12,7 +12,7 @@ IDs `YYYYMMDD-slug`, nie renumbern. Ideen = offene Einträge mit `#idea`.
 
 ## Offen
 
-- [ ] 20260902-cursor-lesewelle Lesewelle 2026-09-02 (cursor-grok-4.6-high): 10 Test-Lücken, 6 Vereinfachungen, 6 Modul-Findings (0 high / 4 medium / 2 low), siehe docs/reviews/2026-09-02-cursor-lesewelle.md #note (Stand 2026-09-02: die Modul-Findings sind in der Wartungs-Session 5b behoben, siehe die 20260902-Einträge unter `## Erledigt`; offen bleiben die Test-Lücken und die Vereinfachungen)
+- [ ] 20260902-cursor-lesewelle Lesewelle 2026-09-02 (cursor-grok-4.6-high): 10 Test-Lücken, 6 Vereinfachungen, 6 Modul-Findings (0 high / 4 medium / 2 low), siehe docs/reviews/2026-09-02-cursor-lesewelle.md #note (Stand 2026-09-02: die Modul-Findings sind in der Wartungs-Session 5b behoben, siehe die 20260902-Einträge unter `## Erledigt`; 6 der 10 Test-Lücken sind mit `20260902-cursor-testgaps` geschlossen; offen bleiben die 6 Vereinfachungen und die 4 restlichen Test-Lücken, die kein ungetestetes Verhalten beschreiben, sondern Bugs: der Bundle-Parser verschluckt eine Flow-Liste `[a, b]` still, `Copy-Item` prüft die Registry-`path` nicht gegen die Repo-Grenze, `Convert-ToLocalRef` verwirft nur führende `..` und `Install-RepoSkills` überspringt ein vorhandenes Zielverzeichnis ohne `SKILL.md` statt es neu zu holen. Ein Test darauf wäre ohne Verhaltensänderung rot)
 
 - [ ] 20260825-zweitmeinung-audit Zweitmeinungs-Audit 2026-08-25 (cursor-grok-4.6-high): 6 neue Findings (0 high / 5 medium / 1 low), siehe docs/reviews/2026-08-25-cursor-audit.md #note
 
@@ -32,6 +32,10 @@ Aus Code-Audit 2026-06-24 (`reviews/2026-06-24-code-audit.md`), recovered, am 20
 ## Erledigt
 
 Ältere Einträge liegen in `archive/backlog-archive.md` (Archiv-Regel der AGENTS.md). Der Reconcile vom 2026-08-18 hat die damals hier stehenden Einträge stichprobenartig gegen den Code gehalten, alle geprüften sind tatsächlich umgesetzt (Belege in `docs/reviews/2026-08-18-reconcile.md`); inzwischen sind sie ins Archiv gewandert, ebenso die Security-Session und die Wartungs-Session 2026-09-01 (ausgelagert 2026-09-02).
+
+Cursor-Testlücken 2026-09-02 (Lauf `20260902T154440-9e966d` über das ai-router-Gate, Branch cursor/testgaps auf Basis 08347c5; jeder neue Test einzeln gegen die im Kopf benannte Mutation geprüft, Proben im Commit-Text von c8f90c2):
+
+- [x] 20260902-cursor-testgaps 6 der 10 Test-Lücken der Lesewelle geschlossen, kein Produktionscode angefasst. Neu: `tests/skills/lib.Tests.ps1` (compose_with-Rekursion plus Zyklus-Wächter in `Resolve-BundleSkills`) und `tests/skills/validate.Tests.ps1` (archive-reference außerhalb `skills/archive` sowie in der Core-Auflösung eines Profils). Erweitert: je ein Fall für `Copy-IfMissing`, den Profilzweig von sync.ps1, `-DryRun` und die Antigravity-Workflows. 5 Tests unverändert übernommen, 1 nachgearbeitet (der Antigravity-Fall fing seine eigene Mutation nicht, siehe decisions.md), 0 verworfen. Danach 51 grün / 0 rot, `validate.ps1` PASS, pytest 21 grün (4155fa7, 2026-09-02)
 
 Wartungs-Session 5b 2026-09-02 (Modul-Findings der Lesewelle 2026-09-02 plus der bekannte Pester-Punkt; Basis c13a0b3, jeder Fix mit Mutationsprobe oder Vorher-Nachher-Repro, Belege im jeweiligen Commit-Text):
 

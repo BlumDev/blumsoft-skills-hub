@@ -262,7 +262,7 @@ Describe 'sync.ps1 antigravity workflows' {
         # unabhängig voneinander (ShouldProcess um den Block plus $WhatIfPreference, das
         # Copy-Item selbst schon anhält). Gemessen 2026-09-02: weder das Auflösen des
         # ShouldProcess-Blocks noch Copy-Item -WhatIf:$false macht einen DryRun-Test rot,
-        # rot wird nur das Streichen von "if ($DryRun) { $WhatIfPreference = $true }", und das
+        # rot wird nur das Streichen von "if ($DryRun) { $WhatIfPreference = $true }". Das
         # fängt bereits 'leaves the installed skill untouched with -DryRun'.
 
         $script:fixture = New-SyncFixture

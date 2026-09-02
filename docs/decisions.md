@@ -152,3 +152,16 @@ fehl. Ein künftiges CI-Gate muss Pester 5 explizit installieren. Die Systeminst
 **Entscheidung.** Option 2. Option 1 scheitert an der Ablaufform des Skills: jeder Block ist ein eigener Tool-Call und der Shell-State überlebt den Call nicht (der Skill sagt das in Schritt b2 selbst). Ein zufälliger Port müsste also über eine Datei weitergereicht werden, deren Name wieder fest wäre. Statt die Kollision aufzulösen macht Schritt a die Voraussetzung explizit: antwortet auf 9222 schon jemand, bricht der Lauf ab, Profil-Reste eines Absturzes werden beendet und ein alter Report wird gelöscht, bevor gemessen wird.
 
 **Trade-off.** Zwei Audits gleichzeitig auf derselben Maschine sind nicht mehr möglich, sie waren es faktisch vorher auch nicht, nur ohne Warnung. Ein fremder Chrome- oder Edge-Debug-Port auf 9222 blockiert den Audit ebenfalls, was richtig ist: den hätte der Lauf sonst vermessen.
+
+## 2026-09-02: Der Antigravity-Test nagelt den Apply-Pfad fest, nicht den Dry-Run
+
+**Kontext.** Aus dem Cursor-Lauf `20260902T154440-9e966d` kam ein Test mit der Behauptung, er falle aus, wenn der Workflow-Block in `sync.ps1:130-145` sein `Copy-Item -Force` außerhalb von `ShouldProcess` ausführt. Die Mutationsprobe widerlegt das: der Test bleibt grün. Unter `-DryRun` schützen zwei Schichten unabhängig voneinander. `sync.ps1:15` setzt `$WhatIfPreference = $true`. Diese Preference hält `Copy-Item` und `New-Item` schon von sich aus an, weil beide selbst `ShouldProcess` unterstützen. Das Auflösen des `if ($PSCmdlet.ShouldProcess(...))`-Blocks ändert deshalb nichts, `Copy-Item -WhatIf:$false` ebenso wenig (die zweite Probe lief nur deshalb grün, weil die erste Schicht noch stand). Rot wird ein Dry-Run-Test auf diesem Block allein durch das Streichen von `sync.ps1:15`. Das fängt bereits der Test über den Skill-Austausch.
+
+**Optionen.**
+1. Den Test unverändert übernehmen: er ist grün, er beschreibt eine wahre Aussage über das Verhalten.
+2. Den Test verwerfen, weil seine benannte Mutation nicht greift.
+3. Den Test auf den Apply-Pfad umstellen: die Vorlage aus dem Repo überschreibt eine lokal geänderte Workflow-Datei.
+
+**Entscheidung.** Option 3. Option 1 hätte einen Test in die Suite gelegt, der eine doppelt abgesicherte Stelle ein drittes Mal bestätigt und dafür einen zusätzlichen Kind-pwsh startet: er kann nur noch mit dem Test brechen, den er dupliziert. Option 2 hätte auch das Apply-Verhalten weggeworfen, das tatsächlich ungetestet war. Die Probe "Copy-Item im Workflow-Block entfernt" macht den umgestellten Test rot, damit hängt er an einer eigenen Mutation.
+
+**Trade-off.** Die Zusage "`-DryRun` fasst die Workflows nicht an" steht jetzt nirgends als Test. Sie hängt an `sync.ps1:15`, das der Test `leaves the installed skill untouched with -DryRun` abdeckt. Fällt diese Zeile, wird dieser eine Test rot und der Grund ist im Kommentar des Antigravity-Tests notiert, damit niemand den Dry-Run-Fall aus Versehen ein zweites Mal baut.
