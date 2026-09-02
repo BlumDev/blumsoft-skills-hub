@@ -39,15 +39,30 @@ core_skills:
   - harmless
 "@
 
+        New-Item -ItemType Directory -Path (Join-Path $repo 'profiles') -Force | Out-Null
+        Set-Content -Path (Join-Path $repo 'profiles/only.json') -Value @"
+{
+  "profile_name": "only",
+  "include_extended": false,
+  "bundle_ids": ["only"],
+  "default_targets": ["codex"]
+}
+"@
+
+        $workflowSrcDir = Join-Path $repo 'adapters/antigravity/global_workflows'
+        New-Item -ItemType Directory -Path $workflowSrcDir -Force | Out-Null
+        Set-Content -Path (Join-Path $workflowSrcDir 'workflow-ops.md') -Value 'repo-workflow'
+
         $fakeHome = Join-Path $tmp 'home'
         New-Item -ItemType Directory -Path $fakeHome -Force | Out-Null
 
         [pscustomobject]@{
-            Root        = $tmp
-            Sync        = Join-Path $repo 'scripts/skills/sync.ps1'
-            FakeHome    = $fakeHome
-            SkillSource = Join-Path $repo 'skills/custom/harmless'
-            InstalledAt = Join-Path $fakeHome '.codex/skills/harmless'
+            Root               = $tmp
+            Sync               = Join-Path $repo 'scripts/skills/sync.ps1'
+            FakeHome           = $fakeHome
+            SkillSource        = Join-Path $repo 'skills/custom/harmless'
+            InstalledAt        = Join-Path $fakeHome '.codex/skills/harmless'
+            WorkflowInstalledAt = Join-Path $fakeHome '.gemini/antigravity/global_workflows/workflow-ops.md'
         }
     }
 
@@ -56,8 +71,11 @@ core_skills:
     function Invoke-FixtureSync {
         param(
             [Parameter(Mandatory = $true)][psobject]$Fixture,
-            [Parameter(Mandatory = $true)][string[]]$Targets,
-            [string]$Fault
+            [string[]]$Targets,
+            [string]$Fault,
+            [string]$Profile,
+            [switch]$DryRun,
+            [switch]$SyncAntigravityWorkflows
         )
 
         $originalProfile = $env:USERPROFILE
@@ -65,7 +83,13 @@ core_skills:
         try {
             $env:USERPROFILE = $Fixture.FakeHome
             $env:SKILLSHUB_SYNC_FAULT = $Fault
-            $command = "& '$($Fixture.Sync)' -BundleId 'only' -Targets $($Targets -join ',')"
+            if ($Profile) {
+                $command = "& '$($Fixture.Sync)' -Profile '$Profile'"
+            } else {
+                $command = "& '$($Fixture.Sync)' -BundleId 'only' -Targets $($Targets -join ',')"
+            }
+            if ($DryRun) { $command += ' -DryRun' }
+            if ($SyncAntigravityWorkflows) { $command += ' -SyncAntigravityWorkflows' }
             $output = & $script:PwshExe -NoProfile -NonInteractive -Command $command 2>&1
             $exitCode = $LASTEXITCODE
         } finally {
@@ -172,5 +196,82 @@ Describe 'sync.ps1 interrupted between the two renames' {
         # Restore consumes the backup and the staging copy is dropped, so nothing is left behind.
         $leftovers = @(Get-ChildItem -LiteralPath (Split-Path -Parent $script:fixture.InstalledAt) -Force | Where-Object { $_.Name -ne 'harmless' })
         $leftovers.Count | Should -Be 0 -Because "no staging or backup directory may stay: $($leftovers.Name -join ', ')"
+    }
+}
+
+Describe 'sync.ps1 profile selection' {
+    AfterEach {
+        if ($script:fixture) {
+            Remove-Item -LiteralPath $script:fixture.Root -Recurse -Force -ErrorAction SilentlyContinue
+            $script:fixture = $null
+        }
+    }
+
+    It 'takes bundles and targets from the profile when -Targets is not given' {
+        # Fällt aus, wenn der Profilzweig $Targets nicht mehr aus default_targets übernimmt
+        # (dann landet der Skill auch unter .cursor) oder $bundleIds nicht mehr aus bundle_ids
+        # (dann landet gar nichts unter .codex).
+
+        $script:fixture = New-SyncFixture
+        $result = Invoke-FixtureSync -Fixture $script:fixture -Profile 'only'
+
+        $result.ExitCode | Should -Be 0
+        Test-Path -LiteralPath (Join-Path $script:fixture.InstalledAt 'SKILL.md') | Should -BeTrue
+        Test-Path -LiteralPath (Join-Path $script:fixture.FakeHome '.cursor/skills/harmless/SKILL.md') | Should -BeFalse
+    }
+}
+
+Describe 'sync.ps1 dry run' {
+    AfterEach {
+        if ($script:fixture) {
+            Remove-Item -LiteralPath $script:fixture.Root -Recurse -Force -ErrorAction SilentlyContinue
+            $script:fixture = $null
+        }
+    }
+
+    It 'leaves the installed skill untouched with -DryRun' {
+        # Fällt aus, wenn -DryRun $WhatIfPreference nicht mehr setzt und ShouldProcess die Kopie durchlässt.
+
+        $script:fixture = New-SyncFixture
+        (Invoke-FixtureSync -Fixture $script:fixture -Targets @('codex')).ExitCode | Should -Be 0
+
+        Set-Content -Path (Join-Path $script:fixture.SkillSource 'SKILL.md') -Value '# harmless v2'
+        $result = Invoke-FixtureSync -Fixture $script:fixture -Targets @('codex') -DryRun
+
+        $result.ExitCode | Should -Be 0
+        (Get-Content -LiteralPath (Join-Path $script:fixture.InstalledAt 'SKILL.md') -Raw).Trim() | Should -Be '# harmless'
+        $staging = @(Get-ChildItem -LiteralPath (Split-Path -Parent $script:fixture.InstalledAt) -Force | Where-Object { $_.Name -like '.*.sync-*' })
+        $staging.Count | Should -Be 0 -Because "DryRun darf kein Staging anlegen: $($staging.Name -join ', ')"
+    }
+}
+
+Describe 'sync.ps1 antigravity workflows' {
+    AfterEach {
+        if ($script:fixture) {
+            Remove-Item -LiteralPath $script:fixture.Root -Recurse -Force -ErrorAction SilentlyContinue
+            $script:fixture = $null
+        }
+    }
+
+    It 'overwrites a locally edited workflow with the repo version' {
+        # Fällt aus, wenn der Workflow-Block die Dateien nicht mehr nach
+        # ~/.gemini/antigravity/global_workflows kopiert. Copy-Item -Force gewinnt hier bewusst
+        # gegen eine lokale Änderung, dieses Verhalten wird hier festgenagelt.
+        #
+        # Der DryRun-Fall gehört NICHT hierher: unter -DryRun schützen zwei Schichten
+        # unabhängig voneinander (ShouldProcess um den Block plus $WhatIfPreference, das
+        # Copy-Item selbst schon anhält). Gemessen 2026-09-02: weder das Auflösen des
+        # ShouldProcess-Blocks noch Copy-Item -WhatIf:$false macht einen DryRun-Test rot,
+        # rot wird nur das Streichen von "if ($DryRun) { $WhatIfPreference = $true }", und das
+        # fängt bereits 'leaves the installed skill untouched with -DryRun'.
+
+        $script:fixture = New-SyncFixture
+        $workflowDir = Split-Path -Parent $script:fixture.WorkflowInstalledAt
+        New-Item -ItemType Directory -Path $workflowDir -Force | Out-Null
+        Set-Content -Path $script:fixture.WorkflowInstalledAt -Value 'user-edit'
+
+        $apply = Invoke-FixtureSync -Fixture $script:fixture -Targets @('codex') -SyncAntigravityWorkflows
+        $apply.ExitCode | Should -Be 0
+        (Get-Content -LiteralPath $script:fixture.WorkflowInstalledAt -Raw).Trim() | Should -Be 'repo-workflow'
     }
 }

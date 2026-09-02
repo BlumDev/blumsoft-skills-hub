@@ -1,7 +1,9 @@
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
-$bootstrapSourcePath = Join-Path $repoRoot 'scripts/project/bootstrap-project.ps1'
-
 Describe 'bootstrap-project.ps1 argument binding' {
+  BeforeAll {
+    $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
+    $script:BootstrapSourcePath = Join-Path $script:RepoRoot 'scripts/project/bootstrap-project.ps1'
+  }
+
   BeforeEach {
     $fixtureRoot = Join-Path $TestDrive 'repo'
     $projectScriptDir = Join-Path $fixtureRoot 'scripts/project'
@@ -14,8 +16,8 @@ Describe 'bootstrap-project.ps1 argument binding' {
     New-Item -ItemType Directory -Path $templateRoot -Force | Out-Null
     New-Item -ItemType Directory -Path $projectRoot -Force | Out-Null
 
-    Copy-Item -LiteralPath $bootstrapSourcePath -Destination $projectScriptDir
-    Copy-Item -LiteralPath (Join-Path $repoRoot 'templates/project/*') -Destination $templateRoot -Recurse
+    Copy-Item -LiteralPath $script:BootstrapSourcePath -Destination $projectScriptDir
+    Copy-Item -Path (Join-Path $script:RepoRoot 'templates/project/*') -Destination $templateRoot -Recurse
     Set-Content -LiteralPath (Join-Path $skillsScriptDir 'sync.ps1') -Encoding utf8NoBOM -Value @'
 [CmdletBinding(SupportsShouldProcess)]
 param(
@@ -69,5 +71,55 @@ $global:BootstrapSyncInvocation = [pscustomobject]@{
     $invocation.SyncAntigravityWorkflows | Should -BeTrue
     $invocation.BoundParameterKeys | Should -Contain 'BundleId'
     $invocation.BoundParameterKeys | Should -Not -Contain 'Profile'
+  }
+}
+
+Describe 'bootstrap-project.ps1 Copy-IfMissing' {
+  BeforeAll {
+    $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
+    $script:BootstrapSourcePath = Join-Path $script:RepoRoot 'scripts/project/bootstrap-project.ps1'
+  }
+
+  BeforeEach {
+    $fixtureRoot = Join-Path $TestDrive 'copy-if-missing-repo'
+    $projectScriptDir = Join-Path $fixtureRoot 'scripts/project'
+    $skillsScriptDir = Join-Path $fixtureRoot 'scripts/skills'
+    $templateRoot = Join-Path $fixtureRoot 'templates/project'
+    $script:ProjectRoot = Join-Path $TestDrive 'copy-if-missing-project'
+
+    New-Item -ItemType Directory -Path $projectScriptDir -Force | Out-Null
+    New-Item -ItemType Directory -Path $skillsScriptDir -Force | Out-Null
+    New-Item -ItemType Directory -Path $templateRoot -Force | Out-Null
+    New-Item -ItemType Directory -Path $script:ProjectRoot -Force | Out-Null
+
+    Copy-Item -LiteralPath $script:BootstrapSourcePath -Destination $projectScriptDir
+    Copy-Item -Path (Join-Path $script:RepoRoot 'templates/project/*') -Destination $templateRoot -Recurse
+    Set-Content -LiteralPath (Join-Path $skillsScriptDir 'sync.ps1') -Encoding utf8NoBOM -Value @'
+[CmdletBinding(SupportsShouldProcess)]
+param(
+  [string]$Profile = 'freelancer-fullstack',
+  [string[]]$BundleId,
+  [switch]$IncludeExtended,
+  [string[]]$Targets,
+  [string]$WorkspaceRoot = '',
+  [switch]$SyncAntigravityWorkflows,
+  [switch]$DryRun
+)
+'@
+
+    $script:BootstrapPath = Join-Path $projectScriptDir 'bootstrap-project.ps1'
+  }
+
+  It 'keeps an existing project file and adds the missing ones' {
+    # Fällt aus, wenn Copy-IfMissing die Zeile if (Test-Path $dst) { return } entfernt und
+    # vorhandene Dateien überschreibt (Lücke aus 20260902-cursor-testgaps).
+
+    Set-Content -LiteralPath (Join-Path $script:ProjectRoot 'DECISIONS.md') -Encoding utf8NoBOM -Value 'keep-me'
+    Test-Path -LiteralPath (Join-Path $script:ProjectRoot 'PROJECT_CONTEXT.md') | Should -BeFalse
+
+    & $script:BootstrapPath -ProjectRoot $script:ProjectRoot
+
+    (Get-Content -LiteralPath (Join-Path $script:ProjectRoot 'DECISIONS.md') -Raw).Trim() | Should -Be 'keep-me'
+    Test-Path -LiteralPath (Join-Path $script:ProjectRoot 'PROJECT_CONTEXT.md') | Should -BeTrue
   }
 }
