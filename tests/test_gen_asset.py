@@ -210,7 +210,13 @@ def fake_download(base, image, out_path):
 
 
 def staged_inputs(folder):
-    """Everything in the stand-in for ComfyUI's shared input folder, name -> bytes."""
+    """Everything in the stand-in for ComfyUI's shared input folder, name -> bytes.
+
+    A folder that does not exist counts as empty: for a run that stages somewhere else the
+    absence is exactly what has to be measured.
+    """
+    if not os.path.isdir(folder):
+        return {}
     return {name: (Path(folder) / name).read_bytes() for name in sorted(os.listdir(folder))}
 
 
@@ -356,6 +362,72 @@ class UpscaleInputFileTests(unittest.TestCase):
             self.assertNotEqual(first_name, second_name,
                                 'the second run must not reuse the input file name of the first')
             self.assertEqual([first_bytes, second_bytes], [b'out', b'projekt'])
+
+
+class UpscaleInputDirTests(unittest.TestCase):
+    """The staging folder has to belong to the ComfyUI behind --url, not to this machine."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.tmp = tmp.name
+        self.source = os.path.join(self.tmp, 'hero.png')
+        with open(self.source, 'wb') as fh:
+            fh.write(b'not really a png')
+        self.local_input = os.path.join(self.tmp, 'local-comfy-input')
+
+    def run_main(self, argv, staged, watch=None):
+        # Snapshot taken while the prompt is queued: that is the only window in which a run's
+        # copy exists, every path removes it again.
+        folder = watch or self.local_input
+        api = stub_api(FAILED_HISTORY_ENTRY, [],
+                       on_prompt=lambda: staged.append(staged_inputs(folder)))
+        with mock.patch.object(upscale, 'api', api), \
+                mock.patch.object(upscale, 'COMFY_INPUT', self.local_input), \
+                mock.patch.object(sys, 'argv', argv), \
+                contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit) as raised:
+                upscale.main()
+        return raised.exception
+
+    def test_refuses_a_remote_url_without_an_input_dir(self):
+        # The old code copied into the local folder no matter what --url said. The remote
+        # server never saw the file, so the run only ever ended in its 1200s timeout.
+        staged = []
+        exception = self.run_main(
+            ['upscale.py', '--image', self.source, '--out', os.path.join(self.tmp, 'o.png'),
+             '--url', 'http://gpu-box:8188', '--timeout', '6'],
+            staged,
+        )
+
+        self.assertIn('--input-dir', str(exception))
+        self.assertEqual(staged, [], 'no prompt may be submitted for a folder the server cannot read')
+        self.assertFalse(os.path.exists(self.local_input),
+                         'nothing may be staged into the local folder for a remote instance')
+
+    def test_input_dir_lets_a_remote_url_stage_where_the_server_reads(self):
+        remote_input = os.path.join(self.tmp, 'mounted-comfy-input')
+        staged = []
+        self.run_main(
+            ['upscale.py', '--image', self.source, '--out', os.path.join(self.tmp, 'o.png'),
+             '--url', 'http://gpu-box:8188', '--input-dir', remote_input, '--timeout', '6'],
+            staged, watch=remote_input,
+        )
+
+        self.assertEqual([len(snapshot) for snapshot in staged], [1],
+                         'the copy has to land in the folder --input-dir names')
+        self.assertFalse(os.path.exists(self.local_input), 'the local default must stay untouched')
+
+    def test_a_local_url_still_uses_the_installation_default(self):
+        staged = []
+        self.run_main(
+            ['upscale.py', '--image', self.source, '--out', os.path.join(self.tmp, 'o.png'),
+             '--timeout', '6'],
+            staged,
+        )
+
+        self.assertEqual([len(snapshot) for snapshot in staged], [1],
+                         'the default path must keep staging into COMFY_INPUT')
 
 
 class UpscaleInputCleanupTests(unittest.TestCase):

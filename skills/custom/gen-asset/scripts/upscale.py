@@ -21,6 +21,8 @@ import urllib.request
 import uuid
 
 COMFY_INPUT = r"D:\Apps\Stability Matrix\Data\Packages\ComfyUI\input"
+# Hosts whose input folder the local filesystem can be: everything else needs --input-dir.
+LOCAL_HOSTS = frozenset(("localhost", "127.0.0.1", "::1", ""))
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_WF = os.path.join(HERE, "..", "workflows", "upscale.api.json")
 
@@ -94,6 +96,8 @@ def main():
     p.add_argument("--checkpoint", default=None, help="override tile re-diffusion model (e.g. an anime checkpoint)")
     p.add_argument("--seed", type=int, default=None)
     p.add_argument("--url", default=os.environ.get("COMFYUI_URL", "http://127.0.0.1:8188"))
+    p.add_argument("--input-dir", dest="input_dir", default=os.environ.get("COMFYUI_INPUT"),
+                   help="input folder of the ComfyUI behind --url (default: local installation)")
     p.add_argument("--timeout", type=int, default=1200, help="max wait seconds")
     a = p.parse_args()
 
@@ -107,9 +111,23 @@ def main():
 
     if not os.path.exists(a.image):
         sys.exit(f"Eingabebild nicht gefunden: {a.image}")
-    os.makedirs(COMFY_INPUT, exist_ok=True)
+
+    # The workflow hands ComfyUI a bare filename, so the copy has to land in the input folder
+    # of exactly the instance --url points at. COMFY_INPUT is the local installation; for a
+    # remote instance or a tunnel it is certainly the wrong folder, and the old code copied
+    # there anyway: the server never found the file and the run only ever hit its timeout.
+    input_dir = a.input_dir or COMFY_INPUT
+    host = (urllib.parse.urlparse(a.url).hostname or "").lower()
+    if not a.input_dir and host not in LOCAL_HOSTS:
+        sys.exit(
+            f"--url zeigt auf '{host}', der Eingabeordner ist aber der lokale ({COMFY_INPUT}). "
+            "Dort läge die Kopie, während der Server sie woanders sucht. "
+            "--input-dir (oder COMFYUI_INPUT) auf den Input-Ordner dieser Instanz setzen."
+        )
+
+    os.makedirs(input_dir, exist_ok=True)
     fname = input_filename(a.image)
-    staged_input = os.path.join(COMFY_INPUT, fname)
+    staged_input = os.path.join(input_dir, fname)
     shutil.copy(a.image, staged_input)
     keep_staged = False
     try:
