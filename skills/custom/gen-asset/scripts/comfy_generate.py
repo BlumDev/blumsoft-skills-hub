@@ -187,6 +187,7 @@ def main():
     # itself unbounded (api() defaults to 600s), so a single hanging /history poll stretched the
     # run far past --timeout. Each poll now gets the remaining budget as its own socket timeout.
     deadline = time.monotonic() + args.timeout
+    last_poll_error = None
     while True:
         remaining = deadline - time.monotonic()
         if remaining <= 0:
@@ -197,9 +198,14 @@ def main():
             break
         try:
             history = api(args.url, f"/history/{prompt_id}", timeout=min(30.0, remaining))
-        except OSError as exc:  # timeout, reset connection, ComfyUI restarting
+        except (OSError, ValueError) as exc:  # connection, or a body that is not JSON
             # A single failed poll must not kill a healthy run; the wall clock above still
-            # ends the loop on time.
+            # ends the loop on time. ValueError belongs in here as much as OSError does:
+            # a restarting ComfyUI (or a proxy in front of it) answers with an empty body or
+            # an HTML page, and json.loads in api() raises on that, not urllib.
+            # The error is remembered because it survives its poll: if the run ends in the
+            # timeout below, the last one is the only trace of why nothing came back.
+            last_poll_error = exc
             print(f"Poll fehlgeschlagen, weiter: {exc}", file=sys.stderr)
             continue
         entry = history.get(prompt_id)
@@ -218,7 +224,8 @@ def main():
         if failure:
             sys.exit(f"ComfyUI-Fehler bei prompt_id={prompt_id}: {failure}")
     if not image:
-        sys.exit(f"Timeout nach {args.timeout}s: kein Bild im History-Output.")
+        reason = f" Letzter Poll-Fehler: {last_poll_error}." if last_poll_error else ""
+        sys.exit(f"Timeout nach {args.timeout}s: kein Bild im History-Output.{reason}")
 
     download(args.url, image, args.out)
     if args.seed is not None:

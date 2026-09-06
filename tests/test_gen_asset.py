@@ -16,6 +16,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+import urllib.error
 from unittest import mock
 
 
@@ -391,6 +392,90 @@ class PollBudgetTests(unittest.TestCase):
                 exception = self.run_until_timeout(upscale, argv, clock, polls, poll_cost=4.0)
 
         self.assert_budget_kept(exception, clock, polls, budget=6.0)
+
+
+def poll_error_api(error, calls, fails=None, history_entry=SUCCESS_HISTORY_ENTRY):
+    """api() whose /history polls raise `error`; after `fails` of them it answers normally.
+
+    fails=None keeps failing for the whole run. What a restarting ComfyUI (or a proxy in front
+    of it) really sends is an empty body or an HTML page: json.loads inside api() then raises a
+    ValueError, which is not an OSError.
+    """
+    def api(base, path, payload=None, timeout=600):
+        if path == '/system_stats':
+            return {}
+        if path == '/prompt':
+            return {'prompt_id': 'p1'}
+        calls.append(path)
+        if fails is None or len(calls) <= fails:
+            raise error()
+        return {'p1': history_entry}
+    return api
+
+
+class PollErrorTests(unittest.TestCase):
+    """A failed poll must not kill a healthy run, and a run that dies of it must say why."""
+
+    def run_main(self, module, api, tmp, clock=None, timeout='6'):
+        """main() of either script against a stubbed HTTP layer; returns the --out path."""
+        out = os.path.join(tmp, 'out.png')
+        if module is upscale:
+            source = os.path.join(tmp, 'hero.png')
+            with open(source, 'wb') as fh:
+                fh.write(b'not really a png')
+            argv = ['upscale.py', '--image', source, '--out', out, '--timeout', timeout]
+        else:
+            argv = ['comfy_generate.py',
+                    '--workflow', str(GEN_ASSET / 'workflows/sdxl_t2i.api.json'),
+                    '--prompt', 'a red apple', '--out', out, '--timeout', timeout]
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(mock.patch.object(module, 'api', api))
+            stack.enter_context(mock.patch.object(module, 'download', fake_download))
+            stack.enter_context(mock.patch.object(sys, 'argv', argv))
+            stack.enter_context(contextlib.redirect_stdout(io.StringIO()))
+            stack.enter_context(contextlib.redirect_stderr(io.StringIO()))
+            if module is upscale:
+                stack.enter_context(
+                    mock.patch.object(upscale, 'COMFY_INPUT', os.path.join(tmp, 'comfy-input')))
+            if clock is not None:
+                stack.enter_context(mock.patch.object(module, 'time', clock))
+            module.main()
+        return out
+
+    def test_a_poll_answering_with_garbage_is_retried(self):
+        # The poll only caught OSError. json.loads on an empty or HTML body raises a
+        # JSONDecodeError instead, so exactly the restart the retry was built for ended the run
+        # on the spot, one poll after the prompt was queued.
+        for module in (comfy_generate, upscale):
+            with self.subTest(module=module.__name__):
+                calls = []
+                api = poll_error_api(lambda: json.JSONDecodeError('Expecting value', '', 0),
+                                     calls, fails=1)
+                with tempfile.TemporaryDirectory() as tmp:
+                    out = self.run_main(module, api, tmp)
+                    produced = os.path.exists(out)
+
+                self.assertTrue(produced, 'the run has to survive a single unreadable answer')
+                self.assertEqual(len(calls), 2, 'the failed poll must be repeated, not skipped')
+
+    def test_the_timeout_names_the_poll_error_that_caused_it(self):
+        # urllib.error.HTTPError inherits from OSError, so a server answering every poll with a
+        # 500 is retried until the budget is gone. The message then blamed the timeout and
+        # dropped the status code, which is the only thing that says what really happened.
+        def http_500():
+            return urllib.error.HTTPError('http://127.0.0.1:8188/history/p1', 500,
+                                          'Internal Server Error', {}, None)
+
+        for module in (comfy_generate, upscale):
+            with self.subTest(module=module.__name__):
+                calls, clock = [], FakeClock()
+                with tempfile.TemporaryDirectory() as tmp:
+                    with self.assertRaises(SystemExit) as raised:
+                        self.run_main(module, poll_error_api(http_500, calls), tmp, clock=clock)
+
+                self.assertIn('Timeout nach 6s', str(raised.exception))
+                self.assertIn('500', str(raised.exception),
+                              'the timeout has to carry the poll error that produced it')
 
 
 class UpscaleInputFileTests(unittest.TestCase):
