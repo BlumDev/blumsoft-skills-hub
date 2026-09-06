@@ -644,6 +644,29 @@ class UpscaleInputCleanupTests(unittest.TestCase):
         self.assertIn(staged[0], str(raised.exception),
                       'the timeout message must name the file it deliberately left behind')
 
+    def test_keeps_the_copy_when_the_run_is_interrupted_while_the_job_is_queued(self):
+        # The timeout is not the only way out of the poll loop: Strg+C runs through finally as
+        # well, and so does any unexpected exception. Between /prompt and the result the copy
+        # belongs to the job, not to this process, so every one of those exits has to leave it
+        # behind. Only the timeout path did.
+        def api(base, path, payload=None, timeout=600):
+            if path == '/system_stats':
+                return {}
+            if path == '/prompt':
+                return {'prompt_id': 'p1'}
+            raise KeyboardInterrupt()
+
+        argv = ['upscale.py', '--image', self.source, '--out', self.out, '--timeout', '6']
+        with mock.patch.object(upscale, 'api', api), \
+                mock.patch.object(upscale, 'COMFY_INPUT', self.comfy_input), \
+                mock.patch.object(sys, 'argv', argv), \
+                contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(KeyboardInterrupt):
+                upscale.main()
+
+        self.assertEqual(len(os.listdir(self.comfy_input)), 1,
+                         'the queued job still needs its input image')
+
 
 if __name__ == '__main__':
     unittest.main()

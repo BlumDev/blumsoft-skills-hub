@@ -153,6 +153,13 @@ def main():
         if not pid:
             sys.exit(f"Keine prompt_id erhalten: {resp}")
         print(f"queued {pid} seed={a.seed} upscale_by={a.upscale_by} denoise={a.denoise}", file=sys.stderr)
+        # From here the copy belongs to the job, not to this process: ComfyUI opens the input
+        # only when the job starts running, so deleting it while the job waits in the queue
+        # breaks it in LoadImage and throws the GPU work away. The timeout was not the only
+        # exit that got there: Strg+C and any unexpected exception run through the finally as
+        # well. Every one of them keeps the file now, and only an outcome that proves the job
+        # is over releases it again.
+        keep_staged = True
 
         img = None
         # Wall clock, not a poll count. The old loop counted 1.5s sleeps and left the HTTP call
@@ -194,18 +201,21 @@ def main():
             # the error ComfyUI already knew about.
             failure = execution_error(entry)
             if failure:
+                keep_staged = False  # ComfyUI is done with this job and will not read the input
                 sys.exit(f"ComfyUI-Fehler bei prompt_id={pid}: {failure}")
         if not img:
             # The timeout says nothing about the job: it may still be queued, and ComfyUI has
-            # not opened the input yet. Deleting the copy here left the job without its image,
-            # LoadImage then failed and the GPU work was gone. So the copy stays, named in the
-            # message, and the caller removes it once the job is really over.
-            keep_staged = True
+            # not opened the input yet. So the copy stays (keep_staged is still set from the
+            # queueing above), named in the message, and the caller removes it once the job is
+            # really over.
             reason = f" Letzter Poll-Fehler: {last_poll_error}." if last_poll_error else ""
             sys.exit(
                 f"Timeout nach {a.timeout}s: kein Bild.{reason} Job {pid} kann noch in der Queue "
                 f"stehen, die Eingabekopie bleibt deshalb liegen: {staged_input}"
             )
+        # The result exists, so ComfyUI has read the input; the copy is free even if the
+        # download below fails.
+        keep_staged = False
         download(a.url, img, a.out)
         print(a.out)
     finally:
