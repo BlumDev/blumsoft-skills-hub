@@ -104,7 +104,13 @@ def cmd_find(args):
         print("(Ledger leer - noch keine bewaehrten Bilder.)")
         return
     rows = []
-    with open(LEDGER, "r", encoding="utf-8") as fh:
+    # errors="replace" because a broken line can be broken below the text layer: cmd_add writes
+    # with ensure_ascii=False, so an interrupted add can end inside a multi byte character
+    # (umlaut in a prompt, a note or a Windows path). Decoding that raises while the file is
+    # iterated, i.e. before json.loads and its except are ever reached, and the index died
+    # exactly as it did before. The replacement character lands in the line instead and json
+    # rejects it, which is the skip path below.
+    with open(LEDGER, "r", encoding="utf-8", errors="replace") as fh:
         for number, line in enumerate(fh, 1):
             line = line.strip()
             if not line:

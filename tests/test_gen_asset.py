@@ -286,6 +286,13 @@ class LedgerFindTests(unittest.TestCase):
             fh.write(''.join(line + '\n' for line in lines))
         return path
 
+    def write_ledger_bytes(self, tmp, blob):
+        """The ledger as raw bytes: a half written line can be broken below the text layer."""
+        path = os.path.join(tmp, 'ledger.jsonl')
+        with open(path, 'wb') as fh:
+            fh.write(blob)
+        return path
+
     def test_a_truncated_line_does_not_hide_the_intact_entries(self):
         # An add killed mid-append leaves exactly this behind. json.loads on it used to raise
         # and every later find died with a JSONDecodeError, however many good lines there were.
@@ -302,6 +309,23 @@ class LedgerFindTests(unittest.TestCase):
         self.assertIn('second.png', out)
         self.assertNotIn('half-written.png', out)
         self.assertIn('Zeile 2', err, 'the skipped line has to be named, not swallowed')
+
+    def test_a_line_broken_mid_utf8_does_not_hide_the_intact_entries(self):
+        # cmd_add writes with ensure_ascii=False, so a prompt, a note or a Windows path with an
+        # umlaut sits in the file as multi byte UTF-8. An add killed inside such a character
+        # leaves a byte the decoder cannot finish, and that raises while the file is being
+        # iterated, i.e. before json.loads is ever reached: the skip path above never ran and
+        # the whole index was gone again.
+        with tempfile.TemporaryDirectory() as tmp:
+            path = self.write_ledger_bytes(
+                tmp,
+                json.dumps({'image': 'first.png', 'rating': 5}).encode('utf-8') + b'\n'
+                + b'{"note": "\xc3',  # first byte of 'ü', the add died right here
+            )
+            out, err = self.find(path)
+
+        self.assertIn('first.png', out)
+        self.assertIn('Zeile 2', err, 'the unreadable line has to be named, not swallowed')
 
     def test_filters_still_apply_to_what_survived(self):
         with tempfile.TemporaryDirectory() as tmp:
