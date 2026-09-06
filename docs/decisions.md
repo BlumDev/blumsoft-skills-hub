@@ -165,3 +165,29 @@ fehl. Ein künftiges CI-Gate muss Pester 5 explizit installieren. Die Systeminst
 **Entscheidung.** Option 3. Option 1 hätte einen Test in die Suite gelegt, der eine doppelt abgesicherte Stelle ein drittes Mal bestätigt und dafür einen zusätzlichen Kind-pwsh startet: er kann nur noch mit dem Test brechen, den er dupliziert. Option 2 hätte auch das Apply-Verhalten weggeworfen, das tatsächlich ungetestet war. Die Probe "Copy-Item im Workflow-Block entfernt" macht den umgestellten Test rot, damit hängt er an einer eigenen Mutation.
 
 **Trade-off.** Die Zusage "`-DryRun` fasst die Workflows nicht an" steht jetzt nirgends als Test. Sie hängt an `sync.ps1:15`, das der Test `leaves the installed skill untouched with -DryRun` abdeckt. Fällt diese Zeile, wird dieser eine Test rot und der Grund ist im Kommentar des Antigravity-Tests notiert, damit niemand den Dry-Run-Fall aus Versehen ein zweites Mal baut.
+
+## 2026-09-06: Ein dauerhaft fehlschlagender Poll bricht nicht ab, er wird in der Timeout-Meldung benannt
+
+**Kontext.** Der Verify-Lauf `20260904T072157-6da303` hat an `upscale.py:172` und `comfy_generate.py:200` zwei Seiten desselben `except OSError` beanstandet. Die eine ist ein Fehler: `api()` endet in `json.loads(...)`, ein neustartendes ComfyUI oder ein Proxy davor antwortet mit leerem Body oder HTML, und die daraus entstehende `JSONDecodeError` ist kein `OSError`. Genau der Neustart, für den die Wiederholung gebaut wurde, beendete den Lauf also sofort. Die andere ist eine Frage der Auslegung: `urllib.error.HTTPError` erbt von `OSError`, ein Server, der jeden Poll mit 500 beantwortet, wird deshalb bis zum Budget wiederholt (gemessen: 39 Polls bei `--timeout 60`) und der Lauf meldet am Ende einen Timeout, nicht den Statuscode.
+
+**Optionen.**
+1. Beim ersten `HTTPError` abbrechen, `ValueError` weiter wiederholen.
+2. Nach N Fehlversuchen in Folge abbrechen.
+3. Weiter wiederholen, den letzten Poll-Fehler aber merken und in der Timeout-Meldung nennen.
+
+**Entscheidung.** Option 3, dazu `except (OSError, ValueError)` für den eigentlichen Fehler. Option 1 macht die Wiederholung an der Stelle wertlos, an der sie gebraucht wird: ein Neustart liefert typischerweise erst 502/503 vom Proxy und danach wieder 200, ein Abbruch beim ersten 5xx tötet also gesunde Läufe. Option 2 braucht eine zweite Zahl neben `--timeout`, die niemand kennt und die den Lauf trotzdem hart beendet. Option 3 lässt die Semantik, wie sie ist (`--timeout` ist die einzige Grenze) und behebt den Teil, der wirklich fehlte: die Ursache steht jetzt in der Abschlussmeldung statt nur in einer stderr-Zeile, die in einem langen Lauf untergeht.
+
+**Trade-off.** Ein Server, der dauerhaft 500 liefert, kostet weiter das volle Budget, bevor der Lauf endet. Das ist bewusst: die Alternative ist ein Abbruch, der zwischen "kaputt" und "startet gerade neu" nicht unterscheiden kann.
+
+## 2026-09-06: Der Tunnel auf 127.0.0.1 bleibt ungeprüft, statt ihn per HTTP zu erraten
+
+**Kontext.** Der `LOCAL_HOSTS`-Guard aus `a0fa1f8` lehnt einen nicht-lokalen Host ohne `--input-dir` ab. Der Verify-Lauf hält dagegen, dass genau der im Kommentar genannte Tunnel durchrutscht: zeigt `--url` auf `127.0.0.1` und liegt ComfyUI woanders, landet die Kopie im lokalen Input-Ordner, der Server sieht sie nie und der Lauf endet nach 1200s im Timeout (bestätigt, siehe `docs/reviews/2026-09-04-cursor-verify.md`). Der Hostname trägt diese Information nicht, keine Prüfung an der URL kann den Fall erkennen.
+
+**Optionen.**
+1. Nach dem Kopieren prüfen, ob der Server die Datei sieht (`/object_info/LoadImage` listet den Inhalt seines Input-Ordners), und sonst mit dem Hinweis auf `--input-dir` abbrechen.
+2. Das Bild über ComfyUIs Upload-Endpunkt schicken statt es zu kopieren, dann entfällt der geteilte Ordner ganz.
+3. Nichts tun und die Lücke benennen.
+
+**Entscheidung.** Vorerst Option 3, gebucht als offener Backlog-Eintrag `20260904-upscale-tunnel-input-dir`. Option 1 hängt an einer Antwortform, die ComfyUI zwischen Versionen ändern kann, und ist ohne laufende Instanz nicht prüfbar, also nicht in einer Triage-Session zu belegen. Option 2 ist der saubere Weg, verlangt aber einen multipart/form-data-Body von Hand (die Skripte sind stdlib-only, das ist bereits am 2026-09-02 entschieden worden) und ändert das Aufräumen mit.
+
+**Trade-off.** Die Fehlkonfiguration "Tunnel auf einen fremden Rechner" kostet weiter ein volles Timeout und hinterlässt seit `ddb3ad4` zusätzlich die Staging-Kopie, die der Lauf bewusst liegen lässt. Der reale Anwendungsfall bleibt die lokale Instanz, der Guard fängt weiter jeden Fall, den er ohne Rateschritt erkennen kann.
