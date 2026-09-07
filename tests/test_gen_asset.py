@@ -694,24 +694,30 @@ class UpscaleInputCleanupTests(unittest.TestCase):
         # The timeout is not the only way out of the poll loop: Strg+C runs through finally as
         # well, and so does any unexpected exception. Between /prompt and the result the copy
         # belongs to the job, not to this process, so every one of those exits has to leave it
-        # behind. Only the timeout path did.
-        def api(base, path, payload=None, timeout=600):
-            if path == '/system_stats':
-                return {}
-            if path == '/prompt':
-                return {'prompt_id': 'p1'}
-            raise KeyboardInterrupt()
+        # behind. Only the timeout path did. Both exits are measured, because Strg+C alone
+        # cannot tell the flag apart from an implementation that only spares KeyboardInterrupt
+        # and lets every other exception delete the input of a job that is still queued.
+        for interrupt in (KeyboardInterrupt, RuntimeError):
+            with self.subTest(exit=interrupt.__name__):
+                def api(base, path, payload=None, timeout=600):
+                    if path == '/system_stats':
+                        return {}
+                    if path == '/prompt':
+                        return {'prompt_id': 'p1'}
+                    raise interrupt()
 
-        argv = ['upscale.py', '--image', self.source, '--out', self.out, '--timeout', '6']
-        with mock.patch.object(upscale, 'api', api), \
-                mock.patch.object(upscale, 'COMFY_INPUT', self.comfy_input), \
-                mock.patch.object(sys, 'argv', argv), \
-                contextlib.redirect_stderr(io.StringIO()):
-            with self.assertRaises(KeyboardInterrupt):
-                upscale.main()
+                argv = ['upscale.py', '--image', self.source, '--out', self.out, '--timeout', '6']
+                with mock.patch.object(upscale, 'api', api), \
+                        mock.patch.object(upscale, 'COMFY_INPUT', self.comfy_input), \
+                        mock.patch.object(sys, 'argv', argv), \
+                        contextlib.redirect_stderr(io.StringIO()):
+                    with self.assertRaises(interrupt):
+                        upscale.main()
 
-        self.assertEqual(len(os.listdir(self.comfy_input)), 1,
-                         'the queued job still needs its input image')
+                staged = os.listdir(self.comfy_input)
+                self.assertEqual(len(staged), 1, 'the queued job still needs its input image')
+                # Removed by hand so the next pass measures its own copy, not this one.
+                os.remove(os.path.join(self.comfy_input, staged[0]))
 
 
 if __name__ == '__main__':
