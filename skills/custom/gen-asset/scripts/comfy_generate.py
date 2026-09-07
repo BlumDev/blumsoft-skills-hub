@@ -14,6 +14,7 @@ Usage (PowerShell):
 On success the final image path is printed to stdout.
 """
 import argparse
+import http.client
 import json
 import os
 import sys
@@ -198,11 +199,14 @@ def main():
             break
         try:
             history = api(args.url, f"/history/{prompt_id}", timeout=min(30.0, remaining))
-        except (OSError, ValueError) as exc:  # connection, or a body that is not JSON
+        except (OSError, ValueError, http.client.HTTPException) as exc:
             # A single failed poll must not kill a healthy run; the wall clock above still
-            # ends the loop on time. ValueError belongs in here as much as OSError does:
-            # a restarting ComfyUI (or a proxy in front of it) answers with an empty body or
-            # an HTML page, and json.loads in api() raises on that, not urllib.
+            # ends the loop on time. All three classes describe the same restart, none of them
+            # covers the other two: OSError is the connection, ValueError the body json.loads
+            # in api() chokes on (an empty answer or an HTML page from a proxy), and
+            # HTTPException the wire format itself, which http.client raises while api() reads
+            # the response (IncompleteRead on a body cut off mid transfer, BadStatusLine on a
+            # broken status line).
             # The error is remembered because it survives its poll: if the run ends in the
             # timeout below, the last one is the only trace of why nothing came back.
             last_poll_error = exc

@@ -11,6 +11,7 @@ Lower --denoise (e.g. 0.15) keeps the original more faithfully; higher (0.35) in
 more detail. Default 0.2 is a safe sharpen.
 """
 import argparse
+import http.client
 import json
 import os
 import shutil
@@ -177,11 +178,14 @@ def main():
                 break
             try:
                 hist = api(a.url, f"/history/{pid}", timeout=min(30.0, remaining))
-            except (OSError, ValueError) as exc:  # connection, or a body that is not JSON
+            except (OSError, ValueError, http.client.HTTPException) as exc:
                 # A single failed poll must not kill a healthy run; the wall clock above still
-                # ends the loop on time. ValueError belongs in here as much as OSError does:
-                # a restarting ComfyUI (or a proxy in front of it) answers with an empty body
-                # or an HTML page, and json.loads in api() raises on that, not urllib.
+                # ends the loop on time. All three classes describe the same restart, none of
+                # them covers the other two: OSError is the connection, ValueError the body
+                # json.loads in api() chokes on (an empty answer or an HTML page from a proxy),
+                # and HTTPException the wire format itself, which http.client raises while
+                # api() reads the response (IncompleteRead on a body cut off mid transfer,
+                # BadStatusLine on a broken status line).
                 # The error is remembered because it survives its poll: if the run ends in the
                 # timeout below, the last one is the only trace of why nothing came back.
                 last_poll_error = exc

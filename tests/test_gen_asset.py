@@ -8,6 +8,7 @@ Importing them is side effect free, main() sits behind the __main__ guard.
 """
 import argparse
 import contextlib
+import http.client
 import importlib.util
 import io
 import json
@@ -457,6 +458,27 @@ class PollErrorTests(unittest.TestCase):
 
                 self.assertTrue(produced, 'the run has to survive a single unreadable answer')
                 self.assertEqual(len(calls), 2, 'the failed poll must be repeated, not skipped')
+
+    def test_a_poll_dying_on_the_http_protocol_is_retried(self):
+        # OSError and ValueError leave a third class out. http.client raises IncompleteRead when
+        # the body is shorter than its Content-Length and BadStatusLine on garbage in the status
+        # line, which is what a ComfyUI (or a proxy) cut off mid restart really sends. Neither
+        # inherits from OSError or ValueError, so the exception came through api() untouched and
+        # ended the run on the first poll after /prompt, the very case the retry exists for.
+        errors = {
+            'IncompleteRead': lambda: http.client.IncompleteRead(b'partial'),
+            'BadStatusLine': lambda: http.client.BadStatusLine('<html>'),
+        }
+        for module in (comfy_generate, upscale):
+            for name, error in errors.items():
+                with self.subTest(module=module.__name__, error=name):
+                    calls = []
+                    with tempfile.TemporaryDirectory() as tmp:
+                        out = self.run_main(module, poll_error_api(error, calls, fails=1), tmp)
+                        produced = os.path.exists(out)
+
+                    self.assertTrue(produced, 'the run has to survive a single broken answer')
+                    self.assertEqual(len(calls), 2, 'the failed poll must be repeated, not skipped')
 
     def test_the_timeout_names_the_poll_error_that_caused_it(self):
         # urllib.error.HTTPError inherits from OSError, so a server answering every poll with a
