@@ -191,3 +191,29 @@ fehl. Ein künftiges CI-Gate muss Pester 5 explizit installieren. Die Systeminst
 **Entscheidung.** Vorerst Option 3, gebucht als offener Backlog-Eintrag `20260904-upscale-tunnel-input-dir`. Option 1 hängt an einer Antwortform, die ComfyUI zwischen Versionen ändern kann, und ist ohne laufende Instanz nicht prüfbar, also nicht in einer Triage-Session zu belegen. Option 2 ist der saubere Weg, verlangt aber einen multipart/form-data-Body von Hand (die Skripte sind stdlib-only, das ist bereits am 2026-09-02 entschieden worden) und ändert das Aufräumen mit.
 
 **Trade-off.** Die Fehlkonfiguration "Tunnel auf einen fremden Rechner" kostet weiter ein volles Timeout und hinterlässt seit `ddb3ad4` zusätzlich die Staging-Kopie, die der Lauf bewusst liegen lässt. Der reale Anwendungsfall bleibt die lokale Instanz, der Guard fängt weiter jeden Fall, den er ohne Rateschritt erkennen kann.
+
+
+## 2026-09-07: Die Staging-Kopie gehört dem Job ab dem Absenden, nicht ab der Antwort
+
+**Kontext.** `ddb3ad4` übergab die Kopie in ComfyUIs Input-Ordner an den Job, sobald `/prompt` mit einer `prompt_id` geantwortet hatte. Der Verify-Lauf `20260907T074020-639054` hält dagegen, dass ComfyUI den Prompt schon während des offenen POST in die Queue stellt: Strg+C zwischen Absenden und Antwort lief mit `keep_staged` False ins `finally` und löschte die Eingabe eines Jobs, der bereits eingereiht war (bestätigt, Probe im Commit-Text von `1be5ecc`). Der Punkt ist nicht, wo das Flag steht, sondern welche Ausgänge als Beweis gelten, dass kein Job existiert.
+
+**Optionen.**
+1. Flag erst nach der Antwort setzen (Status vor diesem Fix), Fenster bleibt offen.
+2. Flag vor dem Absenden setzen und bei jedem Fehler des POST wieder fallen lassen.
+3. Flag vor dem Absenden setzen und nur dort fallen lassen, wo die Antwort selbst beweist, dass nichts eingereiht wurde: ein HTTP-Fehler (der Server hat geantwortet und abgelehnt) oder ein Body ohne `prompt_id`.
+
+**Entscheidung.** Option 3. Option 2 sieht symmetrisch aus, wirft aber genau den Fall weg, um den es geht: eine mitten im POST sterbende Verbindung sagt nichts darüber, ob der Server den Prompt vorher angenommen hat, und behandelt ihn wie eine Ablehnung. Die beiden Fehler kosten unterschiedlich viel: eine überflüssige Kopie ist eine Datei im geteilten Ordner, eine fehlende Kopie ist ein Job, der später in LoadImage stirbt, samt der GPU-Arbeit davor. Bei Unklarheit wird deshalb behalten. Die Vorprüfung über `/system_stats` liegt vor dem Kopieren, ein schlicht nicht laufendes ComfyUI erreicht diesen Pfad also gar nicht.
+
+**Trade-off.** Ein Abbruch, der die Verbindung mitten im POST reißt, hinterlässt jetzt eine Datei, obwohl vielleicht nichts eingereiht wurde. Der Ordner ist geteilt, aus einer Leiche wird über viele Läufe ein Haufen; dagegen steht der eindeutige Dateiname je Lauf und die Tatsache, dass der häufige Fehlerfall (abgelehnter Workflow, vertippter `--checkpoint`) über den HTTP-Fehler weiter aufräumt und mit einem eigenen Test festgehalten ist.
+
+## 2026-09-07: Die Poll-Schleife fängt drei benannte Ausnahmeklassen, nicht `Exception`
+
+**Kontext.** Zum dritten Mal steht dieselbe `except`-Klammer zur Debatte. `f938366` hat `ValueError` ergänzt (der Body, an dem `json.loads` scheitert), dieser Lauf `http.client.HTTPException` (das Drahtformat, an dem `resp.read()` scheitert: `IncompleteRead` bei zu kurzem Body, `BadStatusLine` bei kaputter Statuszeile). Die naheliegende Frage ist, ob die Aufzählung nicht besser `except Exception` heißen sollte, damit die vierte Klasse nicht auch noch einzeln nachgereicht werden muss.
+
+**Optionen.**
+1. `except Exception`, jeder Poll-Fehler wird wiederholt.
+2. Die drei Klassen benennen und die Liste bei Bedarf erweitern.
+
+**Entscheidung.** Option 2. `except Exception` würde auch eigene Programmierfehler in der Schleife (Tippfehler auf einem Attribut, falscher Typ in `min(30.0, remaining)`) in stille Wiederholungen verwandeln: der Lauf liefe bis zum Timeout und meldete am Ende einen Poll-Fehler, statt sofort mit dem Traceback zu sterben. Die drei benannten Klassen decken alles ab, was zwischen Prozess und Server schiefgehen kann, und jede weitere Erweiterung braucht dieselbe Begründung wie diese hier.
+
+**Trade-off.** Kommt eine vierte Fremdklasse dazu, stirbt der Lauf beim ersten Poll, statt sie zu überstehen. Der Preis ist ein Fehlschlag mit Traceback, der die Klasse benennt, statt eines stillen Timeouts, der sie verschluckt.
