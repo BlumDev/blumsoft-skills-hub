@@ -191,6 +191,10 @@ def main():
                 last_poll_error = exc
                 print(f"Poll fehlgeschlagen, weiter: {exc}", file=sys.stderr)
                 continue
+            # This poll came through, so the remembered error is over: it says nothing about a
+            # run that polls fine afterwards and only ends on its own budget, and a timeout
+            # blaming a healthy server costs the queued job if the reader restarts ComfyUI.
+            last_poll_error = None
             entry = hist.get(pid)
             if not entry:
                 continue

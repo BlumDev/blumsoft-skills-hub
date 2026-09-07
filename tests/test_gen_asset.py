@@ -499,6 +499,30 @@ class PollErrorTests(unittest.TestCase):
                 self.assertIn('500', str(raised.exception),
                               'the timeout has to carry the poll error that produced it')
 
+    def test_the_timeout_does_not_blame_a_poll_that_recovered(self):
+        # The remembered error is only the reason for the timeout as long as no poll came
+        # through afterwards. ComfyUI restarting once and then answering normally for the rest
+        # of the budget is the ordinary case, and blaming its 500 sends the reader after a
+        # server that has been healthy for minutes: whoever believes it and restarts ComfyUI
+        # throws away the GPU work of a job that was only still queued.
+        def http_500():
+            return urllib.error.HTTPError('http://127.0.0.1:8188/history/p1', 500,
+                                          'Internal Server Error', {}, None)
+
+        for module in (comfy_generate, upscale):
+            with self.subTest(module=module.__name__):
+                calls, clock = [], FakeClock()
+                api = poll_error_api(http_500, calls, fails=1,
+                                     history_entry=QUEUED_HISTORY_ENTRY)
+                with tempfile.TemporaryDirectory() as tmp:
+                    with self.assertRaises(SystemExit) as raised:
+                        self.run_main(module, api, tmp, clock=clock)
+
+                self.assertIn('Timeout nach 6s', str(raised.exception))
+                self.assertGreater(len(calls), 1, 'the run has to poll again after the failure')
+                self.assertNotIn('500', str(raised.exception),
+                                 'a poll error the run recovered from is not the timeout reason')
+
 
 class UpscaleInputFileTests(unittest.TestCase):
     def test_input_name_is_unique_and_stays_a_bare_filename(self):

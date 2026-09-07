@@ -212,6 +212,10 @@ def main():
             last_poll_error = exc
             print(f"Poll fehlgeschlagen, weiter: {exc}", file=sys.stderr)
             continue
+        # This poll came through, so the remembered error is over: it says nothing about a run
+        # that polls fine afterwards and only ends on its own budget, and a timeout blaming a
+        # server that has been healthy since sends the reader after the wrong thing.
+        last_poll_error = None
         entry = history.get(prompt_id)
         if not entry:
             continue
