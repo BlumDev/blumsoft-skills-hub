@@ -17,6 +17,7 @@ import os
 import shutil
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 import uuid
@@ -149,18 +150,26 @@ def main():
                 inp["ckpt_name"] = a.checkpoint
 
         cid = str(uuid.uuid4())
-        resp = api(a.url, "/prompt", {"prompt": wf, "client_id": cid})
+        # The copy belongs to the job from the moment the request leaves, not from the moment
+        # the answer arrives: ComfyUI queues the prompt while the POST is still open. From here
+        # the copy is the job's, not this process's, because ComfyUI opens the input only when
+        # the job starts running, so deleting it while the job waits in the queue breaks it in
+        # LoadImage and throws the GPU work away. The timeout is not the only exit that gets
+        # there: Strg+C and any unexpected exception run through the finally as well. Only an
+        # outcome that proves the job never made it into the queue, or is over, releases the
+        # copy again. A connection that dies mid POST is not such a proof and keeps it: one
+        # file too many in the shared input folder is cheaper than a queued job without input.
+        keep_staged = True
+        try:
+            resp = api(a.url, "/prompt", {"prompt": wf, "client_id": cid})
+        except urllib.error.HTTPError:
+            keep_staged = False  # the server answered and refused, so it queued nothing
+            raise
         pid = resp.get("prompt_id")
         if not pid:
+            keep_staged = False  # an answer without an id is a refusal, not a queued job
             sys.exit(f"Keine prompt_id erhalten: {resp}")
         print(f"queued {pid} seed={a.seed} upscale_by={a.upscale_by} denoise={a.denoise}", file=sys.stderr)
-        # From here the copy belongs to the job, not to this process: ComfyUI opens the input
-        # only when the job starts running, so deleting it while the job waits in the queue
-        # breaks it in LoadImage and throws the GPU work away. The timeout was not the only
-        # exit that got there: Strg+C and any unexpected exception run through the finally as
-        # well. Every one of them keeps the file now, and only an outcome that proves the job
-        # is over releases it again.
-        keep_staged = True
 
         img = None
         # Wall clock, not a poll count. The old loop counted 1.5s sleeps and left the HTTP call

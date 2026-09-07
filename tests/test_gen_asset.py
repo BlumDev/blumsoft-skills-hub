@@ -719,6 +719,55 @@ class UpscaleInputCleanupTests(unittest.TestCase):
                 # Removed by hand so the next pass measures its own copy, not this one.
                 os.remove(os.path.join(self.comfy_input, staged[0]))
 
+    def test_keeps_the_copy_when_the_prompt_post_is_interrupted(self):
+        # ComfyUI queues the prompt while the POST is still open and answers only afterwards,
+        # so the window between the two already belongs to the job. Strg+C in it ran into the
+        # finally with the flag still unset and deleted the input of a job that was in the
+        # queue: the same LoadImage loss as after the queueing, one call earlier.
+        def api(base, path, payload=None, timeout=900):
+            if path == '/system_stats':
+                return {}
+            raise KeyboardInterrupt()
+
+        argv = ['upscale.py', '--image', self.source, '--out', self.out, '--timeout', '6']
+        with mock.patch.object(upscale, 'api', api), \
+                mock.patch.object(upscale, 'COMFY_INPUT', self.comfy_input), \
+                mock.patch.object(sys, 'argv', argv), \
+                contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(KeyboardInterrupt):
+                upscale.main()
+
+        self.assertEqual(len(os.listdir(self.comfy_input)), 1,
+                         'the job may already be queued, so the copy has to stay')
+
+    def test_removes_the_copy_when_the_prompt_is_rejected(self):
+        # A prompt ComfyUI never took has no job that could own the copy, and both rejections
+        # say so themselves: an HTTP error means the server answered, an answer without a
+        # prompt_id that it queued nothing. Keeping the copy here would grow the shared input
+        # folder by one file per mistyped --checkpoint.
+        def rejected_with_400(base, path, payload=None, timeout=900):
+            if path == '/system_stats':
+                return {}
+            raise urllib.error.HTTPError(base + path, 400, 'Bad Request', {}, None)
+
+        def rejected_without_id(base, path, payload=None, timeout=900):
+            if path == '/system_stats':
+                return {}
+            return {'error': 'prompt outputs failed validation'}
+
+        for api in (rejected_with_400, rejected_without_id):
+            with self.subTest(rejection=api.__name__):
+                argv = ['upscale.py', '--image', self.source, '--out', self.out, '--timeout', '6']
+                with mock.patch.object(upscale, 'api', api), \
+                        mock.patch.object(upscale, 'COMFY_INPUT', self.comfy_input), \
+                        mock.patch.object(sys, 'argv', argv), \
+                        contextlib.redirect_stderr(io.StringIO()):
+                    with self.assertRaises((urllib.error.HTTPError, SystemExit)):
+                        upscale.main()
+
+                self.assertEqual(os.listdir(self.comfy_input), [],
+                                 'a prompt that was never queued leaves nothing behind')
+
 
 if __name__ == '__main__':
     unittest.main()
