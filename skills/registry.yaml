@@ -23,6 +23,9 @@
   - name: code-audit
     source: custom
     path: skills/custom/code-audit
+  - name: repo-modernization-review
+    source: custom
+    path: skills/custom/repo-modernization-review
   - name: ai-hardening
     source: custom
     path: skills/custom/ai-hardening

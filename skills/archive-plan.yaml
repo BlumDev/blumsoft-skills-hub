@@ -24,6 +24,9 @@ skills:
   - name: code-audit
     status: active-core
     target: engineering-core
+  - name: repo-modernization-review
+    status: active-core
+    target: engineering-core
   - name: ai-hardening
     status: active-core
     target: data-ai-systems

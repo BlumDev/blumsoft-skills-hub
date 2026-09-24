@@ -217,3 +217,16 @@ fehl. Ein künftiges CI-Gate muss Pester 5 explizit installieren. Die Systeminst
 **Entscheidung.** Option 2. `except Exception` würde auch eigene Programmierfehler in der Schleife (Tippfehler auf einem Attribut, falscher Typ in `min(30.0, remaining)`) in stille Wiederholungen verwandeln: der Lauf liefe bis zum Timeout und meldete am Ende einen Poll-Fehler, statt sofort mit dem Traceback zu sterben. Die drei benannten Klassen decken alles ab, was zwischen Prozess und Server schiefgehen kann, und jede weitere Erweiterung braucht dieselbe Begründung wie diese hier.
 
 **Trade-off.** Kommt eine vierte Fremdklasse dazu, stirbt der Lauf beim ersten Poll, statt sie zu überstehen. Der Preis ist ein Fehlschlag mit Traceback, der die Klasse benennt, statt eines stillen Timeouts, der sie verschluckt.
+
+## 2026-09-24: Modernisierungs-Review als Entscheidungsschicht über code-audit, kein eigener Umsetzungs-Skill
+
+**Kontext.** Ziel: ältere Repos regelmäßig mit neueren Modellen prüfen und modernisieren. Ein Brainstorming-Prompt schlug 16 Phasen und zwei Skills vor (`repository-audit` für die Analyse, `repository-modernization` für die Umsetzung). Vorhanden waren `code-audit` (Befunde je Zeile, schließt Architektur ausdrücklich aus), `gen-diagram` (IST gegen den laufenden Stand) und dünne Plugin-Raster (`engineering:tech-debt`, `engineering:architecture`). Keiner davon entscheidet je Modul oder bewertet einen Rewrite.
+
+**Optionen.**
+1. Kein neuer Skill, die vorhandenen nur kombinieren.
+2. Ein vollständiger Skill mit allen 16 Phasen, unabhängig von `code-audit`.
+3. Ein schlanker Skill als Entscheidungsschicht, der die Prüftiefe an `code-audit` delegiert, dazu kein eigener Umsetzungs-Skill.
+
+**Entscheidung.** Option 3 (`repo-modernization-review`). Option 1 lässt genau die Lücke offen, um die es geht: KEEP/REFACTOR/REWRITE/DELETE je Modul, SOLL mit Delta und die Rewrite-Bewertung. Option 2 pflegt dieselben Prüfregeln an zwei Stellen. Die Umsetzung decken `engineering` und `code-audit --fix` bereits ab; die Trennung von Analyse und Umsetzung hält der Skill selbst, weil er nur berichtet. Pilot am 2026-09-24 auf `blumsoft-platform` (Deep) und `sound-studio` (Standard) mit Opus 5.5, die Rückmeldungen beider Läufe sind eingearbeitet.
+
+**Trade-off.** Die Qualität hängt an `code-audit`: ändert sich dessen Referenzstruktur, muss Step 2 nachgezogen werden. Ein Lauf kostete im Pilot rund 400.000 Tokens und 25 bis 30 Minuten; Tier-C-Repos laufen deshalb nur als Triage.
