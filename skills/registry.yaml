@@ -47,6 +47,30 @@
   - name: bs-text-natural
     source: custom
     path: skills/custom/bs-text-natural
+  - name: bs-sap-abap-review
+    source: custom
+    path: skills/custom/bs-sap-abap-review
+  - name: bs-sap-support
+    source: custom
+    path: skills/custom/bs-sap-support
+  - name: bs-sap-kickoff
+    source: custom
+    path: skills/custom/bs-sap-kickoff
+  - name: bs-sap-spec
+    source: custom
+    path: skills/custom/bs-sap-spec
+  - name: bs-sap-estimate
+    source: custom
+    path: skills/custom/bs-sap-estimate
+  - name: bs-sap-ui5
+    source: custom
+    path: skills/custom/bs-sap-ui5
+  - name: bs-doc-meeting
+    source: custom
+    path: skills/custom/bs-doc-meeting
+  - name: bs-doc-html
+    source: custom
+    path: skills/custom/bs-doc-html
   - name: advanced-evaluation
     source: vendor-guanyang
     path: skills/vendor/guanyang/advanced-evaluation

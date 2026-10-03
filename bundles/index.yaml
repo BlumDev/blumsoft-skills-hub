@@ -20,6 +20,12 @@ bundles:
   - id: project-bootstrap-core
     name: Project Bootstrap Core
     file: bundles/project-bootstrap-core.yaml
+  - id: sap-consulting
+    name: SAP Consulting
+    file: bundles/sap-consulting.yaml
+  - id: office-docs
+    name: Office Docs
+    file: bundles/office-docs.yaml
   - id: essentials
     name: Essentials
     file: bundles/essentials.yaml

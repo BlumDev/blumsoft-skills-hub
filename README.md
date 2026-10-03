@@ -149,6 +149,14 @@ to build something, names ending in `-audit` or `-review` produce a report.
 | text | `bs-text-audio` | listening scripts for text-to-speech |
 | media | `bs-media-image` | local image assets via ComfyUI |
 | business | `bs-business-growth` | pricing, launch, analytics, experiments |
+| sap | `bs-sap-support` | trace an SAP error from symptom to cause |
+| sap | `bs-sap-abap-review` | judge, explain or extend ABAP source |
+| sap | `bs-sap-kickoff` | set up a new SAP development before the first line |
+| sap | `bs-sap-spec` | write or check functional and technical specs |
+| sap | `bs-sap-estimate` | estimate SAP effort as a range with visible assumptions |
+| sap | `bs-sap-ui5` | SAPUI5, Fiori Elements, OData, Launchpad |
+| doc | `bs-doc-meeting` | meeting notes into decisions, tasks and open points |
+| doc | `bs-doc-html` | standalone HTML documents and cheat sheets |
 
 The mapping from the old names is recorded in [docs/decisions.md](docs/decisions.md)
 (2026-10-03) and in `scripts/skills/migrate-renames.ps1`.
@@ -186,6 +194,14 @@ The active bundle family is:
 - `platform-devops`
 - `security-engineering`
 - `business-growth`
+- `sap-consulting` (composes `office-docs`)
+- `office-docs`
+
+SAP and docs skills are not part of `freelancer-fullstack`; sync them on demand:
+
+```powershell
+./scripts/skills/sync.ps1 -BundleId sap-consulting -Targets claude,codex
+```
 
 Legacy wrapper bundle IDs still exist for backward compatibility, but new work should use the active bundle family.
 

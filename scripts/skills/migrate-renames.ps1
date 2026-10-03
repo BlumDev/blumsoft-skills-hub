@@ -41,6 +41,15 @@ $renames = [ordered]@{
   'voice'                     = 'bs-text-audio'
   'gen-asset'                 = 'bs-media-image'
   'business'                  = 'bs-business-growth'
+  # Bisher nur in claude.ai gepflegt; lokale Kopien unter altem Namen werden mit umgezogen.
+  'sap-abap-review'           = 'bs-sap-abap-review'
+  'sap-fehleranalyse'         = 'bs-sap-support'
+  'sap-projektstart'          = 'bs-sap-kickoff'
+  'sap-fachkonzept'           = 'bs-sap-spec'
+  'sap-aufwand'               = 'bs-sap-estimate'
+  'sap-ui5'                   = 'bs-sap-ui5'
+  'termin-nachbereitung'      = 'bs-doc-meeting'
+  'wissensdokument'           = 'bs-doc-html'
 }
 # Legacy-Skills, deren Inhalt längst in den Kern-Skills steckt: nur sichern und entfernen.
 $removed = @('docu', 'code-review', 'webdev', 'ai-seo-auditor', 'backend', 'project-bootstrap')

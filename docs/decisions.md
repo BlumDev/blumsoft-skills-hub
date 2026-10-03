@@ -264,3 +264,16 @@ fehl. Ein künftiges CI-Gate muss Pester 5 explizit installieren. Die Systeminst
 Entfernt ohne Archivkopie, weil ihr Inhalt seit der Konsolidierung in den Kern-Skills steckt und die Git-Historie reicht: `docu`, `code-review`, `webdev`, `ai-seo-auditor`, `backend`, `project-bootstrap`. Reserviert: `bs-media-video` (entsteht im ComfyUI-Bereich). Zielnamen der Skills, die bisher nur in claude.ai liegen: `bs-sap-abap-review`, `bs-sap-support` (war `sap-fehleranalyse`), `bs-sap-kickoff`, `bs-sap-spec`, `bs-sap-estimate`, `bs-sap-ui5`, `bs-doc-meeting` (war `termin-nachbereitung`), `bs-doc-html` (war `wissensdokument`).
 
 **Trade-off.** Auf jedem Rechner liegen die installierten Skills noch unter den alten Namen, `sync.ps1` räumt sie nicht ab. Dafür gibt es `scripts/skills/migrate-renames.ps1`: alten Ordner sichern, abräumen und unter neuem Namen installieren, Laufzeitdaten wie `out/` werden übernommen. Historische Dokumente (`docs/reviews/`, das Backlog-Archiv, frühere Einträge hier) behalten die alten Namen, weil sie den damaligen Stand beschreiben.
+
+## 2026-10-03: Die claude.ai-Skills kommen ins Repo, mit Kundenreferenz
+
+**Kontext.** Acht eigene Skills (sechs SAP-Skills, `termin-nachbereitung`, `wissensdokument`) lagen nur in claude.ai. Das Repo war damit nicht die einzige Quelle, und `sync.ps1` konnte sie weder an Codex noch an Cursor verteilen. `sap-fehleranalyse` bringt `references/grantor-crm.md` mit, eine kundenspezifische Referenz.
+
+**Optionen.**
+1. Alles ins Repo, die Kundenreferenz eingeschlossen.
+2. Ins Repo ohne `grantor-crm.md`, die Datei nur in claude.ai pflegen.
+3. Die Skills weiter nur in claude.ai halten.
+
+**Entscheidung.** Option 1. Das Repo ist privat (vom Inhaber am 2026-10-03 bestätigt), die Kundenreferenz darf also mit. Option 2 hätte zwei Fassungen desselben Skills erzeugt, Option 3 lässt die Lücke offen, wegen der die Umbenennung überhaupt eine Liste brauchte. Die Skills heißen jetzt `bs-sap-*` und `bs-doc-*` und hängen in zwei neuen Bundles: `sap-consulting` (bindet `office-docs` ein) und `office-docs`. Beide gehören nicht zu `freelancer-fullstack`, sie werden bei Bedarf mit `-BundleId` synchronisiert.
+
+**Trade-off.** Wird das Repo jemals öffentlich oder für Dritte freigegeben, muss `skills/custom/bs-sap-support/references/grantor-crm.md` vorher raus, samt Git-Historie. In claude.ai liegen die Skills weiter unter den alten Namen, bis sie dort neu hochgeladen werden.

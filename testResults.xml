@@ -1,0 +1,257 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="51" errors="0" failures="11" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2026-10-03" time="18:49:01">
+  <environment user="root" os-version="6.18.44-fc-v64" cwd="/home/user/blumsoft-skills-hub" user-domain="" machine-name="vm" clr-version="8.0.10" platform="Linux" nunit-version="2.5.8.0" />
+  <culture-info current-culture="" current-uiculture="" />
+  <test-suite type="TestFixture" name="Pester" executed="True" result="Failure" success="False" time="10.0392" asserts="0" description="Pester">
+    <results>
+      <test-suite type="TestFixture" name="/home/user/blumsoft-skills-hub/tests/skill-id-validation.Tests.ps1" executed="True" result="Success" success="True" time="1.4141" asserts="0" description="/home/user/blumsoft-skills-hub/tests/skill-id-validation.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Test-SkillId" executed="True" result="Success" success="True" time="0.384" asserts="0" description="Test-SkillId">
+            <results>
+              <test-case description="rejects a name with a trailing newline (regex anchor \z, not $)" name="Test-SkillId.rejects a name with a trailing newline (regex anchor \z, not $)" time="0.0125" asserts="0" success="True" result="Success" executed="True" />
+              <test-suite type="ParameterizedTest" name="Test-SkillId.accepts the real skill name &lt;_&gt;" executed="True" result="Success" success="True" time="0.1774" asserts="0" description="accepts the real skill name &lt;_&gt;">
+                <results>
+                  <test-case description="accepts the real skill name bs-dev-audit" name="Test-SkillId.accepts the real skill name bs-dev-audit" time="0.147" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="accepts the real skill name bs-text-natural" name="Test-SkillId.accepts the real skill name bs-text-natural" time="0.0066" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="accepts the real skill name ui-ux-pro-max" name="Test-SkillId.accepts the real skill name ui-ux-pro-max" time="0.0058" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="accepts the real skill name ab-test-setup" name="Test-SkillId.accepts the real skill name ab-test-setup" time="0.0057" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="accepts the real skill name notebooklm" name="Test-SkillId.accepts the real skill name notebooklm" time="0.006" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="accepts the real skill name top-web-vulnerabilities" name="Test-SkillId.accepts the real skill name top-web-vulnerabilities" time="0.0062" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+              <test-suite type="ParameterizedTest" name="Test-SkillId.rejects &lt;_&gt;" executed="True" result="Success" success="True" time="0.1388" asserts="0" description="rejects &lt;_&gt;">
+                <results>
+                  <test-case description="rejects ../../evil" name="Test-SkillId.rejects ../../evil" time="0.0086" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects ..\..\evil" name="Test-SkillId.rejects ..\..\evil" time="0.0052" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects evil/../.." name="Test-SkillId.rejects evil/../.." time="0.0058" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects .." name="Test-SkillId.rejects .." time="0.0115" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects ." name="Test-SkillId.rejects ." time="0.0143" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects C:\Windows" name="Test-SkillId.rejects C:\Windows" time="0.0146" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects \victim" name="Test-SkillId.rejects \victim" time="0.0376" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects \\server\share" name="Test-SkillId.rejects \\server\share" time="0.0055" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects sub/skill" name="Test-SkillId.rejects sub/skill" time="0.0051" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects skill*" name="Test-SkillId.rejects skill*" time="0.0052" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects sk ill" name="Test-SkillId.rejects sk ill" time="0.0049" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects skill:stream" name="Test-SkillId.rejects skill:stream" time="0.0056" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects -leading-hyphen" name="Test-SkillId.rejects -leading-hyphen" time="0.0049" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects UPPER" name="Test-SkillId.rejects UPPER" time="0.0049" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects " name="Test-SkillId.rejects " time="0.005" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Assert-SkillId" executed="True" result="Success" success="True" time="0.5572" asserts="0" description="Assert-SkillId">
+            <results>
+              <test-case description="returns the id unchanged for a valid name" name="Assert-SkillId.returns the id unchanged for a valid name" time="0.0761" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="throws on a traversal name" name="Assert-SkillId.throws on a traversal name" time="0.0891" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Resolve-SkillTargetPath" executed="True" result="Success" success="True" time="0.6139" asserts="0" description="Resolve-SkillTargetPath">
+            <results>
+              <test-case description="resolves a valid skill to a direct child of the base directory" name="Resolve-SkillTargetPath.resolves a valid skill to a direct child of the base directory" time="0.0193" asserts="0" success="True" result="Success" executed="True" />
+              <test-suite type="ParameterizedTest" name="Resolve-SkillTargetPath.throws before returning a path for &lt;_&gt;" executed="True" result="Success" success="True" time="0.0331" asserts="0" description="throws before returning a path for &lt;_&gt;">
+                <results>
+                  <test-case description="throws before returning a path for ../../evil" name="Resolve-SkillTargetPath.throws before returning a path for ../../evil" time="0.0094" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="throws before returning a path for C:\Windows" name="Resolve-SkillTargetPath.throws before returning a path for C:\Windows" time="0.0088" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="throws before returning a path for .." name="Resolve-SkillTargetPath.throws before returning a path for .." time="0.0076" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="throws before returning a path for sub/skill" name="Resolve-SkillTargetPath.throws before returning a path for sub/skill" time="0.0074" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="sync.ps1 refuses to delete outside the skills target directory" executed="True" result="Success" success="True" time="0.9517" asserts="0" description="sync.ps1 refuses to delete outside the skills target directory">
+            <results>
+              <test-case description="aborts on a traversal skill name and deletes nothing" name="sync.ps1 refuses to delete outside the skills target directory.aborts on a traversal skill name and deletes nothing" time="0.0994" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="aborts on an absolute skill name and deletes nothing" name="sync.ps1 refuses to delete outside the skills target directory.aborts on an absolute skill name and deletes nothing" time="0.051" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="still syncs a legitimate skill name" name="sync.ps1 refuses to delete outside the skills target directory.still syncs a legitimate skill name" time="0.1817" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="/home/user/blumsoft-skills-hub/tests/skills/lib.Tests.ps1" executed="True" result="Success" success="True" time="0.0612" asserts="0" description="/home/user/blumsoft-skills-hub/tests/skills/lib.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Resolve-BundleSkills compose_with and extended" executed="True" result="Success" success="True" time="0.0372" asserts="0" description="Resolve-BundleSkills compose_with and extended">
+            <results>
+              <test-case description="resolves composed bundles depth first and survives a cycle" name="Resolve-BundleSkills compose_with and extended.resolves composed bundles depth first and survives a cycle" time="0.0331" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="/home/user/blumsoft-skills-hub/tests/skills/setup-from-profile.Tests.ps1" executed="True" result="Success" success="True" time="0.1547" asserts="0" description="/home/user/blumsoft-skills-hub/tests/skills/setup-from-profile.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="setup-from-profile.ps1 preview run" executed="True" result="Success" success="True" time="0.1013" asserts="0" description="setup-from-profile.ps1 preview run">
+            <results>
+              <test-case description="does not run vendor-import without -Apply" name="setup-from-profile.ps1 preview run.does not run vendor-import without -Apply" time="0.0752" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="runs vendor-import with -Apply" name="setup-from-profile.ps1 preview run.runs vendor-import with -Apply" time="0.0195" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="/home/user/blumsoft-skills-hub/tests/skills/sync-targets.Tests.ps1" executed="True" result="Failure" success="False" time="6.8539" asserts="0" description="/home/user/blumsoft-skills-hub/tests/skills/sync-targets.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="sync.ps1 target de-duplication" executed="True" result="Failure" success="False" time="1.8195" asserts="0" description="sync.ps1 target de-duplication">
+            <results>
+              <test-case description="syncs a skill once when two target names resolve to the same directory" name="sync.ps1 target de-duplication.syncs a skill once when two target names resolve to the same directory" time="1.1314" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>Expected $true, but got $false.</message>
+                  <stack-trace>at Test-Path -LiteralPath (Join-Path $script:fixture.InstalledAt 'SKILL.md') | Should -BeTrue, /home/user/blumsoft-skills-hub/tests/skills/sync-targets.Tests.ps1:125
+at &lt;ScriptBlock&gt;, /home/user/blumsoft-skills-hub/tests/skills/sync-targets.Tests.ps1:125</stack-trace>
+                </failure>
+              </test-case>
+              <test-case description="still syncs both targets when they resolve to different directories" name="sync.ps1 target de-duplication.still syncs both targets when they resolve to different directories" time="0.6835" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>Expected $true, but got $false.</message>
+                  <stack-trace>at Test-Path -LiteralPath (Join-Path $script:fixture.FakeHome '.cursor/skills/harmless/SKILL.md') | Should -BeTrue, /home/user/blumsoft-skills-hub/tests/skills/sync-targets.Tests.ps1:136
+at &lt;ScriptBlock&gt;, /home/user/blumsoft-skills-hub/tests/skills/sync-targets.Tests.ps1:136</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="sync.ps1 replace failure" executed="True" result="Failure" success="False" time="2.4856" asserts="0" description="sync.ps1 replace failure">
+            <results>
+              <test-case description="leaves the installed skill complete when the target cannot be replaced" name="sync.ps1 replace failure.leaves the installed skill complete when the target cannot be replaced" time="0.6586" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>DirectoryNotFoundException: Could not find a part of the path '/tmp/skillshub-sync-3cfeb152/home/.codex/skills/harmless/zz-payload.txt'.
+MethodInvocationException: Exception calling "Open" with "4" argument(s): "Could not find a part of the path '/tmp/skillshub-sync-3cfeb152/home/.codex/skills/harmless/zz-payload.txt'."</message>
+                  <stack-trace>at &lt;ScriptBlock&gt;, /home/user/blumsoft-skills-hub/tests/skills/sync-targets.Tests.ps1:156</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="sync.ps1 interrupted between the two renames" executed="True" result="Failure" success="False" time="3.9171" asserts="0" description="sync.ps1 interrupted between the two renames">
+            <results>
+              <test-case description="restores the old version when the run dies after the target was moved to the backup" name="sync.ps1 interrupted between the two renames.restores the old version when the run dies after the target was moved to the backup" time="1.4254" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>Expected $true, because an abort between the renames must not consume the installed skill, but got $false.</message>
+                  <stack-trace>at Test-Path -LiteralPath (Join-Path $script:fixture.InstalledAt 'SKILL.md') | Should -BeTrue -Because 'an abort between the renames must not consume the installed skill', /home/user/blumsoft-skills-hub/tests/skills/sync-targets.Tests.ps1:192
+at &lt;ScriptBlock&gt;, /home/user/blumsoft-skills-hub/tests/skills/sync-targets.Tests.ps1:192</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="sync.ps1 profile selection" executed="True" result="Failure" success="False" time="4.6092" asserts="0" description="sync.ps1 profile selection">
+            <results>
+              <test-case description="takes bundles and targets from the profile when -Targets is not given" name="sync.ps1 profile selection.takes bundles and targets from the profile when -Targets is not given" time="0.6902" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>Expected $true, but got $false.</message>
+                  <stack-trace>at Test-Path -LiteralPath (Join-Path $script:fixture.InstalledAt 'SKILL.md') | Should -BeTrue, /home/user/blumsoft-skills-hub/tests/skills/sync-targets.Tests.ps1:219
+at &lt;ScriptBlock&gt;, /home/user/blumsoft-skills-hub/tests/skills/sync-targets.Tests.ps1:219</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="sync.ps1 dry run" executed="True" result="Failure" success="False" time="6.0566" asserts="0" description="sync.ps1 dry run">
+            <results>
+              <test-case description="leaves the installed skill untouched with -DryRun" name="sync.ps1 dry run.leaves the installed skill untouched with -DryRun" time="1.4455" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>RuntimeException: You cannot call a method on a null-valued expression.</message>
+                  <stack-trace>at &lt;ScriptBlock&gt;, /home/user/blumsoft-skills-hub/tests/skills/sync-targets.Tests.ps1:242</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="sync.ps1 antigravity workflows" executed="True" result="Failure" success="False" time="6.8126" asserts="0" description="sync.ps1 antigravity workflows">
+            <results>
+              <test-case description="overwrites a locally edited workflow with the repo version" name="sync.ps1 antigravity workflows.overwrites a locally edited workflow with the repo version" time="0.7539" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>Expected strings to be the same, but they were different.
+Expected length: 13
+Actual length:   9
+Strings differ at index 0.
+Expected: 'repo-workflow'
+But was:  'user-edit'
+           ^</message>
+                  <stack-trace>at (Get-Content -LiteralPath $script:fixture.WorkflowInstalledAt -Raw).Trim() | Should -Be 'repo-workflow', /home/user/blumsoft-skills-hub/tests/skills/sync-targets.Tests.ps1:275
+at &lt;ScriptBlock&gt;, /home/user/blumsoft-skills-hub/tests/skills/sync-targets.Tests.ps1:275</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="/home/user/blumsoft-skills-hub/tests/skills/tooling-edge.Tests.ps1" executed="True" result="Failure" success="False" time="0.56" asserts="0" description="/home/user/blumsoft-skills-hub/tests/skills/tooling-edge.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="vendor-import.ps1 native command handling" executed="True" result="Success" success="True" time="0.1312" asserts="0" description="vendor-import.ps1 native command handling">
+            <results>
+              <test-case description="throws when the skill installer returns a nonzero exit code" name="vendor-import.ps1 native command handling.throws when the skill installer returns a nonzero exit code" time="0.1243" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Get-AllBundles duplicate handling" executed="True" result="Success" success="True" time="0.1575" asserts="0" description="Get-AllBundles duplicate handling">
+            <results>
+              <test-case description="rejects duplicate bundle IDs" name="Get-AllBundles duplicate handling.rejects duplicate bundle IDs" time="0.0215" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="sync.ps1 unsafe skill names" executed="True" result="Success" success="True" time="0.2502" asserts="0" description="sync.ps1 unsafe skill names">
+            <results>
+              <test-suite type="ParameterizedTest" name="sync.ps1 unsafe skill names.rejects &lt;SkillName&gt; without changing existing targets" executed="True" result="Success" success="True" time="0.0807" asserts="0" description="rejects &lt;SkillName&gt; without changing existing targets">
+                <results>
+                  <test-case description="rejects ../outside without changing existing targets" name="sync.ps1 unsafe skill names.rejects ../outside without changing existing targets" time="0.0387" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="rejects * without changing existing targets" name="sync.ps1 unsafe skill names.rejects * without changing existing targets" time="0.0419" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="with_server.py occupied port handling" executed="True" result="Failure" success="False" time="0.463" asserts="0" description="with_server.py occupied port handling">
+            <results>
+              <test-suite type="ParameterizedTest" name="with_server.py occupied port handling.rejects an occupied port in the &lt;Name&gt; copy" executed="True" result="Failure" success="False" time="0.2095" asserts="0" description="rejects an occupied port in the &lt;Name&gt; copy">
+                <results>
+                  <test-case description="rejects an occupied port in the custom copy" name="with_server.py occupied port handling.rejects an occupied port in the custom copy" time="0.124" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>Expected 0 to be different from the actual value, but got the same value.</message>
+                      <stack-trace>at $exitCode | Should -Not -Be 0, /home/user/blumsoft-skills-hub/tests/skills/tooling-edge.Tests.ps1:174
+at &lt;ScriptBlock&gt;, /home/user/blumsoft-skills-hub/tests/skills/tooling-edge.Tests.ps1:174</stack-trace>
+                    </failure>
+                  </test-case>
+                  <test-case description="rejects an occupied port in the vendor copy" name="with_server.py occupied port handling.rejects an occupied port in the vendor copy" time="0.0855" asserts="0" success="False" result="Failure" executed="True">
+                    <failure>
+                      <message>Expected 0 to be different from the actual value, but got the same value.</message>
+                      <stack-trace>at $exitCode | Should -Not -Be 0, /home/user/blumsoft-skills-hub/tests/skills/tooling-edge.Tests.ps1:174
+at &lt;ScriptBlock&gt;, /home/user/blumsoft-skills-hub/tests/skills/tooling-edge.Tests.ps1:174</stack-trace>
+                    </failure>
+                  </test-case>
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="/home/user/blumsoft-skills-hub/tests/skills/validate.Tests.ps1" executed="True" result="Success" success="True" time="0.8963" asserts="0" description="/home/user/blumsoft-skills-hub/tests/skills/validate.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="validate.ps1 archive mismatch and profile leak" executed="True" result="Success" success="True" time="0.8823" asserts="0" description="validate.ps1 archive mismatch and profile leak">
+            <results>
+              <test-case description="fails on an archive-reference skill outside skills/archive and inside a profile" name="validate.ps1 archive mismatch and profile leak.fails on an archive-reference skill outside skills/archive and inside a profile" time="0.8803" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="/home/user/blumsoft-skills-hub/tests/project/bootstrap-project.Tests.ps1" executed="True" result="Failure" success="False" time="0.099" asserts="0" description="/home/user/blumsoft-skills-hub/tests/project/bootstrap-project.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="bootstrap-project.ps1 argument binding" executed="True" result="Failure" success="False" time="0.0337" asserts="0" description="bootstrap-project.ps1 argument binding">
+            <results>
+              <test-case description="binds multiple bundle IDs and named sync parameters correctly" name="bootstrap-project.ps1 argument binding.binds multiple bundle IDs and named sync parameters correctly" time="0.0261" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>RuntimeException: Template not found: /tmp/9eee4306-444e-405d-a306-3e0346fe073d/repo/templates/project/.github/copilot-instructions.md</message>
+                  <stack-trace>at Copy-IfMissing, /tmp/9eee4306-444e-405d-a306-3e0346fe073d/repo/scripts/project/bootstrap-project.ps1:26
+at &lt;ScriptBlock&gt;, /tmp/9eee4306-444e-405d-a306-3e0346fe073d/repo/scripts/project/bootstrap-project.ps1:40
+at &lt;ScriptBlock&gt;, /home/user/blumsoft-skills-hub/tests/project/bootstrap-project.Tests.ps1:65</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="bootstrap-project.ps1 Copy-IfMissing" executed="True" result="Failure" success="False" time="0.0852" asserts="0" description="bootstrap-project.ps1 Copy-IfMissing">
+            <results>
+              <test-case description="keeps an existing project file and adds the missing ones" name="bootstrap-project.ps1 Copy-IfMissing.keeps an existing project file and adds the missing ones" time="0.0425" asserts="0" success="False" result="Failure" executed="True">
+                <failure>
+                  <message>RuntimeException: Template not found: /tmp/9eee4306-444e-405d-a306-3e0346fe073d/copy-if-missing-repo/templates/project/.github/copilot-instructions.md</message>
+                  <stack-trace>at Copy-IfMissing, /tmp/9eee4306-444e-405d-a306-3e0346fe073d/copy-if-missing-repo/scripts/project/bootstrap-project.ps1:26
+at &lt;ScriptBlock&gt;, /tmp/9eee4306-444e-405d-a306-3e0346fe073d/copy-if-missing-repo/scripts/project/bootstrap-project.ps1:40
+at &lt;ScriptBlock&gt;, /home/user/blumsoft-skills-hub/tests/project/bootstrap-project.Tests.ps1:120</stack-trace>
+                </failure>
+              </test-case>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

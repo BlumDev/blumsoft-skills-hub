@@ -1,0 +1,161 @@
+<!-- BAUSTEINKISTE. Diese Datei ist Doku und Demo zugleich: in den Browser
+     ziehen, um alle Blöcke gerendert zu sehen. Zum Bauen wird nur der Inhalt
+     zwischen den Bausteinen kopiert, nie eigene Klassen erfunden. -->
+
+<header class="masthead">
+  <div class="kicker">Kicker, klein und in Versalien</div>
+  <h1>Titel des Dokuments</h1>
+  <p class="sub">Untertitel in einem Satz. Sagt, was drinsteht und für wen.</p>
+  <div class="meta">
+    <span>Randangabe</span>
+    <span>noch eine</span>
+  </div>
+</header>
+
+<!-- WARNKASTEN. Immer dann ganz oben, wenn Teile des Dokuments nicht für
+     fremde Augen sind. note-warn ist der gelbe, note der blaue. -->
+<div class="note note-warn">
+  <span class="lbl">Vor dem Weitergeben lesen</span>
+  Was hier steht, liest jemand unter Zeitdruck. Ein Satz, keine Abhandlung.
+</div>
+
+<!-- ABSCHNITT. h2 gliedert, das tag markiert intern oder zeigbar. -->
+<h2>Abschnitt <span class="tag tag-ext">zeigbar</span></h2>
+<h2>Anderer Abschnitt <span class="tag tag-int">intern</span></h2>
+
+<!-- SHEET. Umrahmter Block für einen zusammenhängenden Teil. Nicht
+     verschachteln, nicht für jeden Absatz nehmen. -->
+<div class="sheet">
+  <h3>Überschrift im Kasten</h3>
+  <p>Fließtext. Ein Absatz ist eine Zeile in der Quelldatei, umgebrochen wird vom Browser.</p>
+  <p><strong>Hervorhebung am Satzanfang.</strong> So beginnt ein Absatz, dessen Kernaussage vorgezogen wird.</p>
+</div>
+
+<!-- NOTE. Blauer Hinweis für Einordnung, Belegstatus, Nebenbedingung. -->
+<div class="note">
+  <span class="lbl">Belegstatus</span>
+  Für alles, was der Leser wissen muss, bevor er die Aussage darüber verwendet.
+</div>
+
+<!-- ZONE. Gegenüberstellung, genau zwei Spalten. Grün ist a, gelb ist b.
+     Für erlaubt gegen verboten, trägt gegen trägt nicht, im Pilot gegen
+     nicht im Pilot. Bei drei oder mehr Gruppen stattdessen cards nehmen. -->
+<div class="zone">
+  <div class="a">
+    <div class="hd">Trägt</div>
+    <ul>
+      <li>Kurze Punkte</li>
+      <li>Keine Nebensätze</li>
+    </ul>
+  </div>
+  <div class="b">
+    <div class="hd">Trägt nicht</div>
+    <ul>
+      <li>Gegenstück in gleicher Zahl</li>
+      <li>Sonst wirkt es unfertig</li>
+    </ul>
+  </div>
+</div>
+
+<!-- CARDS. Kartenraster, bricht selbst um. Das Arbeitspferd der
+     Referenzkarte. Varianten: card.ok grün, card.warn gelb, cards.two für
+     breitere Karten. -->
+<div class="cards">
+  <div class="card">
+    <div class="t">Kartentitel</div>
+    <p>Kurzer Inhalt, zwei bis drei Zeilen.</p>
+  </div>
+  <div class="card ok">
+    <div class="t">Empfohlen</div>
+    <ul><li>Punkt eins</li><li>Punkt zwei</li></ul>
+  </div>
+  <div class="card warn">
+    <div class="t">Vorsicht</div>
+    <p>Was schiefgeht, wenn man es anders macht.</p>
+  </div>
+</div>
+
+<!-- LAYER. Nummerierter Block mit Akzentkante. Für Ebenen, Stufen,
+     Bestandteile eines Systems. -->
+<div class="layer">
+  <div class="num">Ebene 1</div>
+  <h3>Name der Ebene</h3>
+  <p>Was auf dieser Ebene passiert.</p>
+</div>
+
+<!-- PHASE. Zeitplanzeile: links wann, rechts was. Mehrere hintereinander
+     ergeben den Plan. -->
+<div class="phase">
+  <div class="when">Sept</div>
+  <div class="what"><strong>Was passiert</strong><p>Erläuterung in einem Satz.</p></div>
+</div>
+<div class="phase">
+  <div class="when">Okt bis Nov</div>
+  <div class="what"><strong>Nächster Schritt</strong><p>Erläuterung.</p></div>
+</div>
+
+<!-- Q. Frage mit Begründung darunter. Für Gesprächsleitfäden und
+     Prüffragen. Die Begründung sagt, warum die Frage gestellt wird, nicht
+     was die Antwort sein soll. -->
+<div class="q">
+  <div class="txt">"Die Frage im Wortlaut, so wie sie gestellt wird?"</div>
+  <div class="why">Warum diese Frage gestellt wird. Und was ihre Antwort entscheidet.</div>
+</div>
+
+<!-- TABELLEN. Standard hat eine fette erste Spalte ohne Umbruch. Mit
+     class="free" bricht die erste Spalte normal um, das ist für längere
+     Bezeichnungen. -->
+<table>
+  <thead><tr><th>Schlüssel</th><th>Wert</th><th>Bemerkung</th></tr></thead>
+  <tbody>
+    <tr><td>ST22</td><td>Kurzdumps</td><td>Fehlerklasse und Aufrufstapel</td></tr>
+    <tr><td>SM37</td><td>Hintergrundjobs</td><td>Joblog lesen, nicht den Status</td></tr>
+  </tbody>
+</table>
+
+<table class="free">
+  <thead><tr><th>Längere Bezeichnung</th><th>Bedeutung</th></tr></thead>
+  <tbody>
+    <tr><td>Ein Eintrag, der umbrechen darf</td><td>Erklärung</td></tr>
+  </tbody>
+</table>
+
+<!-- KLEINTEILE. kbd für Tasten und Codes, pill für Zustände, code für
+     Bezeichner im Fließtext. -->
+<p>
+  Taste <span class="kbd">T</span> schaltet um.
+  Status <span class="pill ok">aktiv</span> <span class="pill warn">offen</span> <span class="pill">neutral</span>.
+  Im Text ein Bezeichner: <code>SAPSQL_ARRAY_INSERT_DUPREC</code>.
+</p>
+
+<!-- DIAGRAMM. Muster aus diagramme.md kopieren. figcaption sagt, was man
+     sehen soll, nicht was das Bild zeigt. -->
+<figure class="fig">
+  <svg viewBox="0 0 400 60" style="width:100%;max-width:400px" role="img" aria-label="Beispiel">
+    <defs>
+      <marker id="ar" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="8" markerHeight="7" orient="auto">
+        <path d="M0,0 L10,4 L0,8 z" class="d-fill-line"/>
+      </marker>
+    </defs>
+    <rect x="2" y="10" width="170" height="40" rx="6" class="d-box"/>
+    <text x="87" y="35" class="d-t-b" text-anchor="middle">Vorher</text>
+    <rect x="228" y="10" width="170" height="40" rx="6" class="d-box-a"/>
+    <text x="313" y="35" class="d-t-b" text-anchor="middle">Nachher</text>
+    <path d="M172,30 L224,30" class="d-line" marker-end="url(#ar)"/>
+  </svg>
+  <figcaption>Die Bildunterschrift nennt die Schlussfolgerung.</figcaption>
+</figure>
+
+<!-- QUELLEN. Am Ende, klein. -->
+<h3>Quellen</h3>
+<ul class="src">
+  <li>Woher die Angaben stammen, mit Datum des Abrufs</li>
+</ul>
+
+<!-- SEITENUMBRUCH im Druck: class="pb" an ein h2 hängen. -->
+<h2 class="pb">Beginnt beim Drucken auf neuer Seite</h2>
+
+<!-- REFERENZKARTEN-MODUS: am body die Klasse dense setzen, dann wird alles
+     enger und die Kartenraster kommen zur Geltung:
+     <body class="dense">
+-->

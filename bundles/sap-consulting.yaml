@@ -1,0 +1,17 @@
+id: sap-consulting
+name: SAP Consulting
+goal: SAP development and support work from the first requirement to the root cause of a production error, ABAP backend and UI5/Fiori frontend.
+recommended_start_skill: bs-sap-support
+fallback_skills:
+  - bs-sap-abap-review
+core_skills:
+  - bs-sap-support
+  - bs-sap-abap-review
+  - bs-sap-kickoff
+  - bs-sap-spec
+  - bs-sap-estimate
+  - bs-sap-ui5
+extended_skills:
+compose_with:
+  - office-docs
+starter_prompt: bundles/prompts/sap-consulting.md

@@ -48,6 +48,30 @@ skills:
   - name: bs-text-natural
     status: active-core
     target: business-growth
+  - name: bs-sap-abap-review
+    status: active-core
+    target: sap-consulting
+  - name: bs-sap-support
+    status: active-core
+    target: sap-consulting
+  - name: bs-sap-kickoff
+    status: active-core
+    target: sap-consulting
+  - name: bs-sap-spec
+    status: active-core
+    target: sap-consulting
+  - name: bs-sap-estimate
+    status: active-core
+    target: sap-consulting
+  - name: bs-sap-ui5
+    status: active-core
+    target: sap-consulting
+  - name: bs-doc-meeting
+    status: active-core
+    target: office-docs
+  - name: bs-doc-html
+    status: active-core
+    target: office-docs
   - name: advanced-evaluation
     status: inactive
     target: data-ai-systems

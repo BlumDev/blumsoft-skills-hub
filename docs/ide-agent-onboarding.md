@@ -31,6 +31,7 @@ Use only these bundles through the `freelancer-fullstack` profile:
 ## Add only when explicitly needed
 
 - `business-growth` for pricing, launch, SEO, analytics, CRO, or experimentation
+- `sap-consulting` (with `office-docs`) for SAP development, support, specs and estimates
 - legacy wrapper bundles only for backward compatibility
 - archived skills never by default
 
