@@ -7,10 +7,9 @@ description: Project Kickoff Bundle Starter
 Compose with: `essentials`
 
 Start with core skills:
-- `project-bootstrap`
+- `bs-dev-kickoff`
 - `project-development`
 - `tool-design`
-- `docu`
 
 Workflow:
 1. Capture `PROJECT_CONTEXT.md` (goal, users, constraints, success metrics).

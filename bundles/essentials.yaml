@@ -1,12 +1,12 @@
 id: essentials
 name: Essentials
 goal: Legacy wrapper for the lean engineering-core bundle.
-recommended_start_skill: engineering
+recommended_start_skill: bs-dev-workflow
 fallback_skills:
-  - code-audit
-  - smart-commits
+  - bs-dev-audit
+  - bs-dev-commits
 core_skills:
-  - engineering
+  - bs-dev-workflow
 extended_skills:
 compose_with:
   - engineering-core

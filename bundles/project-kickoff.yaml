@@ -1,10 +1,10 @@
 id: project-kickoff
 name: Project Kickoff
 goal: Legacy wrapper for the project-bootstrap-core bundle.
-recommended_start_skill: bootstrap
+recommended_start_skill: bs-dev-kickoff
 fallback_skills:
 core_skills:
-  - bootstrap
+  - bs-dev-kickoff
 extended_skills:
 compose_with:
   - project-bootstrap-core

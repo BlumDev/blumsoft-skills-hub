@@ -1,8 +1,9 @@
 Use the `Engineering Core` bundle.
 
 Start with:
-- `writing-plans` for structure
-- `systematic-debugging` for failures
-- `verification-before-completion` before claiming success
+- `bs-dev-workflow` for plan, implement, debug, verify, review and landing a branch
+- `bs-dev-audit` to audit existing code by dimension, as a report or with `--fix`
+- `bs-dev-repo-review` for a keep/refactor/rewrite decision per module on an older repo
+- `bs-dev-commits` to cut the working tree into clean commits
 
-Add extended skills only when the task clearly needs reviews, TDD, worktrees, or branch-completion steps.
+Each skill loads its references on demand; pull them only when the task needs them.

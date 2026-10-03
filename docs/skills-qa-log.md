@@ -1,5 +1,7 @@
 # Skills QA Log
 
+> Historisches Protokoll mit den Skill-Namen vor dem `bs-`-Präfix (2026-10-03). Zuordnung: `code-audit` = `bs-dev-audit`, `ai-hardening` = `bs-ai-harden`, `web` = `bs-web-build`, `ai-systems` = `bs-ai-build`, `security` = `bs-dev-security`, `platform` = `bs-ops-infra`, `bootstrap` = `bs-dev-kickoff`; vollständige Liste in `docs/decisions.md`.
+
 Record of the quality tests run against the consolidated skill set, so results
 are reproducible rather than living only in a chat session.
 

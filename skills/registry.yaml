@@ -1,70 +1,52 @@
 ﻿skills:
-  - name: docu
+  - name: bs-dev-commits
     source: custom
-    path: skills/custom/docu
-  - name: code-review
+    path: skills/custom/bs-dev-commits
+  - name: bs-dev-audit
     source: custom
-    path: skills/custom/code-review
-  - name: webdev
+    path: skills/custom/bs-dev-audit
+  - name: bs-dev-repo-review
     source: custom
-    path: skills/custom/webdev
-  - name: ai-seo-auditor
+    path: skills/custom/bs-dev-repo-review
+  - name: bs-ai-harden
     source: custom
-    path: skills/custom/ai-seo-auditor
-  - name: backend
+    path: skills/custom/bs-ai-harden
+  - name: bs-dev-workflow
     source: custom
-    path: skills/custom/backend
-  - name: project-bootstrap
+    path: skills/custom/bs-dev-workflow
+  - name: bs-ai-build
     source: custom
-    path: skills/custom/project-bootstrap
-  - name: smart-commits
+    path: skills/custom/bs-ai-build
+  - name: bs-web-build
     source: custom
-    path: skills/custom/smart-commits
-  - name: code-audit
+    path: skills/custom/bs-web-build
+  - name: bs-dev-security
     source: custom
-    path: skills/custom/code-audit
-  - name: repo-modernization-review
+    path: skills/custom/bs-dev-security
+  - name: bs-ops-infra
     source: custom
-    path: skills/custom/repo-modernization-review
-  - name: ai-hardening
+    path: skills/custom/bs-ops-infra
+  - name: bs-business-growth
     source: custom
-    path: skills/custom/ai-hardening
-  - name: engineering
+    path: skills/custom/bs-business-growth
+  - name: bs-dev-kickoff
     source: custom
-    path: skills/custom/engineering
-  - name: ai-systems
+    path: skills/custom/bs-dev-kickoff
+  - name: bs-ops-deploy-blumsoft
     source: custom
-    path: skills/custom/ai-systems
-  - name: web
+    path: skills/custom/bs-ops-deploy-blumsoft
+  - name: bs-web-audit
     source: custom
-    path: skills/custom/web
-  - name: security
+    path: skills/custom/bs-web-audit
+  - name: bs-media-image
     source: custom
-    path: skills/custom/security
-  - name: platform
+    path: skills/custom/bs-media-image
+  - name: bs-text-audio
     source: custom
-    path: skills/custom/platform
-  - name: business
+    path: skills/custom/bs-text-audio
+  - name: bs-text-natural
     source: custom
-    path: skills/custom/business
-  - name: bootstrap
-    source: custom
-    path: skills/custom/bootstrap
-  - name: blumsoft-deploy
-    source: custom
-    path: skills/custom/blumsoft-deploy
-  - name: website-audit
-    source: custom
-    path: skills/custom/website-audit
-  - name: gen-asset
-    source: custom
-    path: skills/custom/gen-asset
-  - name: voice
-    source: custom
-    path: skills/custom/voice
-  - name: human-voice
-    source: custom
-    path: skills/custom/human-voice
+    path: skills/custom/bs-text-natural
   - name: advanced-evaluation
     source: vendor-guanyang
     path: skills/vendor/guanyang/advanced-evaluation

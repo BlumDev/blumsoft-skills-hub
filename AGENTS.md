@@ -18,6 +18,7 @@ When the task is to install skills from this repo, use **PowerShell in the repo 
 - Do not add legacy wrapper bundles unless explicitly requested.
 - Do not add archived skills unless explicitly requested.
 - Add `business-growth` only when the task explicitly includes pricing, launch, SEO, analytics, CRO, or experimentation.
+- Name new own skills `bs-<area>-<purpose>` (see `README.md`, section Own skills); vendor skills keep their upstream names.
 
 ## If unsure
 

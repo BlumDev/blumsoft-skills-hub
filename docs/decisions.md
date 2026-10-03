@@ -230,3 +230,37 @@ fehl. Ein künftiges CI-Gate muss Pester 5 explizit installieren. Die Systeminst
 **Entscheidung.** Option 3 (`repo-modernization-review`). Option 1 lässt genau die Lücke offen, um die es geht: KEEP/REFACTOR/REWRITE/DELETE je Modul, SOLL mit Delta und die Rewrite-Bewertung. Option 2 pflegt dieselben Prüfregeln an zwei Stellen. Die Umsetzung decken `engineering` und `code-audit --fix` bereits ab; die Trennung von Analyse und Umsetzung hält der Skill selbst, weil er nur berichtet. Pilot am 2026-09-24 auf `blumsoft-platform` (Deep) und `sound-studio` (Standard) mit Opus 5.5, die Rückmeldungen beider Läufe sind eingearbeitet.
 
 **Trade-off.** Die Qualität hängt an `code-audit`: ändert sich dessen Referenzstruktur, muss Step 2 nachgezogen werden. Ein Lauf kostete im Pilot rund 400.000 Tokens und 25 bis 30 Minuten; Tier-C-Repos laufen deshalb nur als Triage.
+
+## 2026-10-03: Eigene Skills heißen `bs-<bereich>-<zweck>`, die Legacy-Skills fliegen raus
+
+**Kontext.** Die eigenen Skills trugen gewachsene Namen ohne Muster (`engineering`, `web`, `human-voice`, `gen-asset`). Daraus folgten drei Probleme. In Listen waren eigene und Vendor-Skills nicht zu unterscheiden. `code-review` kollidierte mit dem eingebauten `/code-review` von Claude Code, `engineering` mit dem Plugin-Namespace `engineering:`. Einzelne Namen sagten nichts über den Zweck (`gen-asset`, `voice` direkt neben `human-voice`).
+
+**Optionen.**
+1. Nur das Präfix `bs-` vor die bestehenden Namen setzen.
+2. Präfix, Bereich und Zweck: `bs-<bereich>-<zweck>`.
+3. Wie 2, aber mit `blum-` statt `bs-`.
+
+**Entscheidung.** Option 2 mit `bs-`. Der Bereich sortiert jede Liste von selbst und entspricht grob den Bundles. Das Suffix trennt Bauen (`-build`) von Berichten (`-audit`, `-review`). `bs-` bleibt, weil das Kürzel schon im Projekt-Starter steht und Einheitlichkeit mehr wiegt als die Wahl des Kürzels. Die englische Lesart von „BS“ zählt nur dort, wo Skills in Kunden-Repos landen (Target `vscode-copilot`). Vendor-Skills behalten ihre Upstream-Namen, `vendor-lock.json` führt sie darunter.
+
+| alt | neu |
+|---|---|
+| `engineering` | `bs-dev-workflow` |
+| `bootstrap` | `bs-dev-kickoff` |
+| `smart-commits` | `bs-dev-commits` |
+| `code-audit` | `bs-dev-audit` |
+| `repo-modernization-review` | `bs-dev-repo-review` |
+| `security` | `bs-dev-security` |
+| `web` | `bs-web-build` |
+| `website-audit` | `bs-web-audit` |
+| `ai-systems` | `bs-ai-build` |
+| `ai-hardening` | `bs-ai-harden` |
+| `platform` | `bs-ops-infra` |
+| `blumsoft-deploy` | `bs-ops-deploy-blumsoft` |
+| `human-voice` | `bs-text-natural` |
+| `voice` | `bs-text-audio` |
+| `gen-asset` | `bs-media-image` |
+| `business` | `bs-business-growth` |
+
+Entfernt ohne Archivkopie, weil ihr Inhalt seit der Konsolidierung in den Kern-Skills steckt und die Git-Historie reicht: `docu`, `code-review`, `webdev`, `ai-seo-auditor`, `backend`, `project-bootstrap`. Reserviert: `bs-media-video` (entsteht im ComfyUI-Bereich). Zielnamen der Skills, die bisher nur in claude.ai liegen: `bs-sap-abap-review`, `bs-sap-support` (war `sap-fehleranalyse`), `bs-sap-kickoff`, `bs-sap-spec`, `bs-sap-estimate`, `bs-sap-ui5`, `bs-doc-meeting` (war `termin-nachbereitung`), `bs-doc-html` (war `wissensdokument`).
+
+**Trade-off.** Auf jedem Rechner liegen die installierten Skills noch unter den alten Namen, `sync.ps1` räumt sie nicht ab. Dafür gibt es `scripts/skills/migrate-renames.ps1`: alten Ordner sichern, abräumen und unter neuem Namen installieren, Laufzeitdaten wie `out/` werden übernommen. Historische Dokumente (`docs/reviews/`, das Backlog-Archiv, frühere Einträge hier) behalten die alten Namen, weil sie den damaligen Stand beschreiben.

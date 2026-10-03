@@ -8,7 +8,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 WITH_SERVER_PATHS = (
-    ROOT / 'skills/custom/web/scripts/with_server.py',
+    ROOT / 'skills/custom/bs-web-build/scripts/with_server.py',
     ROOT / 'skills/vendor/guanyang/webapp-testing/scripts/with_server.py',
 )
 

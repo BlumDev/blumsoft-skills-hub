@@ -1,8 +1,7 @@
 Use the `Security Engineering` bundle.
 
 Default flow:
-- `code-review` for risk discovery
-- `security-auditor` for broader hardening
-- `api-security-best-practices` and `backend-security-coder` when implementation details matter
+- `bs-dev-security` for writing secure code and designing auth, API and data protection
+- `bs-dev-audit` with the `security` dimension to find vulnerabilities in existing code (from `engineering-core`)
 
-Pull extended skills only when auth, frontend security, or vulnerability taxonomies are directly relevant.
+Hardening LLM, agent or MCP code against prompt injection and tool abuse belongs to `bs-ai-harden` in `data-ai-systems`.

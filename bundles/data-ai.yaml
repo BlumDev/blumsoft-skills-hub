@@ -1,10 +1,10 @@
 id: data-ai
 name: Data & AI
 goal: Legacy wrapper for the lean data-ai-systems bundle.
-recommended_start_skill: ai-systems
+recommended_start_skill: bs-ai-build
 fallback_skills:
 core_skills:
-  - ai-systems
+  - bs-ai-build
 extended_skills:
 compose_with:
   - data-ai-systems

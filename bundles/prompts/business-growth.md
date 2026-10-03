@@ -1,8 +1,8 @@
 Use the `Business Growth` bundle.
 
 Start with:
-- `product-manager-toolkit` for product framing
-- `pricing-strategy` for monetization
-- `launch-strategy` for go-to-market planning
+- `bs-business-growth` for product framing, pricing, launch planning, analytics and experiments
+- `bs-text-natural` for copy that has to read as written by a person
+- `brand-review` to check drafts against the brand voice
 
-Pull analytics and experimentation skills only when measurement and growth loops are part of the scope.
+Pull analytics and experimentation only when measurement and growth loops are part of the scope.

@@ -1,10 +1,10 @@
 id: project-bootstrap-core
 name: Project Bootstrap Core
 goal: Start a new client project or existing repo takeover with minimal docs, decisions, and a clean execution path.
-recommended_start_skill: bootstrap
+recommended_start_skill: bs-dev-kickoff
 fallback_skills:
 core_skills:
-  - bootstrap
+  - bs-dev-kickoff
 extended_skills:
 compose_with:
   - engineering-core
