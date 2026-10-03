@@ -1,8 +1,8 @@
 ---
 status: wartung
 track: infra
-next_step: "Skills bei Bedarf pflegen, optional eine CI-Validierung ergänzen"
-updated: 2026-09-08
+next_step: "migrate-renames.ps1 auf jedem Rechner laufen lassen, claude.ai-Skills auf die bs-Namen umstellen"
+updated: 2026-10-03
 ---
 
 # Backlog
@@ -11,6 +11,11 @@ Einzige Workflow-Wahrheit dieses Repos. Format/Regeln: siehe `../AGENTS.md`.
 IDs `YYYYMMDD-slug`, nie renumbern. Ideen = offene Einträge mit `#idea`.
 
 ## Offen
+
+- [ ] 20261003-migrate-installed-skills `scripts/skills/migrate-renames.ps1` auf jedem Rechner einmal laufen lassen (erst `-DryRun`, danach `sync.ps1 -Profile freelancer-fullstack`), bei Kunden-Repos mit synchronisiertem `.github/skills` zusätzlich mit `-WorkspaceRoot`. Danach Skript und Eintrag entfernen #task (Quelle: Umbenennung 2026-10-03, siehe docs/decisions.md)
+- [ ] 20261003-claude-ai-skills-bs-names Die eigenen claude.ai-Skills liegen nicht im Repo und tragen noch die alten Namen. Zielnamen laut docs/decisions.md (2026-10-03): `bs-sap-abap-review`, `bs-sap-support`, `bs-sap-kickoff`, `bs-sap-spec`, `bs-sap-estimate`, `bs-sap-ui5`, `bs-doc-meeting`, `bs-doc-html`, dazu `human-voice` durch `bs-text-natural` aus dem Repo ersetzen (die Repo-Fassung ist neuer). Offen ist, ob sie ins Repo kommen: `sap-fehleranalyse/references/grantor-crm.md` sieht kundenspezifisch aus und darf nur rein, wenn das Repo privat bleibt. Querverweise untereinander (`sap-fehleranalyse`, `sap-fachkonzept` usw.) beim Umbenennen mitziehen #task (Quelle: Umbenennung 2026-10-03)
+- [ ] 20261003-bs-media-video Video-Skill `bs-media-video` aus dem ComfyUI-Bereich ins Repo holen, sobald er läuft. Name ist reserviert, `bs-media-image` verweist schon darauf #task (Quelle: Umbenennung 2026-10-03)
+- [ ] 20261003-local-only-skills `gen-diagram` (Verweis in `bs-dev-repo-review` und `wissensdokument`) und `fable-uiux` (Verweis in `sap-ui5`) liegen weder im Repo noch in claude.ai, vermutlich nur lokal unter `~/.claude/skills`. Ins Repo holen, nach `bs-<bereich>-<zweck>` benennen und die Verweise nachziehen #task (Quelle: Umbenennung 2026-10-03)
 
 - [ ] 20260904-upscale-tunnel-input-dir Der `LOCAL_HOSTS`-Guard in `upscale.py:27,123` erkennt einen Tunnel auf 127.0.0.1 nicht: zeigt `--url` dorthin und liegt ComfyUI woanders, landet die Kopie im lokalen Input-Ordner, der Server sieht sie nie und der Lauf endet nach 1200s im Timeout #bug (Quelle: docs/reviews/2026-09-04-cursor-verify.md, bestätigt 2026-09-06 mit Repro. Nicht gefixt, weil der Hostname die Information nicht trägt: die einzige belastbare Prüfung läuft über HTTP (Dateiliste via `/object_info/LoadImage` oder Upload statt Kopie), das ist eine Architekturentscheidung mit neuer Abhängigkeit von einer ComfyUI-Antwortform und ohne laufende Instanz nicht prüfbar. Optionen in docs/decisions.md, Eintrag 2026-09-06)
 
@@ -34,6 +39,10 @@ Aus Code-Audit 2026-06-24 (`reviews/2026-06-24-code-audit.md`), recovered, am 20
 ## Erledigt
 
 Ältere Einträge liegen in `archive/backlog-archive.md` (Archiv-Regel der AGENTS.md). Der Reconcile vom 2026-08-18 hat die damals hier stehenden Einträge stichprobenartig gegen den Code gehalten, alle geprüften sind tatsächlich umgesetzt (Belege in `docs/reviews/2026-08-18-reconcile.md`); inzwischen sind sie ins Archiv gewandert, ebenso die Security-Session und die Wartungs-Session 2026-09-01 (ausgelagert 2026-09-02) sowie die Wartungs-Session 5b und der Verify der Runde-2-Commits (ausgelagert 2026-09-07).
+
+Umbenennung der eigenen Skills auf `bs-<bereich>-<zweck>` (Entscheidung in docs/decisions.md, 2026-10-03):
+
+- [x] 20261003-skill-rename-bs-prefix 16 eigene Skills umbenannt, 6 Legacy-Skills entfernt, alle Verweise in Registry, Archivplan, Bundles, Starter-Prompts, Antigravity-Adaptern, Tests, `validate.ps1`, README, Governance und AGENTS.md nachgezogen, `migrate-renames.ps1` für installierte Skills. Gates: `validate.ps1` PASS, `validate-skills.ps1` PASS (77 Skills), `python -m unittest tests.test_media_image tests.test_with_server` 29 grün, Migration und Sync in einem Wegwerf-HOME durchgespielt. Pester lief nicht (PowerShell Gallery in der Session gesperrt), die angepassten Pester-Dateien (`skill-id-validation`, `tooling-edge`) und die Sync-Tests wegen `Get-SyncTargetMap` also lokal mit `Invoke-Pester -Path tests/` prüfen (06d93b1, 2026-10-03)
 
 Verify der Triage-Fixes 2026-09-04/06 (`docs/reviews/2026-09-06-cursor-verify2.md`, cursor-grok-4.6-high, Lauf `20260907T074020-639054` über das ai-router-Gate, Basis dca4579): 4 Findings, alle vier am Code bestätigt, keines widerlegt, alle vier behoben. Jeder Fix mit einer Mutationsprobe, deren Rot vor dem Fix gemessen ist (Proben im jeweiligen Commit-Text):
 
