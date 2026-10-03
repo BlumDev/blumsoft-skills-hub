@@ -1,8 +1,8 @@
 ---
 status: wartung
 track: infra
-next_step: "Skills bei Bedarf pflegen, optional eine CI-Validierung ergänzen"
-updated: 2026-09-08
+next_step: "migrate-renames.ps1 auf jedem Rechner laufen lassen, claude.ai-Skills auf die bs-Namen umstellen"
+updated: 2026-10-03
 ---
 
 # Backlog
@@ -11,6 +11,12 @@ Einzige Workflow-Wahrheit dieses Repos. Format/Regeln: siehe `../AGENTS.md`.
 IDs `YYYYMMDD-slug`, nie renumbern. Ideen = offene Einträge mit `#idea`.
 
 ## Offen
+
+- [ ] 20261003-migrate-installed-skills `scripts/skills/migrate-renames.ps1` auf jedem Rechner einmal laufen lassen (erst `-DryRun`, danach `sync.ps1 -Profile freelancer-fullstack`), bei Kunden-Repos mit synchronisiertem `.github/skills` zusätzlich mit `-WorkspaceRoot`. Danach Skript und Eintrag entfernen #task (Quelle: Umbenennung 2026-10-03, siehe docs/decisions.md)
+- [ ] 20261003-claude-ai-skills-bs-names Die eigenen claude.ai-Skills tragen dort noch die alten Namen. Seit dem Import liegen sie im Repo unter `skills/custom/bs-sap-*` und `skills/custom/bs-doc-*`. Diese Ordner plus `bs-text-natural` (ersetzt `human-voice`, die Repo-Fassung ist neuer) in claude.ai neu hochladen, danach die alten neun dort löschen. Ab dann im Repo pflegen und nach claude.ai hochladen, nicht umgekehrt #task (Quelle: Umbenennung 2026-10-03, Import siehe docs/decisions.md)
+- [ ] 20261003-bs-media-video Video-Skill `bs-media-video` aus dem ComfyUI-Bereich ins Repo holen, sobald er läuft. Name ist reserviert, `bs-media-image` verweist schon darauf #task (Quelle: Umbenennung 2026-10-03)
+- [ ] 20261003-local-only-skills `gen-diagram` (Verweis in `bs-dev-repo-review` und `bs-doc-html`) und `fable-uiux` (Verweis in `bs-sap-ui5`) liegen weder im Repo noch in claude.ai, vermutlich nur lokal unter `~/.claude/skills`. Ins Repo holen, nach `bs-<bereich>-<zweck>` benennen und die Verweise nachziehen #task (Quelle: Umbenennung 2026-10-03)
+- [ ] 20261003-pester-linux Die Pester-Suite läuft nur unter Windows grün, unter Linux sind 11 von 51 Tests rot (gleich auf `main` und Branch, gemessen 2026-10-03): die Sync-Tests setzen `USERPROFILE`, pwsh unter Linux liest `HOME` und schreibt dadurch ins echte HOME; der Ersetzen-Test braucht Windows-Dateisperren; die beiden Port-Tests von `with_server.py` erwarten Windows-Socket-Verhalten; `bootstrap-project.ps1` findet in der Fixture `templates/project/.github` nicht, weil Punkt-Ordner unter Linux versteckt sind. Relevant erst, wenn Pester in CI auf Linux laufen soll #idea (Quelle: Pester-Lauf in der Cloud-Session 2026-10-03)
 
 - [ ] 20260904-upscale-tunnel-input-dir Der `LOCAL_HOSTS`-Guard in `upscale.py:27,123` erkennt einen Tunnel auf 127.0.0.1 nicht: zeigt `--url` dorthin und liegt ComfyUI woanders, landet die Kopie im lokalen Input-Ordner, der Server sieht sie nie und der Lauf endet nach 1200s im Timeout #bug (Quelle: docs/reviews/2026-09-04-cursor-verify.md, bestätigt 2026-09-06 mit Repro. Nicht gefixt, weil der Hostname die Information nicht trägt: die einzige belastbare Prüfung läuft über HTTP (Dateiliste via `/object_info/LoadImage` oder Upload statt Kopie), das ist eine Architekturentscheidung mit neuer Abhängigkeit von einer ComfyUI-Antwortform und ohne laufende Instanz nicht prüfbar. Optionen in docs/decisions.md, Eintrag 2026-09-06)
 
@@ -34,6 +40,11 @@ Aus Code-Audit 2026-06-24 (`reviews/2026-06-24-code-audit.md`), recovered, am 20
 ## Erledigt
 
 Ältere Einträge liegen in `archive/backlog-archive.md` (Archiv-Regel der AGENTS.md). Der Reconcile vom 2026-08-18 hat die damals hier stehenden Einträge stichprobenartig gegen den Code gehalten, alle geprüften sind tatsächlich umgesetzt (Belege in `docs/reviews/2026-08-18-reconcile.md`); inzwischen sind sie ins Archiv gewandert, ebenso die Security-Session und die Wartungs-Session 2026-09-01 (ausgelagert 2026-09-02) sowie die Wartungs-Session 5b und der Verify der Runde-2-Commits (ausgelagert 2026-09-07).
+
+Umbenennung der eigenen Skills auf `bs-<bereich>-<zweck>` (Entscheidung in docs/decisions.md, 2026-10-03):
+
+- [x] 20261003-claude-ai-skills-import Die acht eigenen claude.ai-Skills als `bs-sap-*` und `bs-doc-*` ins Repo geholt, Querverweise untereinander umbenannt, neue Bundles `sap-consulting` (bindet `office-docs` ein) und `office-docs`, `migrate-renames.ps1` zieht lokale Kopien unter alten Namen mit um. Repo privat, `grantor-crm.md` deshalb enthalten (Entscheidung in docs/decisions.md). Gates: `validate.ps1` PASS (85 Skills, 17 Bundles), `validate-skills.ps1` PASS, Migration und `sync.ps1 -BundleId sap-consulting` im Wegwerf-HOME durchgespielt (a30869a, 2026-10-03)
+- [x] 20261003-skill-rename-bs-prefix 16 eigene Skills umbenannt, 6 Legacy-Skills entfernt, alle Verweise in Registry, Archivplan, Bundles, Starter-Prompts, Antigravity-Adaptern, Tests, `validate.ps1`, README, Governance und AGENTS.md nachgezogen, `migrate-renames.ps1` für installierte Skills. Gates: `validate.ps1` PASS, `validate-skills.ps1` PASS (77 Skills), `python -m unittest tests.test_media_image tests.test_with_server` 29 grün, Migration und Sync in einem Wegwerf-HOME durchgespielt. Pester nachgeholt (aus dem Quellcode gebaut, die Gallery war gesperrt): unter Linux 40 grün / 11 rot, dieselben 11 wie auf `main` (siehe `20261003-pester-linux`); die Sync-Tests mit HOME-Shim 6 von 7 grün, ebenfalls wie auf `main` (06d93b1, 2026-10-03)
 
 Verify der Triage-Fixes 2026-09-04/06 (`docs/reviews/2026-09-06-cursor-verify2.md`, cursor-grok-4.6-high, Lauf `20260907T074020-639054` über das ai-router-Gate, Basis dca4579): 4 Findings, alle vier am Code bestätigt, keines widerlegt, alle vier behoben. Jeder Fix mit einer Mutationsprobe, deren Rot vor dem Fix gemessen ist (Proben im jeweiligen Commit-Text):
 

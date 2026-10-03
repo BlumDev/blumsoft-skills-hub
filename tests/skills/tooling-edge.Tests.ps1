@@ -11,7 +11,7 @@ BeforeDiscovery {
     @{ SkillName = '*' }
   )
   $serverHelperCases = @(
-    @{ Name = 'custom'; Path = Join-Path $discoveryRepoRoot 'skills/custom/web/scripts/with_server.py' }
+    @{ Name = 'custom'; Path = Join-Path $discoveryRepoRoot 'skills/custom/bs-web-build/scripts/with_server.py' }
     @{ Name = 'vendor'; Path = Join-Path $discoveryRepoRoot 'skills/vendor/guanyang/webapp-testing/scripts/with_server.py' }
   )
 }

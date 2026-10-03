@@ -1,7 +1,7 @@
 ﻿Use the `Web Wizard` bundle.
 
 Start with core skills:
-- `webdev`
+- `bs-web-build`
 - `frontend-design`
 - `ui-ux-pro-max`
 - `webapp-testing`

@@ -54,6 +54,20 @@ function Resolve-SkillTargetPath {
   $candidate
 }
 
+# Zielordner je Target, gemeinsam für sync.ps1 und migrate-renames.ps1: wer einen Skill
+# installiert und wer ihn unter altem Namen wieder abräumt, muss dieselben Ordner meinen.
+function Get-SyncTargetMap {
+  param([Parameter(Mandatory=$true)][string]$WorkspaceRoot)
+  [ordered]@{
+    'claude'         = Join-Path $HOME '.claude/skills'
+    'codex'          = Join-Path $HOME '.codex/skills'
+    'cursor'         = Join-Path $HOME '.cursor/skills'
+    'antigravity'    = Join-Path $HOME '.gemini/antigravity/skills'
+    'vscode-copilot' = Join-Path $WorkspaceRoot '.github/skills'
+    'vscode-chatgpt' = Join-Path $HOME '.codex/skills'
+  }
+}
+
 function Normalize-YamlValue {
   param([string]$Value)
   $v = $Value.Trim()

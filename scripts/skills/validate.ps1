@@ -149,7 +149,7 @@ if (Test-Path $githubSkillsDir) {
   }
 }
 
-$customWithServerPath = Join-Path $root 'skills/custom/web/scripts/with_server.py'
+$customWithServerPath = Join-Path $root 'skills/custom/bs-web-build/scripts/with_server.py'
 $vendorWithServerPath = Join-Path $root 'skills/vendor/guanyang/webapp-testing/scripts/with_server.py'
 if (-not (Test-Path -LiteralPath $customWithServerPath)) {
   $errors.Add("Custom with_server.py fehlt: $customWithServerPath") | Out-Null

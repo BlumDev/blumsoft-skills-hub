@@ -1,7 +1,7 @@
 ﻿Use the `DevOps & Cloud` bundle.
 
 Start with core skills:
-- `backend`
+- `bs-ops-infra`
 - `docker-expert`
 - `deployment-procedures`
 - `terraform-specialist`

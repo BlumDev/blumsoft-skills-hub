@@ -1,71 +1,77 @@
 version: 1
 skills:
-  - name: docu
-    status: inactive
-    target: project-bootstrap-core
-  - name: code-review
-    status: inactive
-    target: security-engineering
-  - name: webdev
-    status: inactive
-    target: web-product
-  - name: ai-seo-auditor
-    status: inactive
-    target: web-product
-  - name: backend
-    status: inactive
-    target: platform-devops
-  - name: project-bootstrap
-    status: inactive
-    target: project-bootstrap-core
-  - name: smart-commits
+  - name: bs-dev-commits
     status: active-extended
     target: engineering-core
-  - name: code-audit
+  - name: bs-dev-audit
     status: active-core
     target: engineering-core
-  - name: repo-modernization-review
+  - name: bs-dev-repo-review
     status: active-core
     target: engineering-core
-  - name: ai-hardening
+  - name: bs-ai-harden
     status: active-core
     target: data-ai-systems
-  - name: engineering
+  - name: bs-dev-workflow
     status: active-core
     target: engineering-core
-  - name: ai-systems
+  - name: bs-ai-build
     status: active-core
     target: data-ai-systems
-  - name: web
+  - name: bs-web-build
     status: active-core
     target: web-product
-  - name: security
+  - name: bs-dev-security
     status: active-core
     target: security-engineering
-  - name: platform
+  - name: bs-ops-infra
     status: active-core
     target: platform-devops
-  - name: business
+  - name: bs-business-growth
     status: inactive
     target: business-growth
-  - name: bootstrap
+  - name: bs-dev-kickoff
     status: active-core
     target: project-bootstrap-core
-  - name: blumsoft-deploy
+  - name: bs-ops-deploy-blumsoft
     status: inactive
     target: platform-devops
-  - name: website-audit
+  - name: bs-web-audit
     status: active-core
     target: web-product
-  - name: gen-asset
+  - name: bs-media-image
     status: inactive
     target: web-product
-  - name: voice
+  - name: bs-text-audio
     status: inactive
     target: project-bootstrap-core
-  - name: human-voice
+  - name: bs-text-natural
     status: active-core
     target: business-growth
+  - name: bs-sap-abap-review
+    status: active-core
+    target: sap-consulting
+  - name: bs-sap-support
+    status: active-core
+    target: sap-consulting
+  - name: bs-sap-kickoff
+    status: active-core
+    target: sap-consulting
+  - name: bs-sap-spec
+    status: active-core
+    target: sap-consulting
+  - name: bs-sap-estimate
+    status: active-core
+    target: sap-consulting
+  - name: bs-sap-ui5
+    status: active-core
+    target: sap-consulting
+  - name: bs-doc-meeting
+    status: active-core
+    target: office-docs
+  - name: bs-doc-html
+    status: active-core
+    target: office-docs
   - name: advanced-evaluation
     status: inactive
     target: data-ai-systems

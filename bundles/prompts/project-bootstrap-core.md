@@ -1,8 +1,6 @@
 Use the `Project Bootstrap Core` bundle.
 
 Start with:
-- `project-bootstrap` for the initial project frame
-- `project-development` for architecture and implementation planning
-- `docu` for handover-quality documentation
+- `bs-dev-kickoff` for the initial project frame, discovery, minimal docs and decisions, and workflow or tool design
 
-Pull workflow and tool-design skills only when the project explicitly needs those delivery patterns.
+Hand over to `bs-dev-workflow` (from `engineering-core`) once the first vertical slice is planned.

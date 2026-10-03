@@ -1,12 +1,12 @@
 id: web-product
 name: Web Product
 goal: Build websites and SaaS frontends with strong UI quality, UX clarity, and practical verification.
-recommended_start_skill: web
+recommended_start_skill: bs-web-build
 fallback_skills:
 core_skills:
-  - web
-  - website-audit
-  - human-voice
+  - bs-web-build
+  - bs-web-audit
+  - bs-text-natural
 extended_skills:
 compose_with:
   - engineering-core

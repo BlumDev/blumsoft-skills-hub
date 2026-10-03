@@ -78,7 +78,7 @@ core_skills:
 
 Describe 'Test-SkillId' {
     It 'accepts the real skill name <_>' -ForEach @(
-        'docu', 'code-review', 'ui-ux-pro-max', 'ab-test-setup', 'notebooklm', 'top-web-vulnerabilities'
+        'bs-dev-audit', 'bs-text-natural', 'ui-ux-pro-max', 'ab-test-setup', 'notebooklm', 'top-web-vulnerabilities'
     ) {
         Test-SkillId -Id $_ | Should -BeTrue
     }
@@ -110,7 +110,7 @@ Describe 'Test-SkillId' {
 
 Describe 'Assert-SkillId' {
     It 'returns the id unchanged for a valid name' {
-        Assert-SkillId -Id 'code-review' | Should -Be 'code-review'
+        Assert-SkillId -Id 'bs-dev-audit' | Should -Be 'bs-dev-audit'
     }
 
     It 'throws on a traversal name' {
@@ -121,8 +121,8 @@ Describe 'Assert-SkillId' {
 Describe 'Resolve-SkillTargetPath' {
     It 'resolves a valid skill to a direct child of the base directory' {
         $base = Join-Path ([System.IO.Path]::GetTempPath()) 'skills-base'
-        $resolved = Resolve-SkillTargetPath -BaseDir $base -SkillId 'code-review'
-        $resolved | Should -Be (Join-Path ([System.IO.Path]::GetFullPath($base)) 'code-review')
+        $resolved = Resolve-SkillTargetPath -BaseDir $base -SkillId 'bs-dev-audit'
+        $resolved | Should -Be (Join-Path ([System.IO.Path]::GetFullPath($base)) 'bs-dev-audit')
     }
 
     It 'throws before returning a path for <_>' -ForEach @('../../evil', 'C:\Windows', '..', 'sub/skill') {

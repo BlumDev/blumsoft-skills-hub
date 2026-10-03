@@ -7,7 +7,7 @@ description: DevOps Cloud Bundle Starter
 Compose with: `essentials`
 
 Start with core skills:
-- `backend`
+- `bs-ops-infra`
 - `docker-expert`
 - `deployment-procedures`
 - `terraform-specialist`

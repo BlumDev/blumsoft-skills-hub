@@ -1,5 +1,7 @@
 # Skills Consolidation And Archive Matrix
 
+> Historischer Konsolidierungsplan. Die hier als `merge-into` geführten Legacy-Skills (`docu`, `code-review`, `webdev`, `ai-seo-auditor`, `backend`, `project-bootstrap`) sind am 2026-10-03 entfernt worden, ihre Inhalte stecken in `bs-dev-kickoff`, `bs-dev-audit`, `bs-web-build`, `bs-web-audit` und `bs-ops-infra`. Aktuelle Namen und Zuordnung: `README.md` (Own skills) und `docs/decisions.md`.
+
 ## Ziel
 
 Das aktuelle Repo enthält 66 Skills. Für einen freiberuflichen selbständigen Softwareentwickler mit Fokus auf Webseiten, SaaS, Automatisierung und KI ist das zu breit als aktives Daily-Set.

@@ -106,6 +106,61 @@ Dry run:
 ./scripts/skills/sync.ps1 -Profile freelancer-fullstack -DryRun
 ```
 
+### `migrate-renames.ps1`
+
+One-time cleanup after the switch to the `bs-` prefix. `sync.ps1` only installs and
+replaces, it never removes, so installed skills under their old names would sit next to
+the new ones and trigger twice. Per target the script backs up each old folder to
+`~/.skills-hub-backup/`, installs the skill under its new name from the repo, carries over
+files that only existed in the old folder (runtime data such as `out/`), and removes the
+six legacy skills. Folders whose `SKILL.md` carries a different name are left alone.
+
+Run (dry run first, then sync as usual):
+
+```powershell
+./scripts/skills/migrate-renames.ps1 -DryRun
+./scripts/skills/migrate-renames.ps1
+./scripts/skills/sync.ps1 -Profile freelancer-fullstack
+```
+
+Add `-WorkspaceRoot <repo>` for project-local `.github/skills` folders synced into another repo.
+
+## Own skills
+
+Own skills are named `bs-<area>-<purpose>`. Vendor skills keep their upstream names, so
+the prefix shows at a glance what is maintained here. Names ending in `-build` explain how
+to build something, names ending in `-audit` or `-review` produce a report.
+
+| Area | Skill | Purpose |
+|---|---|---|
+| dev | `bs-dev-workflow` | plan, implement, debug, verify, land a branch |
+| dev | `bs-dev-kickoff` | start a project or take over a repo |
+| dev | `bs-dev-commits` | cut changes into clean commits |
+| dev | `bs-dev-audit` | audit existing code by dimension, report or `--fix` |
+| dev | `bs-dev-repo-review` | keep/refactor/rewrite decision per module |
+| dev | `bs-dev-security` | write secure code, design auth and APIs |
+| web | `bs-web-build` | pages, components, UI/UX, browser checks |
+| web | `bs-web-audit` | measured website quality report |
+| ai | `bs-ai-build` | prompts, MCP, RAG, agents |
+| ai | `bs-ai-harden` | harden LLM/agent code against attacks |
+| ops | `bs-ops-infra` | backend, deploy, containers, observability, IaC |
+| ops | `bs-ops-deploy-blumsoft` | release flow of the BlumSoft platform |
+| text | `bs-text-natural` | visible text that does not read as generated |
+| text | `bs-text-audio` | listening scripts for text-to-speech |
+| media | `bs-media-image` | local image assets via ComfyUI |
+| business | `bs-business-growth` | pricing, launch, analytics, experiments |
+| sap | `bs-sap-support` | trace an SAP error from symptom to cause |
+| sap | `bs-sap-abap-review` | judge, explain or extend ABAP source |
+| sap | `bs-sap-kickoff` | set up a new SAP development before the first line |
+| sap | `bs-sap-spec` | write or check functional and technical specs |
+| sap | `bs-sap-estimate` | estimate SAP effort as a range with visible assumptions |
+| sap | `bs-sap-ui5` | SAPUI5, Fiori Elements, OData, Launchpad |
+| doc | `bs-doc-meeting` | meeting notes into decisions, tasks and open points |
+| doc | `bs-doc-html` | standalone HTML documents and cheat sheets |
+
+The mapping from the old names is recorded in [docs/decisions.md](docs/decisions.md)
+(2026-10-03) and in `scripts/skills/migrate-renames.ps1`.
+
 ## IDE agent onboarding
 
 If you hand this repo path to an IDE agent, do not ask it to install everything.
@@ -139,6 +194,14 @@ The active bundle family is:
 - `platform-devops`
 - `security-engineering`
 - `business-growth`
+- `sap-consulting` (composes `office-docs`)
+- `office-docs`
+
+SAP and docs skills are not part of `freelancer-fullstack`; sync them on demand:
+
+```powershell
+./scripts/skills/sync.ps1 -BundleId sap-consulting -Targets claude,codex
+```
 
 Legacy wrapper bundle IDs still exist for backward compatibility, but new work should use the active bundle family.
 

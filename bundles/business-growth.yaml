@@ -1,11 +1,11 @@
 id: business-growth
 name: Business Growth
 goal: Support product strategy, pricing, launch planning, and growth measurement when a freelance project also carries commercial goals.
-recommended_start_skill: business
+recommended_start_skill: bs-business-growth
 fallback_skills:
 core_skills:
-  - business
-  - human-voice
+  - bs-business-growth
+  - bs-text-natural
   - brand-review
 extended_skills:
 compose_with:

@@ -1,10 +1,9 @@
 Use the `Project Kickoff` bundle.
 
 Start with core skills:
-- `project-bootstrap`
+- `bs-dev-kickoff`
 - `project-development`
 - `tool-design`
-- `docu`
 
 Process:
 1. Define scope, success metrics, and constraints.

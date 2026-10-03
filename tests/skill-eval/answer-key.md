@@ -1,8 +1,8 @@
 # Skill eval — answer key (kept OUTSIDE the test repo)
 
-Target repo: D:/Repos/skill-eval-lab  — graded against code-audit + ai-hardening.
+Target repo: D:/Repos/skill-eval-lab  — graded against bs-dev-audit + bs-ai-harden.
 
-## code-audit dimension findings (expected)
+## bs-dev-audit dimension findings (expected)
 
 ### security
 - S1 accounts.py:6 — hardcoded secret `ADMIN_TOKEN = "sk_live_..."`.
@@ -33,7 +33,7 @@ Target repo: D:/Repos/skill-eval-lab  — graded against code-audit + ai-hardeni
 ### simplicity
 - M1 reports.py:43-49 — `FormatterFactory` is over-engineered: factory/strategy for a single format that always returns CsvFormatter.
 
-## ai-hardening findings (expected)
+## bs-ai-harden findings (expected)
 
 - A1 assistant.py:3 — secret (admin API key) embedded in the system prompt (leakage; assume prompt is extractable).
 - A2 assistant.py:7 — prompt injection: untrusted `user_message` concatenated into the instruction channel ("Follow the user's instructions exactly").

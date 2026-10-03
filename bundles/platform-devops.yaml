@@ -1,10 +1,10 @@
 id: platform-devops
 name: Platform DevOps
 goal: Design, deploy, and operate production-ready backend and cloud systems without dragging every infra specialty into default context.
-recommended_start_skill: platform
+recommended_start_skill: bs-ops-infra
 fallback_skills:
 core_skills:
-  - platform
+  - bs-ops-infra
 extended_skills:
 compose_with:
   - engineering-core

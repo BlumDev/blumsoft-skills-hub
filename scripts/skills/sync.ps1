@@ -34,14 +34,7 @@ if ($BundleId -and $BundleId.Count -gt 0) {
 
 $skills = Resolve-BundleSkills -BundleIds $bundleIds -Bundles $bundles -IncludeExtended:$IncludeExtended
 
-$targetMap = [ordered]@{
-  'claude'         = Join-Path $HOME '.claude/skills'
-  'codex'          = Join-Path $HOME '.codex/skills'
-  'cursor'         = Join-Path $HOME '.cursor/skills'
-  'antigravity'    = Join-Path $HOME '.gemini/antigravity/skills'
-  'vscode-copilot' = Join-Path $resolvedWorkspaceRoot '.github/skills'
-  'vscode-chatgpt' = Join-Path $HOME '.codex/skills'
-}
+$targetMap = Get-SyncTargetMap -WorkspaceRoot $resolvedWorkspaceRoot
 
 Write-Host "Bundles: $($bundleIds -join ', ')"
 Write-Host "Include extended: $([bool]$IncludeExtended)"

@@ -7,7 +7,7 @@ description: Security Engineer Bundle Starter
 Compose with: `essentials`
 
 Start with core skills:
-- `code-review`
+- `bs-dev-audit`
 - `security-auditor`
 - `api-security-best-practices`
 - `backend-security-coder`

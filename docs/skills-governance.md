@@ -5,6 +5,7 @@
 3. `skills/vendor/sickn33/*` is gap-fill only.
 
 ## Rules
+- Own skills are named `bs-<area>-<purpose>` (areas: `dev`, `web`, `ai`, `ops`, `text`, `media`, `business`, `sap`, `doc`); folder name and frontmatter `name` are identical. Vendor skills keep their upstream names.
 - Bundles are starter sets, not automatic orchestration.
 - Start with core skills; add extended skills only on demand.
 - Never sync the full registry by default; prefer a curated profile.
@@ -16,6 +17,7 @@
 - Prefer `engineering-core`, `web-product`, `data-ai-systems`, `platform-devops`, `security-engineering`, and `project-bootstrap-core`.
 - Prefer profile `freelancer-fullstack` for a freelance software engineer building websites, SaaS, automation tools, and AI features.
 - Add `business-growth` only when the project scope includes pricing, launch, SEO, analytics, or experimentation.
+- Add `sap-consulting` (composes `office-docs`) only for SAP work.
 
 ## Legacy wrappers
 

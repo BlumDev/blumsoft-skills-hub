@@ -1,0 +1,11 @@
+id: office-docs
+name: Office Docs
+goal: Turn meeting notes into decisions and tasks, and condense knowledge into standalone HTML documents and cheat sheets.
+recommended_start_skill: bs-doc-meeting
+fallback_skills:
+core_skills:
+  - bs-doc-meeting
+  - bs-doc-html
+extended_skills:
+compose_with:
+starter_prompt: bundles/prompts/office-docs.md

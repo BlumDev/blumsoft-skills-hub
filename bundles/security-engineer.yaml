@@ -1,10 +1,10 @@
 id: security-engineer
 name: Security Engineer
 goal: Legacy wrapper for the lean security-engineering bundle.
-recommended_start_skill: security
+recommended_start_skill: bs-dev-security
 fallback_skills:
 core_skills:
-  - security
+  - bs-dev-security
 extended_skills:
 compose_with:
   - security-engineering
