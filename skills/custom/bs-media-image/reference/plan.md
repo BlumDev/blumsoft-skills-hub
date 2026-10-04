@@ -1,4 +1,4 @@
-# bs-media-image: Plan & Architektur
+# gen-asset: Plan & Architektur
 
 Lokale Bild- (später Video-) Generierung für die Entwicklung. Code-Agenten
 erzeugen brauchbare Assets selbständig, prüfen sie per Vision und verwenden sie.
@@ -195,3 +195,29 @@ Falls Node-Signaturen abweichen, Workflow einmal in der ComfyUI-UI bauen und via
 - [Wan 2.2 offizieller ComfyUI-Workflow](https://docs.comfy.org/tutorials/video/wan/wan2_2)
 - [FLUX Arch Realism LoRA (Civitai)](https://civitai.com/models/709956/flux-arch-realism-lora)
 - [Ultimate Food Photography LoRA (Civitai)](https://civitai.com/models/1202156/ultimate-high-resolution-food-photography-flux-or-realistic-food-lora)
+
+## Qwen-Image: erledigt am 28.08.2026
+
+Alle Dateien vollständig geladen und per Byte-Größe geprüft: Text-Encoder `qwen_2.5_vl_7b_fp8_scaled`,
+`qwen_image_vae`, `Qwen-Image-2512-Q4_K_M.gguf`, `qwen-image-edit-2511-Q4_K_M.gguf`, dazu die
+Turbo-LoRA (2 Steps) und die Lightning-LoRA (4 Steps). Beide Workflows getestet, Ergebnisse und
+Grenzen stehen in learnings.md, Bilder im Ledger.
+
+Krea 2 Turbo ist seit 20.09.2026 installiert (fp8, 18,3 GB mit Encoder) und im A/B gegen
+Z-Image gefahren (5:2 bei 4 Unentschieden, learnings.md). Entscheidung Ersatz offen. Passende Dateien liegen bei Comfy-Org/Krea-2: Turbo fp8_scaled 13,1 GB plus
+Text-Encoder qwen3vl_4b fp8 5,2 GB, die VAE (qwen_image_vae) ist schon da. Entscheidung offen,
+vorgeschlagenes Protokoll: laden, A/B gegen Z-Image-Turbo auf vier Motiven, der Verlierer fliegt
+(Details learnings.md, 2026-09-20). Das Update selbst ging schief und wurde repariert
+(learnings.md), die Torch-Umgebung steht jetzt auf 2.14.0+cu130.
+
+Erledigt am 19.09.2026: CyberRealistic Z-Image v7 (BF16), WAI-illustrious v17 und
+CyberRealistic Pony v18 installiert, Workflows 06 bis 08 vorbelegt, Konsolidierung auf fünf
+Modellfamilien durchgeführt (learnings.md). 06 und 08 am 20.09.2026 per Smoke-Test
+bestätigt (je etwa 30 s, Ablage stimmt, learnings.md). Beim Nutzer offen: 07 nach dem
+Testprotokoll (Nullprobe, dann nur Motiv tauschen) durchlaufen und die Befunde melden.
+
+Nächste sinnvolle Ausbaustufen, in dieser Reihenfolge: (1) Subgraphen für die neun
+UI-Workflows, sichtbar bleiben Prompt, Format und Run, (2) img2img-Vorlage für Illustrious,
+weil Komposition dort per Text kaum steuerbar ist, (3) LoRA-Knoten in 07 und 08, sobald der
+Nutzer LoRAs benennt (Download per Civitai-Token funktioniert), (4) Entscheidung Krea 2 gegen Z-Image umsetzen (Workflows 00 und 01, UI-Workflows neu
+erzeugen), (5) INT8-Formate auf 0.36.0 prüfen.

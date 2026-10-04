@@ -2,11 +2,14 @@
 """Upscale an existing image via ComfyUI UltimateSDUpscale (tile re-diffusion).
 
 Copies the input image into ComfyUI's input folder, runs workflows/upscale.api.json
-(SDXL Juggernaut tiles + 4x-UltraSharp at low denoise = sharper and more detail while
-keeping the original look), polls and downloads the result. Stdlib only.
+(Z-Image-Turbo as tile refiner + 4x-UltraSharp at low denoise = sharper and more
+detail while keeping the original look), polls and prints where
+the result landed (ComfyUI's output folder is the image library, Text2Img/upscale/). --out is optional:
+hardlink inside the library, plain copy elsewhere. Stdlib only, except for the optional
+provenance stamp at the end, which needs Pillow and is skipped when it is missing.
 
 Usage (PowerShell):
-  python upscale.py --image in.png --out in_2x.png --upscale-by 2.0
+  python upscale.py --image in.png --upscale-by 2.0
 Lower --denoise (e.g. 0.15) keeps the original more faithfully; higher (0.35) invents
 more detail. Default 0.2 is a safe sharpen.
 """
@@ -22,11 +25,35 @@ import urllib.parse
 import urllib.request
 import uuid
 
+import ablage  # Ablage nach Workflow und Quelle, liegt neben diesem Skript
+
 COMFY_INPUT = r"D:\Apps\Stability Matrix\Data\Packages\ComfyUI\input"
+# ComfyUI's output folder is a junction onto the Stability Matrix image library.
+COMFY_OUTPUT = r"D:\Apps\Stability Matrix\Data\Images\Text2Img"
+IMAGES_ROOT = r"D:\Apps\Stability Matrix\Data\Images"
+
+OUT_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "out"))
+
+
+def reject_out_dir(out):
+    """bs-media-image/out lies on another drive, so a --out there can only be a copy: exactly
+    the duplicate this skill no longer makes. Derived files (comparison sheets) may go there."""
+    if out and os.path.normcase(os.path.abspath(out)).startswith(os.path.normcase(OUT_DIR + os.sep)):
+        sys.exit("--out unter bs-media-image/out legt eine Zweitkopie an. Weglassen und den ausgegebenen "
+                 "Bibliothekspfad verwenden, nach out/ gehören nur abgeleitete Dateien wie Vergleichsblätter.")
+
+
 # Hosts whose input folder the local filesystem can be: everything else needs --input-dir.
 LOCAL_HOSTS = frozenset(("localhost", "127.0.0.1", "::1", ""))
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_WF = os.path.join(HERE, "..", "workflows", "upscale.api.json")
+
+
+def expand_dates(workflow):
+    """Bringt jeden SaveImage-Prefix in die Ablage nach Workflow (ablage.py): agent/%date:yyyy-MM-dd%/foto wird
+    foto/foto, Testreihen landen unter _tests/<reihe>/. Ein Datum im Ordner gibt es seit dem Umzug der Bildablage
+    nicht mehr, %date% käme über die HTTP-API sonst wörtlich an (WinError 267)."""
+    return ablage.normalisiere(workflow)
 
 
 def api(base, path, payload=None, timeout=900):
@@ -53,6 +80,72 @@ def download(base, image, out_path):
     os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
     with open(out_path, "wb") as f:
         f.write(blob)
+
+
+def deliver(base, image, out):
+    """Path of the result. ComfyUI already saved it into the image library, so
+    without --out that path is returned and nothing is copied. With --out the
+    file is hardlinked when the target lies inside the library (one copy on
+    disk) and copied elsewhere (project folders, other drives). Falls back to
+    an HTTP download when the file is not on this machine (remote --url)."""
+    src = os.path.normpath(os.path.join(COMFY_OUTPUT, image.get("subfolder", ""), image["filename"]))
+    if image.get("type", "output") != "output" or not os.path.exists(src):
+        if not out:
+            sys.exit(f"Ergebnis liegt nicht unter {COMFY_OUTPUT}, --out angeben.")
+        download(base, image, out)
+        return out
+    if not out:
+        return src
+    out = os.path.abspath(out)
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    if os.path.exists(out):
+        if os.path.samefile(out, src):
+            return out
+        os.remove(out)
+    if os.path.normcase(out).startswith(os.path.normcase(IMAGES_ROOT + os.sep)):
+        os.link(src, out)
+    else:
+        shutil.copyfile(src, out)
+    return out
+
+
+def stamp_source(ergebnis, quelle):
+    """Schreibt die Herkunfts-Chunks der Galerie, damit ein Detailpass neben seinem Original steht.
+
+    Ohne sie hängt das nachgeschärfte Bild unverknüpft in der Galerie und trägt den Refiner
+    als Modell-Badge, obwohl das Motiv aus einem anderen Modell stammt.
+
+    Geschrieben werden nur `gallery_src_key` und `gallery_src_method`. Modell und Prompt holt
+    sich die Galerie in `link_sources()` über den Schlüssel beim Original ab (Ketten laufen bis
+    zur Wurzel), ihre Label-Zuordnung hier nachzubauen ergäbe nur eine zweite Quelle, die
+    auseinanderläuft. Vorhandene Chunks (prompt, workflow) werden unverändert übernommen.
+
+    Braucht Pillow. Fehlt es, gelingt der Upscale trotzdem und nur die Verknüpfung fehlt.
+    """
+    if not (os.path.exists(ergebnis) and os.path.exists(quelle)):
+        return
+    quelle = os.path.abspath(quelle)
+    if not os.path.normcase(quelle).startswith(os.path.normcase(IMAGES_ROOT + os.sep)):
+        return  # außerhalb der Bibliothek kennt die Galerie keinen Schlüssel
+    try:
+        from PIL import Image
+        from PIL.PngImagePlugin import PngInfo
+    except ImportError:
+        print("Pillow fehlt, Herkunft nicht gestempelt.", file=sys.stderr)
+        return
+
+    key = "images/" + os.path.relpath(quelle, IMAGES_ROOT).replace(os.sep, "/")
+    with Image.open(ergebnis) as im:
+        im.load()  # erst vollständig lesen, gleich wird dieselbe Datei überschrieben
+        vorhanden, bild = dict(im.text), im.copy()
+    info = PngInfo()
+    for name, wert in vorhanden.items():
+        info.add_text(name, wert)
+    info.add_text("gallery_src_key", key)
+    info.add_text("gallery_src_method", "detailpass")
+    # In dieselbe Datei speichern, damit ein Hardlink aus deliver() weiter auf diesen Inhalt zeigt.
+    bild.save(ergebnis, pnginfo=info)
+    print(f"Herkunft gestempelt: {key}", file=sys.stderr)
 
 
 def input_filename(image_path):
@@ -88,9 +181,17 @@ def execution_error(entry):
 
 
 def main():
+    if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "WARTUNG")):
+        raise SystemExit("bs-media-image ist in Wartung: die Bildablage zieht um. Erst weiterarbeiten, wenn die "
+                         "Datei WARTUNG in bs-media-image fehlt.")
     p = argparse.ArgumentParser(description="ComfyUI UltimateSDUpscale")
     p.add_argument("--image", required=True, help="input image to upscale")
-    p.add_argument("--out", required=True, help="output .png path")
+    p.add_argument(
+        "--out",
+        default=None,
+        help="optional: hardlink (inside the image library) or copy of the result; "
+        "without it the path in the library is printed",
+    )
     p.add_argument("--workflow", default=DEFAULT_WF)
     p.add_argument("--upscale-by", type=float, default=2.0, dest="upscale_by")
     p.add_argument("--denoise", type=float, default=0.2)
@@ -102,6 +203,7 @@ def main():
                    help="input folder of the ComfyUI behind --url (default: local installation)")
     p.add_argument("--timeout", type=int, default=1200, help="max wait seconds")
     a = p.parse_args()
+    reject_out_dir(a.out)
 
     if a.seed is None:
         a.seed = int.from_bytes(os.urandom(4), "big")
@@ -145,11 +247,17 @@ def main():
                 inp["denoise"] = a.denoise
                 inp["seed"] = a.seed
             elif title == "POSITIVE_PROMPT" and a.prompt:
+                # Seit dem 22.09.2026 ist Krea 2 der Refiner, score-Tags braucht es nicht mehr.
                 inp["text"] = a.prompt
             elif title == "CHECKPOINT" and a.checkpoint:
-                inp["ckpt_name"] = a.checkpoint
+                # Krea 2 kommt über UNETLoader, SDXL-Checkpoints über CheckpointLoaderSimple.
+                if "unet_name" in inp:
+                    inp["unet_name"] = a.checkpoint
+                if "ckpt_name" in inp:
+                    inp["ckpt_name"] = a.checkpoint
 
         cid = str(uuid.uuid4())
+        wf = expand_dates(wf)
         # The copy belongs to the job from the moment the request leaves, not from the moment
         # the answer arrives: ComfyUI queues the prompt while the POST is still open. From here
         # the copy is the job's, not this process's, because ComfyUI opens the input only when
@@ -161,7 +269,7 @@ def main():
         # file too many in the shared input folder is cheaper than a queued job without input.
         keep_staged = True
         try:
-            resp = api(a.url, "/prompt", {"prompt": wf, "client_id": cid})
+            resp = api(a.url, "/prompt", {"prompt": wf, "client_id": cid, "extra_data": ablage.EXTRA})
         except urllib.error.HTTPError:
             keep_staged = False  # the server answered and refused, so it queued nothing
             raise
@@ -230,11 +338,12 @@ def main():
                 f"Timeout nach {a.timeout}s: kein Bild.{reason} Job {pid} kann noch in der Queue "
                 f"stehen, die Eingabekopie bleibt deshalb liegen: {staged_input}"
             )
-        # The result exists, so ComfyUI has read the input; the copy is free even if the
-        # download below fails.
+        # The result exists, so ComfyUI has read the input; the copy is free even if stamping or
+        # delivery below fails.
         keep_staged = False
-        download(a.url, img, a.out)
-        print(a.out)
+        # Erst stempeln, dann ausliefern: so trägt auch eine Kopie unter --out die Herkunft.
+        stamp_source(os.path.normpath(os.path.join(COMFY_OUTPUT, img.get("subfolder", ""), img["filename"])), a.image)
+        print(deliver(a.url, img, a.out))
     finally:
         # COMFY_INPUT is shared with every other run and with ComfyUI itself, so the copy has to
         # go once this run is really over: success and reported error alike. The unique name of

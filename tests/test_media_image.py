@@ -23,7 +23,8 @@ from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 MEDIA_IMAGE = ROOT / 'skills/custom/bs-media-image'
-HIRES_WORKFLOWS = ('sdxl_hires.api.json', 'sd15_anime_hires.api.json')
+# The scripts import their sibling modules (ablage) by plain name, as they do when run directly.
+sys.path.insert(0, str(MEDIA_IMAGE / 'scripts'))
 
 
 def load_script(name):
@@ -86,41 +87,24 @@ def cli_args(**overrides):
     args = dict(
         prompt='a red apple', negative='', width=1024, height=1024,
         seed=4242, steps=None, checkpoint=None, lora=None, lora_strength=0.8,
+        uploaded_image=None, detail_strength=None, detail_lora=None,
     )
     args.update(overrides)
     return argparse.Namespace(**args)
 
 
 class InjectSeedTests(unittest.TestCase):
-    def test_seed_reaches_both_samplers_of_the_hires_workflows(self):
-        for name in HIRES_WORKFLOWS:
-            with self.subTest(workflow=name):
-                template = by_title(workflow(name))
-                self.assertNotEqual(
-                    template['SAMPLER_HIRES']['seed'], 4242,
-                    'the template must carry a different seed, otherwise this test cannot fail',
-                )
-
-                nodes = by_title(comfy_generate.inject(workflow(name), cli_args(seed=4242)))
-                self.assertEqual(nodes['SAMPLER']['seed'], 4242)
-                self.assertEqual(nodes['SAMPLER_HIRES']['seed'], 4242)
-
-    def test_steps_stay_on_the_base_pass(self):
-        # The hires pass runs deliberately fewer steps than the base pass, so --steps must
-        # not be pushed onto it.
-        for name in HIRES_WORKFLOWS:
-            with self.subTest(workflow=name):
-                template = by_title(workflow(name))
-                nodes = by_title(comfy_generate.inject(workflow(name), cli_args(steps=12)))
-                self.assertEqual(nodes['SAMPLER']['steps'], 12)
-                self.assertEqual(nodes['SAMPLER_HIRES']['steps'], template['SAMPLER_HIRES']['steps'])
-
-    def test_seed_reaches_the_single_sampler_workflows(self):
-        for name in ('sdxl_t2i.api.json', 'flux_schnell_t2i.api.json', 'chroma_t2i.api.json'):
-            with self.subTest(workflow=name):
-                nodes = by_title(comfy_generate.inject(workflow(name), cli_args(seed=7)))
-                self.assertEqual(nodes['SAMPLER']['seed'], 7)
-                self.assertNotIn('SAMPLER_HIRES', nodes)
+    def test_seed_reaches_the_sampler_of_every_template(self):
+        # KSamplerAdvanced (Wan) calls the field noise_seed, KSampler seed.
+        checked = 0
+        for path in sorted((MEDIA_IMAGE / 'workflows').glob('*.api.json')):
+            if 'SAMPLER' not in by_title(workflow(path.name)):
+                continue
+            with self.subTest(workflow=path.name):
+                nodes = by_title(comfy_generate.inject(workflow(path.name), cli_args(seed=7)))
+                self.assertEqual(nodes['SAMPLER'].get('noise_seed', nodes['SAMPLER'].get('seed')), 7)
+                checked += 1
+        self.assertGreater(checked, 0, 'no template carries a SAMPLER node, the test checks nothing')
 
 
 class ExecutionErrorTests(unittest.TestCase):
@@ -231,7 +215,7 @@ class PollLoopTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             argv = [
                 'comfy_generate.py',
-                '--workflow', str(MEDIA_IMAGE / 'workflows/sdxl_t2i.api.json'),
+                '--workflow', str(MEDIA_IMAGE / 'workflows/zimage_turbo_t2i.api.json'),
                 '--prompt', 'a red apple',
                 '--out', os.path.join(tmp, 'out.png'),
                 # Short timeout on purpose: without the fix this bounds the test at four
@@ -372,7 +356,7 @@ class PollBudgetTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             argv = [
                 'comfy_generate.py',
-                '--workflow', str(MEDIA_IMAGE / 'workflows/sdxl_t2i.api.json'),
+                '--workflow', str(MEDIA_IMAGE / 'workflows/zimage_turbo_t2i.api.json'),
                 '--prompt', 'a red apple',
                 '--out', os.path.join(tmp, 'out.png'),
                 '--timeout', '6',
@@ -427,7 +411,7 @@ class PollErrorTests(unittest.TestCase):
             argv = ['upscale.py', '--image', source, '--out', out, '--timeout', timeout]
         else:
             argv = ['comfy_generate.py',
-                    '--workflow', str(MEDIA_IMAGE / 'workflows/sdxl_t2i.api.json'),
+                    '--workflow', str(MEDIA_IMAGE / 'workflows/zimage_turbo_t2i.api.json'),
                     '--prompt', 'a red apple', '--out', out, '--timeout', timeout]
         with contextlib.ExitStack() as stack:
             stack.enter_context(mock.patch.object(module, 'api', api))

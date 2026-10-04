@@ -1,44 +1,87 @@
 {
   "1": {
     "class_type": "LoadImage",
-    "inputs": { "image": "placeholder.png", "upload": "image" },
-    "_meta": { "title": "INPUT_IMAGE" }
+    "inputs": {
+      "image": "beispiel-upscale.png",
+      "upload": "image"
+    },
+    "_meta": {
+      "title": "INPUT_IMAGE"
+    }
   },
   "2": {
-    "class_type": "CheckpointLoaderSimple",
-    "inputs": { "ckpt_name": "juggernautXL_v8Rundiffusion.safetensors" },
-    "_meta": { "title": "CHECKPOINT" }
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "z_image_turbo_bf16.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "CHECKPOINT"
+    }
+  },
+  "8": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_3_4b.safetensors",
+      "type": "lumina2",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "CLIP"
+    }
+  },
+  "9": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "ae_zimage.safetensors"
+    },
+    "_meta": {
+      "title": "VAE"
+    }
   },
   "3": {
     "class_type": "CLIPTextEncode",
-    "inputs": { "text": "high quality, sharp focus, fine detail, highly detailed", "clip": ["2", 1] },
-    "_meta": { "title": "POSITIVE_PROMPT" }
+    "inputs": {
+      "text": "high quality photo of a wooden crate of green apples in a barn, sharp focus, fine detail",
+      "clip": [
+        "8",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "POSITIVE_PROMPT"
+    }
   },
   "4": {
-    "class_type": "CLIPTextEncode",
-    "inputs": { "text": "blurry, lowres, jpeg artifacts, oversharpened, deformed", "clip": ["2", 1] },
-    "_meta": { "title": "NEGATIVE_PROMPT" }
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "3",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "NEGATIVE_ZEROED"
+    }
   },
   "5": {
     "class_type": "UpscaleModelLoader",
-    "inputs": { "model_name": "4x-UltraSharp.pth" },
-    "_meta": { "title": "UPSCALE_MODEL" }
+    "inputs": {
+      "model_name": "4x-UltraSharp.pth"
+    },
+    "_meta": {
+      "title": "UPSCALE_MODEL"
+    }
   },
   "6": {
     "class_type": "UltimateSDUpscale",
     "inputs": {
-      "image": ["1", 0],
-      "model": ["2", 0],
-      "positive": ["3", 0],
-      "negative": ["4", 0],
-      "vae": ["2", 2],
-      "upscale_model": ["5", 0],
       "upscale_by": 2.0,
       "seed": 0,
-      "steps": 20,
-      "cfg": 7.0,
-      "sampler_name": "dpmpp_2m",
-      "scheduler": "karras",
+      "steps": 8,
+      "cfg": 1.0,
+      "sampler_name": "res_multistep",
+      "scheduler": "simple",
       "denoise": 0.2,
       "mode_type": "Linear",
       "tile_width": 1024,
@@ -52,13 +95,47 @@
       "seam_fix_padding": 16,
       "force_uniform_tiles": true,
       "tiled_decode": false,
-      "batch_size": 1
+      "batch_size": 1,
+      "image": [
+        "1",
+        0
+      ],
+      "model": [
+        "2",
+        0
+      ],
+      "positive": [
+        "3",
+        0
+      ],
+      "negative": [
+        "4",
+        0
+      ],
+      "vae": [
+        "9",
+        0
+      ],
+      "upscale_model": [
+        "5",
+        0
+      ]
     },
-    "_meta": { "title": "UPSCALE" }
+    "_meta": {
+      "title": "UPSCALE"
+    }
   },
   "7": {
     "class_type": "SaveImage",
-    "inputs": { "filename_prefix": "upscaled", "images": ["6", 0] },
-    "_meta": { "title": "SAVE" }
+    "inputs": {
+      "filename_prefix": "upscale/upscale",
+      "images": [
+        "6",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SAVE"
+    }
   }
 }

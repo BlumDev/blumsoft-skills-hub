@@ -1,0 +1,189 @@
+{
+  "10": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "z_image_turbo_bf16.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "CHECKPOINT"
+    }
+  },
+  "11": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_3_4b.safetensors",
+      "type": "lumina2",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "CLIP"
+    }
+  },
+  "12": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "ae_zimage.safetensors"
+    },
+    "_meta": {
+      "title": "VAE"
+    }
+  },
+  "15": {
+    "class_type": "ModelSamplingAuraFlow",
+    "inputs": {
+      "shift": 3.0,
+      "model": [
+        "10",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SHIFT"
+    }
+  },
+  "5": {
+    "class_type": "EmptySD3LatentImage",
+    "inputs": {
+      "width": 1024,
+      "height": 1024,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "LATENT"
+    }
+  },
+  "6": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "placeholder",
+      "clip": [
+        "11",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "POSITIVE_PROMPT"
+    }
+  },
+  "14": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "6",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "NEGATIVE_ZEROED"
+    }
+  },
+  "13": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 0,
+      "steps": 8,
+      "cfg": 1.0,
+      "sampler_name": "res_multistep",
+      "scheduler": "simple",
+      "denoise": 1.0,
+      "model": [
+        "15",
+        0
+      ],
+      "positive": [
+        "6",
+        0
+      ],
+      "negative": [
+        "14",
+        0
+      ],
+      "latent_image": [
+        "5",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SAMPLER"
+    }
+  },
+  "8": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "13",
+        0
+      ],
+      "vae": [
+        "12",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "DECODE"
+    }
+  },
+  "20": {
+    "class_type": "LayerMask: LoadBiRefNetModelV2",
+    "inputs": {
+      "version": "BiRefNet-General"
+    },
+    "_meta": {
+      "title": "BIREFNET_MODEL"
+    }
+  },
+  "21": {
+    "class_type": "LayerMask: BiRefNetUltraV2",
+    "inputs": {
+      "image": [
+        "8",
+        0
+      ],
+      "birefnet_model": [
+        "20",
+        0
+      ],
+      "detail_method": "VITMatte(local)",
+      "detail_erode": 4,
+      "detail_dilate": 2,
+      "black_point": 0.01,
+      "white_point": 0.99,
+      "process_detail": false,
+      "device": "cuda",
+      "max_megapixels": 2.0
+    },
+    "_meta": {
+      "title": "MATTE"
+    }
+  },
+  "22": {
+    "class_type": "LayerUtility: ImageCombineAlpha",
+    "inputs": {
+      "RGB_image": [
+        "21",
+        0
+      ],
+      "mask": [
+        "21",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "COMBINE_ALPHA"
+    }
+  },
+  "9": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "cutout/cutout",
+      "images": [
+        "22",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SAVE"
+    }
+  }
+}

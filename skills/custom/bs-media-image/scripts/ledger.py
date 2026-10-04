@@ -145,6 +145,9 @@ def cmd_find(args):
 
 
 def main():
+    if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "WARTUNG")):
+        raise SystemExit("bs-media-image ist in Wartung: die Bildablage zieht um. Erst weiterarbeiten, wenn die "
+                         "Datei WARTUNG in bs-media-image fehlt.")
     parser = argparse.ArgumentParser(description="bs-media-image recall index")
     sub = parser.add_subparsers(dest="cmd", required=True)
 

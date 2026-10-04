@@ -1,0 +1,211 @@
+{
+ "10": {
+  "class_type": "UNETLoader",
+  "inputs": {
+   "unet_name": "krea2_turbo_fp8_scaled.safetensors",
+   "weight_dtype": "default"
+  },
+  "_meta": {
+   "title": "CHECKPOINT"
+  }
+ },
+ "11": {
+  "class_type": "CLIPLoader",
+  "inputs": {
+   "clip_name": "qwen3vl_4b_fp8_scaled.safetensors",
+   "type": "krea2",
+   "device": "default"
+  },
+  "_meta": {
+   "title": "CLIP"
+  }
+ },
+ "12": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "qwen_image_vae.safetensors"
+  },
+  "_meta": {
+   "title": "VAE"
+  }
+ },
+ "5": {
+  "class_type": "EmptyLatentImage",
+  "inputs": {
+   "width": 1568,
+   "height": 672,
+   "batch_size": 1
+  },
+  "_meta": {
+   "title": "LATENT"
+  }
+ },
+ "6": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": "placeholder",
+   "clip": [
+    "11",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "POSITIVE_PROMPT"
+  }
+ },
+ "14": {
+  "class_type": "ConditioningZeroOut",
+  "inputs": {
+   "conditioning": [
+    "6",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "NEGATIVE_ZEROED"
+  }
+ },
+ "13": {
+  "class_type": "KSampler",
+  "inputs": {
+   "seed": 0,
+   "steps": 8,
+   "cfg": 1.0,
+   "sampler_name": "euler",
+   "scheduler": "simple",
+   "denoise": 1.0,
+   "model": [
+    "19",
+    0
+   ],
+   "positive": [
+    "6",
+    0
+   ],
+   "negative": [
+    "14",
+    0
+   ],
+   "latent_image": [
+    "5",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "SAMPLER"
+  }
+ },
+ "8": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "13",
+    0
+   ],
+   "vae": [
+    "12",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "DECODE"
+  }
+ },
+ "9": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "banner/banner",
+   "images": [
+    "8",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "SAVE"
+  }
+ },
+ "16": {
+  "class_type": "LoraLoaderModelOnly",
+  "inputs": {
+   "lora_name": "Detailer-KREA2.safetensors",
+   "strength_model": 1.0,
+   "model": [
+    "10",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "DETAIL_LORA"
+  }
+ },
+ "17": {
+  "class_type": "LoraLoaderModelOnly",
+  "inputs": {
+   "lora_name": "WarmLightSlider-KREA2_v1.safetensors",
+   "strength_model": 0.5,
+   "model": [
+    "16",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "STIMMUNG_WARM"
+  }
+ },
+ "18": {
+  "class_type": "LoraLoaderModelOnly",
+  "inputs": {
+   "lora_name": "Afterlight_v1.safetensors",
+   "strength_model": 0.35,
+   "model": [
+    "17",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "STIMMUNG_AFTERLIGHT"
+  }
+ },
+ "19": {
+  "class_type": "LoraLoaderModelOnly",
+  "inputs": {
+   "lora_name": "CharacterDesign-KREA2_v1.safetensors",
+   "strength_model": 0.0,
+   "model": [
+    "21",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "STYLE_LORA"
+  }
+ },
+ "20": {
+  "class_type": "LoraLoaderModelOnly",
+  "inputs": {
+   "lora_name": "RealismSlider-v1.safetensors",
+   "strength_model": 0.0,
+   "model": [
+    "18",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "REALISM_LORA"
+  }
+ },
+ "21": {
+  "class_type": "LoraLoaderModelOnly",
+  "inputs": {
+   "lora_name": "WeightSlider-KREA2_v2.safetensors",
+   "strength_model": 0.0,
+   "model": [
+    "20",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "WEIGHT_LORA"
+  }
+ }
+}

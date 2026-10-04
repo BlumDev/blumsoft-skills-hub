@@ -1,0 +1,309 @@
+{
+  "10": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "krea2_turbo_fp8_scaled.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "CHECKPOINT"
+    }
+  },
+  "11": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen3vl_4b_fp8_scaled.safetensors",
+      "type": "krea2",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "CLIP"
+    }
+  },
+  "12": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "qwen_image_vae.safetensors"
+    },
+    "_meta": {
+      "title": "VAE"
+    }
+  },
+  "5": {
+    "class_type": "EmptyLatentImage",
+    "inputs": {
+      "width": 1536,
+      "height": 1024,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "LATENT"
+    }
+  },
+  "6": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "placeholder",
+      "clip": [
+        "11",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "POSITIVE_PROMPT"
+    }
+  },
+  "14": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "6",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "NEGATIVE_ZEROED"
+    }
+  },
+  "13": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 0,
+      "steps": 8,
+      "cfg": 1.0,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "denoise": 1.0,
+      "model": [
+        "19",
+        0
+      ],
+      "positive": [
+        "6",
+        0
+      ],
+      "negative": [
+        "14",
+        0
+      ],
+      "latent_image": [
+        "5",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SAMPLER"
+    }
+  },
+  "8": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "13",
+        0
+      ],
+      "vae": [
+        "12",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "DECODE"
+    }
+  },
+  "9": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "sprite/sprite",
+      "images": [
+        "8",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SAVE"
+    }
+  },
+  "16": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "lora_name": "Detailer-KREA2.safetensors",
+      "strength_model": 0.5,
+      "model": [
+        "10",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "DETAIL_LORA"
+    }
+  },
+  "17": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "lora_name": "WarmLightSlider-KREA2_v1.safetensors",
+      "strength_model": 0.0,
+      "model": [
+        "16",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "WARM_LORA"
+    }
+  },
+  "18": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "lora_name": "Afterlight_v1.safetensors",
+      "strength_model": 0.0,
+      "model": [
+        "17",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "AFTERLIGHT_LORA"
+    }
+  },
+  "19": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "lora_name": "CharacterDesign-KREA2_v1.safetensors",
+      "strength_model": 0.0,
+      "model": [
+        "21",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "STYLE_LORA"
+    }
+  },
+  "20": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "lora_name": "RealismSlider-v1.safetensors",
+      "strength_model": 0.0,
+      "model": [
+        "18",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "REALISM_LORA"
+    }
+  },
+  "21": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "lora_name": "WeightSlider-KREA2_v2.safetensors",
+      "strength_model": 0.0,
+      "model": [
+        "20",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "WEIGHT_LORA"
+    }
+  },
+  "40": {
+    "class_type": "ImageCrop",
+    "inputs": {
+      "image": [
+        "8",
+        0
+      ],
+      "width": 512,
+      "height": 1024,
+      "x": 0,
+      "y": 0
+    },
+    "_meta": {
+      "title": "ZELLE_STAND"
+    }
+  },
+  "41": {
+    "class_type": "ImageCrop",
+    "inputs": {
+      "image": [
+        "8",
+        0
+      ],
+      "width": 512,
+      "height": 1024,
+      "x": 512,
+      "y": 0
+    },
+    "_meta": {
+      "title": "ZELLE_SCHRITT"
+    }
+  },
+  "42": {
+    "class_type": "ImageFlip",
+    "inputs": {
+      "image": [
+        "41",
+        0
+      ],
+      "flip_method": "y-axis: horizontally"
+    },
+    "_meta": {
+      "title": "ZELLE_SCHRITT_GESPIEGELT"
+    }
+  },
+  "43": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "40",
+        0
+      ],
+      "image2": [
+        "41",
+        0
+      ],
+      "direction": "right",
+      "match_image_size": false,
+      "spacing_width": 0,
+      "spacing_color": "black"
+    },
+    "_meta": {
+      "title": "BOGEN_ZWEI_ZELLEN"
+    }
+  },
+  "44": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "43",
+        0
+      ],
+      "image2": [
+        "42",
+        0
+      ],
+      "direction": "right",
+      "match_image_size": false,
+      "spacing_width": 0,
+      "spacing_color": "black"
+    },
+    "_meta": {
+      "title": "BOGEN_GESPIEGELT"
+    }
+  },
+  "45": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "44",
+        0
+      ],
+      "filename_prefix": "sprite/sprite-gespiegelt"
+    },
+    "_meta": {
+      "title": "SAVE_GESPIEGELT"
+    }
+  }
+}

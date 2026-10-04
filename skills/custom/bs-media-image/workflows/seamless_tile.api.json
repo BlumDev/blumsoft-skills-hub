@@ -1,0 +1,65 @@
+{
+  "20": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "beispiel-kachel-grund.png"
+    },
+    "_meta": {
+      "title": "INPUT_IMAGE"
+    }
+  },
+  "21": {
+    "class_type": "LayerUtility: ImageShift",
+    "inputs": {
+      "image": [
+        "20",
+        0
+      ],
+      "shift_x": 512,
+      "shift_y": 512,
+      "cyclic": true,
+      "background_color": "#000000",
+      "border_mask_width": 80,
+      "border_mask_blur": 60
+    },
+    "_meta": {
+      "title": "VERSATZ_HALB"
+    }
+  },
+  "24": {
+    "class_type": "ImageCompositeMasked",
+    "inputs": {
+      "destination": [
+        "21",
+        0
+      ],
+      "source": [
+        "20",
+        0
+      ],
+      "x": 0,
+      "y": 0,
+      "resize_source": false,
+      "mask": [
+        "21",
+        2
+      ]
+    },
+    "_meta": {
+      "title": "ÜBERBLENDUNG"
+    }
+  },
+  "9": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "24",
+        0
+      ],
+      "filename_prefix": "kachel/kachel"
+    },
+    "_meta": {
+      "title": "SAVE"
+    }
+  }
+}

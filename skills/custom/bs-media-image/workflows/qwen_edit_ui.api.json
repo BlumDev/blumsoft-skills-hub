@@ -1,0 +1,330 @@
+{
+  "10": {
+    "class_type": "UnetLoaderGGUF",
+    "inputs": {
+      "unet_name": "qwen-image-edit-2511-Q4_K_M.gguf"
+    },
+    "_meta": {
+      "title": "CHECKPOINT"
+    }
+  },
+  "16": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "lora_name": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
+      "strength_model": 1.0,
+      "model": [
+        "10",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "LIGHTNING_LORA"
+    }
+  },
+  "15": {
+    "class_type": "ModelSamplingAuraFlow",
+    "inputs": {
+      "shift": 3.1,
+      "model": [
+        "16",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SHIFT"
+    }
+  },
+  "17": {
+    "class_type": "CFGNorm",
+    "inputs": {
+      "strength": 1.0,
+      "model": [
+        "15",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "CFGNORM"
+    }
+  },
+  "11": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+      "type": "qwen_image",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "CLIP"
+    }
+  },
+  "12": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "qwen_image_vae.safetensors"
+    },
+    "_meta": {
+      "title": "VAE"
+    }
+  },
+  "20": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "example.png"
+    },
+    "_meta": {
+      "title": "INPUT_IMAGE"
+    }
+  },
+  "21": {
+    "class_type": "FluxKontextImageScale",
+    "inputs": {
+      "image": [
+        "20",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SCALE_INPUT"
+    }
+  },
+  "22": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "21",
+        0
+      ],
+      "vae": [
+        "12",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "ENCODE_INPUT"
+    }
+  },
+  "6": {
+    "class_type": "TextEncodeQwenImageEditPlus",
+    "inputs": {
+      "prompt": "placeholder",
+      "clip": [
+        "11",
+        0
+      ],
+      "vae": [
+        "12",
+        0
+      ],
+      "image1": [
+        "21",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "POSITIVE_PROMPT"
+    }
+  },
+  "14": {
+    "class_type": "TextEncodeQwenImageEditPlus",
+    "inputs": {
+      "prompt": "",
+      "clip": [
+        "11",
+        0
+      ],
+      "vae": [
+        "12",
+        0
+      ],
+      "image1": [
+        "21",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "NEGATIVE_PROMPT"
+    }
+  },
+  "23": {
+    "class_type": "FluxKontextMultiReferenceLatentMethod",
+    "inputs": {
+      "conditioning": [
+        "6",
+        0
+      ],
+      "reference_latents_method": "index_timestep_zero"
+    },
+    "_meta": {
+      "title": "REF_POS"
+    }
+  },
+  "24": {
+    "class_type": "FluxKontextMultiReferenceLatentMethod",
+    "inputs": {
+      "conditioning": [
+        "14",
+        0
+      ],
+      "reference_latents_method": "index_timestep_zero"
+    },
+    "_meta": {
+      "title": "REF_NEG"
+    }
+  },
+  "13": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 0,
+      "steps": 4,
+      "cfg": 1.0,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "denoise": 1.0,
+      "model": [
+        "17",
+        0
+      ],
+      "positive": [
+        "23",
+        0
+      ],
+      "negative": [
+        "24",
+        0
+      ],
+      "latent_image": [
+        "22",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SAMPLER"
+    }
+  },
+  "8": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "13",
+        0
+      ],
+      "vae": [
+        "12",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "DECODE"
+    }
+  },
+  "9": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "ui/ui",
+      "images": [
+        "8",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SAVE"
+    }
+  },
+  "40": {
+    "class_type": "ImageCrop",
+    "inputs": {
+      "image": [
+        "8",
+        0
+      ],
+      "width": 512,
+      "height": 512,
+      "x": 0,
+      "y": 0
+    },
+    "_meta": {
+      "title": "SYM_VIERTEL"
+    }
+  },
+  "41": {
+    "class_type": "ImageFlip",
+    "inputs": {
+      "image": [
+        "40",
+        0
+      ],
+      "flip_method": "y-axis: horizontally"
+    },
+    "_meta": {
+      "title": "SYM_SPIEGEL_WAAGERECHT"
+    }
+  },
+  "42": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "40",
+        0
+      ],
+      "image2": [
+        "41",
+        0
+      ],
+      "direction": "right",
+      "match_image_size": false,
+      "spacing_width": 0,
+      "spacing_color": "black"
+    },
+    "_meta": {
+      "title": "SYM_OBEN"
+    }
+  },
+  "43": {
+    "class_type": "ImageFlip",
+    "inputs": {
+      "image": [
+        "42",
+        0
+      ],
+      "flip_method": "x-axis: vertically"
+    },
+    "_meta": {
+      "title": "SYM_SPIEGEL_SENKRECHT"
+    }
+  },
+  "44": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "42",
+        0
+      ],
+      "image2": [
+        "43",
+        0
+      ],
+      "direction": "down",
+      "match_image_size": false,
+      "spacing_width": 0,
+      "spacing_color": "black"
+    },
+    "_meta": {
+      "title": "SYM_GANZ"
+    }
+  },
+  "45": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "44",
+        0
+      ],
+      "filename_prefix": "ui/ui-symmetrisch"
+    },
+    "_meta": {
+      "title": "SAVE_SYMMETRISCH"
+    }
+  }
+}

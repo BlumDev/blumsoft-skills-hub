@@ -1,0 +1,74 @@
+{
+  "1": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "placeholder.png",
+      "upload": "image"
+    },
+    "_meta": {
+      "title": "INPUT_IMAGE"
+    }
+  },
+  "20": {
+    "class_type": "LayerMask: LoadBiRefNetModelV2",
+    "inputs": {
+      "version": "BiRefNet-General"
+    },
+    "_meta": {
+      "title": "BIREFNET_MODEL"
+    }
+  },
+  "21": {
+    "class_type": "LayerMask: BiRefNetUltraV2",
+    "inputs": {
+      "image": [
+        "1",
+        0
+      ],
+      "birefnet_model": [
+        "20",
+        0
+      ],
+      "detail_method": "VITMatte(local)",
+      "detail_erode": 4,
+      "detail_dilate": 2,
+      "black_point": 0.01,
+      "white_point": 0.99,
+      "process_detail": false,
+      "device": "cuda",
+      "max_megapixels": 2.0
+    },
+    "_meta": {
+      "title": "MATTE"
+    }
+  },
+  "22": {
+    "class_type": "LayerUtility: ImageCombineAlpha",
+    "inputs": {
+      "RGB_image": [
+        "21",
+        0
+      ],
+      "mask": [
+        "21",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "COMBINE_ALPHA"
+    }
+  },
+  "9": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "matte/matte",
+      "images": [
+        "22",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SAVE"
+    }
+  }
+}

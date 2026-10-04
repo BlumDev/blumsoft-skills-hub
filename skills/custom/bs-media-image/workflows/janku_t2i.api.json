@@ -1,0 +1,297 @@
+{
+ "10": {
+  "class_type": "CheckpointLoaderSimple",
+  "inputs": {
+   "ckpt_name": "JANKUTrainedChenkinNoobai_v50.safetensors"
+  },
+  "_meta": {
+   "title": "CHECKPOINT"
+  }
+ },
+ "40": {
+  "class_type": "LoraLoader",
+  "inputs": {
+   "lora_name": "USNR_STYLE_ILL_V1_lokr3-000024.safetensors",
+   "strength_model": 0.5,
+   "strength_clip": 0.5,
+   "model": [
+    "10",
+    0
+   ],
+   "clip": [
+    "10",
+    1
+   ]
+  },
+  "_meta": {
+   "title": "STIL_LORA USNR"
+  }
+ },
+ "41": {
+  "class_type": "LoraLoader",
+  "inputs": {
+   "lora_name": "WSSKX_WAI.safetensors",
+   "strength_model": 0.3,
+   "strength_clip": 0.3,
+   "model": [
+    "40",
+    0
+   ],
+   "clip": [
+    "40",
+    1
+   ]
+  },
+  "_meta": {
+   "title": "STIL_LORA WSSKX"
+  }
+ },
+ "42": {
+  "class_type": "LoraLoader",
+  "inputs": {
+   "lora_name": "Smooth_Booster_v5.safetensors",
+   "strength_model": 0.65,
+   "strength_clip": 0.65,
+   "model": [
+    "41",
+    0
+   ],
+   "clip": [
+    "41",
+    1
+   ]
+  },
+  "_meta": {
+   "title": "STIL_LORA SMOOTH"
+  }
+ },
+ "43": {
+  "class_type": "LoraLoader",
+  "inputs": {
+   "lora_name": "illustriousXLv01_stabilizer_v1.185c.safetensors",
+   "strength_model": 0.25,
+   "strength_clip": 0.25,
+   "model": [
+    "42",
+    0
+   ],
+   "clip": [
+    "42",
+    1
+   ]
+  },
+  "_meta": {
+   "title": "STIL_LORA STABILIZER"
+  }
+ },
+ "6": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": "placeholder",
+   "clip": [
+    "43",
+    1
+   ]
+  },
+  "_meta": {
+   "title": "POSITIVE_PROMPT"
+  }
+ },
+ "14": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "text": "embedding:lazyhand, embedding:lazyneg, embedding:lazyloli, embedding:lazynsfw, bad perspective, poor lighting, missing limbs, photo, photorealistic, realistic, realism, signature",
+   "clip": [
+    "43",
+    1
+   ]
+  },
+  "_meta": {
+   "title": "NEGATIVE_PROMPT"
+  }
+ },
+ "5": {
+  "class_type": "EmptyLatentImage",
+  "inputs": {
+   "width": 832,
+   "height": 1216,
+   "batch_size": 1
+  },
+  "_meta": {
+   "title": "LATENT"
+  }
+ },
+ "13": {
+  "class_type": "KSampler",
+  "inputs": {
+   "seed": 0,
+   "steps": 30,
+   "cfg": 5.0,
+   "sampler_name": "euler_ancestral",
+   "scheduler": "simple",
+   "denoise": 1.0,
+   "model": [
+    "43",
+    0
+   ],
+   "positive": [
+    "6",
+    0
+   ],
+   "negative": [
+    "14",
+    0
+   ],
+   "latent_image": [
+    "5",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "SAMPLER"
+  }
+ },
+ "8": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "13",
+    0
+   ],
+   "vae": [
+    "10",
+    2
+   ]
+  },
+  "_meta": {
+   "title": "DECODE"
+  }
+ },
+ "9": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "janku/janku",
+   "images": [
+    "8",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "SAVE"
+  }
+ },
+ "20": {
+  "class_type": "UpscaleModelLoader",
+  "inputs": {
+   "model_name": "RealESRGAN_x4plus.safetensors"
+  },
+  "_meta": {
+   "title": "UPSCALE_MODEL"
+  }
+ },
+ "24": {
+  "class_type": "ImageUpscaleWithModel",
+  "inputs": {
+   "upscale_model": [
+    "20",
+    0
+   ],
+   "image": [
+    "8",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "UPSCALE_4X"
+  }
+ },
+ "25": {
+  "class_type": "ImageScaleBy",
+  "inputs": {
+   "upscale_method": "lanczos",
+   "scale_by": 0.375,
+   "image": [
+    "24",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "HIRES_SIZE"
+  }
+ },
+ "26": {
+  "class_type": "VAEEncode",
+  "inputs": {
+   "pixels": [
+    "25",
+    0
+   ],
+   "vae": [
+    "10",
+    2
+   ]
+  },
+  "_meta": {
+   "title": "HIRES_ENCODE"
+  }
+ },
+ "21": {
+  "class_type": "KSampler",
+  "inputs": {
+   "seed": 0,
+   "steps": 30,
+   "cfg": 5.0,
+   "sampler_name": "euler_ancestral",
+   "scheduler": "simple",
+   "denoise": 0.4,
+   "model": [
+    "43",
+    0
+   ],
+   "positive": [
+    "6",
+    0
+   ],
+   "negative": [
+    "14",
+    0
+   ],
+   "latent_image": [
+    "26",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "UPSCALE"
+  }
+ },
+ "27": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "21",
+    0
+   ],
+   "vae": [
+    "10",
+    2
+   ]
+  },
+  "_meta": {
+   "title": "HIRES_DECODE"
+  }
+ },
+ "22": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "filename_prefix": "janku/janku-detail",
+   "images": [
+    "27",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "SAVE_DETAIL"
+  }
+ }
+}

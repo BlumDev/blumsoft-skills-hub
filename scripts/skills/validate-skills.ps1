@@ -215,7 +215,10 @@ foreach ($f in $files) {
 
     foreach ($ref in (Get-LocalFileRefs -Body $fm.body -SkillDir $skillDir)) {
       $target = Join-Path $skillDir ($ref -replace '/', '\')
-      if (-not (Test-Path -LiteralPath $target)) { $errs += "referenced file not found: $ref" }
+      # A glob like `workflows/*.api.json` names a set of files: it holds if at least one matches.
+      $found = if ($ref -match '[*?]') { @(Get-ChildItem -Path $target -File -ErrorAction SilentlyContinue).Count -gt 0 }
+               else { Test-Path -LiteralPath $target }
+      if (-not $found) { $errs += "referenced file not found: $ref" }
     }
   }
 

@@ -1,0 +1,276 @@
+{
+  "28": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": {
+      "ckpt_name": "illustriousRealism_ilXL10V40.safetensors"
+    },
+    "_meta": {
+      "title": "CHECKPOINT"
+    }
+  },
+  "5": {
+    "class_type": "CLIPSetLastLayer",
+    "inputs": {
+      "stop_at_clip_layer": -2,
+      "clip": [
+        "28",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "CLIP_SKIP"
+    }
+  },
+  "3": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "placeholder",
+      "clip": [
+        "5",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "POSITIVE_PROMPT"
+    }
+  },
+  "2": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "embedding:lazyloli, bad quality, worst quality, worst detail, censor, bad anatomy",
+      "clip": [
+        "5",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "NEGATIVE_PROMPT"
+    }
+  },
+  "4": {
+    "class_type": "EmptyLatentImage",
+    "inputs": {
+      "width": 832,
+      "height": 1216,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "LATENT"
+    }
+  },
+  "6": {
+    "class_type": "KSamplerAdvanced",
+    "inputs": {
+      "add_noise": "enable",
+      "noise_seed": 0,
+      "steps": 25,
+      "cfg": 6.0,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "karras",
+      "start_at_step": 0,
+      "end_at_step": 10000,
+      "return_with_leftover_noise": "disable",
+      "model": [
+        "28",
+        0
+      ],
+      "positive": [
+        "3",
+        0
+      ],
+      "negative": [
+        "2",
+        0
+      ],
+      "latent_image": [
+        "4",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SAMPLER"
+    }
+  },
+  "7": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "6",
+        0
+      ],
+      "vae": [
+        "28",
+        2
+      ]
+    },
+    "_meta": {
+      "title": "DECODE"
+    }
+  },
+  "8": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "illustrious-realism/illustrious-realism",
+      "images": [
+        "7",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SAVE"
+    }
+  },
+  "29": {
+    "class_type": "UpscaleModelLoader",
+    "inputs": {
+      "model_name": "4x-UltraSharp.pth"
+    },
+    "_meta": {
+      "title": "UPSCALE_MODEL"
+    }
+  },
+  "38": {
+    "class_type": "ImageUpscaleWithModel",
+    "inputs": {
+      "upscale_model": [
+        "29",
+        0
+      ],
+      "image": [
+        "7",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "UPSCALE_4X"
+    }
+  },
+  "30": {
+    "class_type": "UpscaleModelLoader",
+    "inputs": {
+      "model_name": "1xSkinContrast-High-SuperUltraCompact.pth"
+    },
+    "_meta": {
+      "title": "SKIN_MODEL"
+    }
+  },
+  "34": {
+    "class_type": "ImageUpscaleWithModel",
+    "inputs": {
+      "upscale_model": [
+        "30",
+        0
+      ],
+      "image": [
+        "38",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SKIN_CONTRAST"
+    }
+  },
+  "36": {
+    "class_type": "ImageScaleBy",
+    "inputs": {
+      "image": [
+        "34",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "scale_by": 0.32
+    },
+    "_meta": {
+      "title": "HIRES_SIZE"
+    }
+  },
+  "35": {
+    "class_type": "ImageToMultipleOf",
+    "inputs": {
+      "image": [
+        "36",
+        0
+      ],
+      "multiple_of": 64,
+      "method": "center crop"
+    },
+    "_meta": {
+      "title": "HIRES_CROP"
+    }
+  },
+  "37": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "35",
+        0
+      ],
+      "vae": [
+        "28",
+        2
+      ]
+    },
+    "_meta": {
+      "title": "HIRES_ENCODE"
+    }
+  },
+  "33": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 10,
+      "steps": 20,
+      "cfg": 7.0,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "karras",
+      "denoise": 0.45,
+      "model": [
+        "28",
+        0
+      ],
+      "positive": [
+        "3",
+        0
+      ],
+      "negative": [
+        "2",
+        0
+      ],
+      "latent_image": [
+        "37",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SAMPLER_DETAIL"
+    }
+  },
+  "31": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "33",
+        0
+      ],
+      "vae": [
+        "28",
+        2
+      ]
+    },
+    "_meta": {
+      "title": "HIRES_DECODE"
+    }
+  },
+  "32": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "illustrious-realism/illustrious-realism-detail",
+      "images": [
+        "31",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SAVE_DETAIL"
+    }
+  }
+}
