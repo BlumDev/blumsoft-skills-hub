@@ -2,7 +2,7 @@
 status: wartung
 track: infra
 next_step: "migrate-renames.ps1 auf jedem Rechner laufen lassen, claude.ai-Skills auf die bs-Namen umstellen"
-updated: 2026-10-03
+updated: 2026-10-04
 ---
 
 # Backlog
@@ -12,7 +12,8 @@ IDs `YYYYMMDD-slug`, nie renumbern. Ideen = offene Einträge mit `#idea`.
 
 ## Offen
 
-- [ ] 20261003-migrate-installed-skills `scripts/skills/migrate-renames.ps1` auf jedem Rechner einmal laufen lassen (erst `-DryRun`, danach `sync.ps1 -Profile freelancer-fullstack`), bei Kunden-Repos mit synchronisiertem `.github/skills` zusätzlich mit `-WorkspaceRoot`. Danach Skript und Eintrag entfernen #task (Quelle: Umbenennung 2026-10-03, siehe docs/decisions.md)
+- [ ] 20261003-migrate-installed-skills `scripts/skills/migrate-renames.ps1` auf jedem Rechner einmal laufen lassen (erst `-DryRun`, danach `sync.ps1 -Profile freelancer-fullstack`), bei Kunden-Repos mit synchronisiertem `.github/skills` zusätzlich mit `-WorkspaceRoot`. Das Skript überspringt seit 2026-10-04 live gepflegte Skills: Liegt auf einem Rechner noch `gen-asset`, den Ordner vor dem Sync von Hand in `bs-media-image` umbenennen und `name:` im SKILL.md anpassen. Hauptrechner erledigt am 2026-10-04 (dort mit Schaden, siehe docs/decisions.md vom selben Tag). Danach Skript und Eintrag entfernen #task (Quelle: Umbenennung 2026-10-03, siehe docs/decisions.md)
+- [ ] 20261004-bs-media-image-review-notes Drei Anmerkungen der ComfyUI-Session zu den gemergten Skripten, keine Regression. (1) Scheitert bei einer zweistufigen Vorlage die zweite Stufe, nachdem die erste gespeichert ist, nimmt `comfy_generate.py` das Bild der ersten Stufe als Ergebnis: `execution_error` greift nur, solange kein Bild da ist. Abhilfe: den Fehler vor der Bildauswahl prüfen oder ein fehlendes `SAVE_DETAIL` melden. (2) `ensure_comfyui.ps1` nennt beim Absturz nur die `.err`, das ComfyUI-Log steht aber in der `.log` (stdout), beide nennen. (3) Jeder Start legt ein neues Logpaar in `%TEMP%` an, die Paare sammeln sich dort. Der Skill ist live gepflegt: im Live-Ordner fixen, danach ins Repo zurückholen #bug (Quelle: Live-Lauf der ComfyUI-Session 2026-10-04)
 - [ ] 20261003-bs-media-video Video-Skill `bs-media-video` aus dem ComfyUI-Bereich ins Repo holen, sobald er läuft. Name ist reserviert, `bs-media-image` verweist schon darauf #task (Quelle: Umbenennung 2026-10-03)
 - [ ] 20261003-local-only-skills `gen-diagram` (Verweis in `bs-dev-repo-review` und `bs-doc-html`) und `fable-uiux` (Verweis in `bs-sap-ui5`) liegen weder im Repo noch in claude.ai, vermutlich nur lokal unter `~/.claude/skills`. Ins Repo holen, nach `bs-<bereich>-<zweck>` benennen und die Verweise nachziehen #task (Quelle: Umbenennung 2026-10-03)
 - [ ] 20261003-pester-linux Die Pester-Suite läuft nur unter Windows grün, unter Linux sind 11 von 51 Tests rot (gleich auf `main` und Branch, gemessen 2026-10-03): die Sync-Tests setzen `USERPROFILE`, pwsh unter Linux liest `HOME` und schreibt dadurch ins echte HOME; der Ersetzen-Test braucht Windows-Dateisperren; die beiden Port-Tests von `with_server.py` erwarten Windows-Socket-Verhalten; `bootstrap-project.ps1` findet in der Fixture `templates/project/.github` nicht, weil Punkt-Ordner unter Linux versteckt sind. Relevant erst, wenn Pester in CI auf Linux laufen soll #idea (Quelle: Pester-Lauf in der Cloud-Session 2026-10-03)
@@ -39,6 +40,11 @@ Aus Code-Audit 2026-06-24 (`reviews/2026-06-24-code-audit.md`), recovered, am 20
 ## Erledigt
 
 Ältere Einträge liegen in `archive/backlog-archive.md` (Archiv-Regel der AGENTS.md). Der Reconcile vom 2026-08-18 hat die damals hier stehenden Einträge stichprobenartig gegen den Code gehalten, alle geprüften sind tatsächlich umgesetzt (Belege in `docs/reviews/2026-08-18-reconcile.md`); inzwischen sind sie ins Archiv gewandert, ebenso die Security-Session und die Wartungs-Session 2026-09-01 (ausgelagert 2026-09-02) sowie die Wartungs-Session 5b und der Verify der Runde-2-Commits (ausgelagert 2026-09-07).
+
+Vorfall `bs-media-image` vom 2026-10-04 (Entscheidung in docs/decisions.md vom selben Tag):
+
+- [x] 20261004-live-maintained-skills `Get-LiveMaintainedSkills` in `lib.ps1` listet live gepflegte Skills (bisher nur `bs-media-image`). `sync.ps1` installiert sie nur, wenn sie am Ziel fehlen, `migrate-renames.ps1` lässt sie unter altem Namen liegen. Gates: Pester 53 grün, der neue Sync-Test wird mit leerer Liste rot; Migration im Wegwerf-HOME durchgespielt (ba9b27e, 2026-10-04)
+- [x] 20261004-bs-media-image-reimport Live-Ordner nach `skills/custom/bs-media-image` zurückgeholt (ohne `out/`, `__pycache__`, `*.bak-*`, fünf gestrichene Vorlagen gelöscht). Die vier Skripte sind ein Drei-Wege-Merge mit den 14 September-Fixes, die live gefehlt hatten, und sind wieder live installiert. Gates: `python -m unittest tests.test_media_image tests.test_with_server` 27 grün, `validate.ps1` und `validate-skills.ps1` PASS, Pester 53 grün, echter Lauf von generate, upscale, ensure (Pfad "läuft bereits") und ledger durch die ComfyUI-Session (c12e18d, 2026-10-04)
 
 Umbenennung der eigenen Skills auf `bs-<bereich>-<zweck>` (Entscheidung in docs/decisions.md, 2026-10-03):
 
