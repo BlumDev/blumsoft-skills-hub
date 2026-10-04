@@ -14,29 +14,31 @@ BeforeAll {
 
     # Throwaway repo carrying one skill 'harmless'. The skill holds a second file that sorts
     # after SKILL.md, so a recursive delete that dies halfway through is visible in what survives.
+    # -SkillName lets a test use a name from Get-LiveMaintainedSkills.
     function New-SyncFixture {
+        param([string]$SkillName = 'harmless')
         $tmp = Join-Path ([System.IO.Path]::GetTempPath()) ("skillshub-sync-" + [guid]::NewGuid().ToString('N').Substring(0, 8))
         $repo = Join-Path $tmp 'repo'
         New-Item -ItemType Directory -Path (Join-Path $repo 'scripts/skills') -Force | Out-Null
-        New-Item -ItemType Directory -Path (Join-Path $repo 'skills/custom/harmless') -Force | Out-Null
+        New-Item -ItemType Directory -Path (Join-Path $repo "skills/custom/$SkillName") -Force | Out-Null
         New-Item -ItemType Directory -Path (Join-Path $repo 'bundles') -Force | Out-Null
 
         Copy-Item (Join-Path $script:RepoRoot 'scripts/skills/sync.ps1') (Join-Path $repo 'scripts/skills/sync.ps1')
         Copy-Item (Join-Path $script:RepoRoot 'scripts/skills/lib.ps1') (Join-Path $repo 'scripts/skills/lib.ps1')
-        Set-Content -Path (Join-Path $repo 'skills/custom/harmless/SKILL.md') -Value '# harmless'
-        Set-Content -Path (Join-Path $repo 'skills/custom/harmless/zz-payload.txt') -Value 'must survive a failed replace'
+        Set-Content -Path (Join-Path $repo "skills/custom/$SkillName/SKILL.md") -Value "# $SkillName"
+        Set-Content -Path (Join-Path $repo "skills/custom/$SkillName/zz-payload.txt") -Value 'must survive a failed replace'
 
         Set-Content -Path (Join-Path $repo 'skills/registry.yaml') -Value @"
 skills:
-  - name: harmless
+  - name: $SkillName
     source: custom
-    path: skills/custom/harmless
+    path: skills/custom/$SkillName
 "@
         Set-Content -Path (Join-Path $repo 'bundles/only.yaml') -Value @"
 id: only
 name: Only Bundle
 core_skills:
-  - harmless
+  - $SkillName
 "@
 
         New-Item -ItemType Directory -Path (Join-Path $repo 'profiles') -Force | Out-Null
@@ -60,8 +62,8 @@ core_skills:
             Root               = $tmp
             Sync               = Join-Path $repo 'scripts/skills/sync.ps1'
             FakeHome           = $fakeHome
-            SkillSource        = Join-Path $repo 'skills/custom/harmless'
-            InstalledAt        = Join-Path $fakeHome '.codex/skills/harmless'
+            SkillSource        = Join-Path $repo "skills/custom/$SkillName"
+            InstalledAt        = Join-Path $fakeHome ".codex/skills/$SkillName"
             WorkflowInstalledAt = Join-Path $fakeHome '.gemini/antigravity/global_workflows/workflow-ops.md'
         }
     }
@@ -242,6 +244,41 @@ Describe 'sync.ps1 dry run' {
         (Get-Content -LiteralPath (Join-Path $script:fixture.InstalledAt 'SKILL.md') -Raw).Trim() | Should -Be '# harmless'
         $staging = @(Get-ChildItem -LiteralPath (Split-Path -Parent $script:fixture.InstalledAt) -Force | Where-Object { $_.Name -like '.*.sync-*' })
         $staging.Count | Should -Be 0 -Because "DryRun darf kein Staging anlegen: $($staging.Name -join ', ')"
+    }
+}
+
+Describe 'sync.ps1 live-maintained skills' {
+    AfterEach {
+        if ($script:fixture) {
+            Remove-Item -LiteralPath $script:fixture.Root -Recurse -Force -ErrorAction SilentlyContinue
+            $script:fixture = $null
+        }
+    }
+
+    It 'never replaces an installed live-maintained skill' {
+        # Fällt aus, wenn sync.ps1 Get-LiveMaintainedSkills nicht mehr beachtet. Vorfall 2026-10-04:
+        # die Repo-Fassung von bs-media-image hat den laufend gepflegten Live-Ordner überschrieben.
+        $script:fixture = New-SyncFixture -SkillName 'bs-media-image'
+        New-Item -ItemType Directory -Path (Join-Path $script:fixture.InstalledAt 'out') -Force | Out-Null
+        Set-Content -Path (Join-Path $script:fixture.InstalledAt 'SKILL.md') -Value '# live'
+        Set-Content -Path (Join-Path $script:fixture.InstalledAt 'out/render.png') -Value 'image'
+
+        $result = Invoke-FixtureSync -Fixture $script:fixture -Targets @('codex')
+
+        $result.ExitCode | Should -Be 0
+        $result.Output | Should -Match '\[SKIP\] bs-media-image'
+        (Get-Content -LiteralPath (Join-Path $script:fixture.InstalledAt 'SKILL.md') -Raw).Trim() | Should -Be '# live'
+        Join-Path $script:fixture.InstalledAt 'out/render.png' | Should -Exist
+        Join-Path $script:fixture.InstalledAt 'zz-payload.txt' | Should -Not -Exist
+    }
+
+    It 'installs a live-maintained skill that is missing at the target' {
+        $script:fixture = New-SyncFixture -SkillName 'bs-media-image'
+
+        $result = Invoke-FixtureSync -Fixture $script:fixture -Targets @('codex')
+
+        $result.ExitCode | Should -Be 0
+        (Get-Content -LiteralPath (Join-Path $script:fixture.InstalledAt 'SKILL.md') -Raw).Trim() | Should -Be '# bs-media-image'
     }
 }
 

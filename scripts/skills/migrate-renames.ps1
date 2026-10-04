@@ -16,6 +16,8 @@ param(
 #   3. Dateien, die nur im alten Ordner lagen (Laufzeitdaten wie out/ von bs-media-image),
 #      werden in den neuen Ordner übernommen. Lokal geänderte Dateien, die es auch im Repo
 #      gibt (etwa reference/ledger.jsonl), bleiben in der Repo-Fassung, die alte liegt im Backup.
+#   Ausnahme: live gepflegte Skills (Get-LiveMaintainedSkills in lib.ps1) bleiben unter dem
+#   alten Namen liegen. Ihr Ordner ist die Quelle, umbenannt wird er von Hand.
 # Ein Ordner wird nur angefasst, wenn sein SKILL.md den alten Namen trägt; ein fremder
 # Skill, der zufällig 'web' oder 'security' heißt, bleibt liegen.
 
@@ -75,6 +77,7 @@ foreach ($new in $renames.Values) {
 
 $resolvedWorkspaceRoot = if ([string]::IsNullOrWhiteSpace($WorkspaceRoot)) { $root } else { $WorkspaceRoot }
 $targetMap = Get-SyncTargetMap -WorkspaceRoot $resolvedWorkspaceRoot
+$liveMaintained = @(Get-LiveMaintainedSkills)
 $backupRoot = Join-Path $HOME (".skills-hub-backup/rename-{0}" -f (Get-Date -Format 'yyyyMMdd-HHmmss'))
 $oldNames = @($renames.Keys) + $removed
 $seenDirs = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
@@ -98,6 +101,10 @@ foreach ($target in $Targets) {
     }
 
     $new = if ($renames.Contains($old)) { $renames[$old] } else { $null }
+    if ($new -and $liveMaintained -contains $new) {
+      Write-Host "  [SKIP] $old (live gepflegt: von Hand nach $new umbenennen, der Ordner ist die Quelle)" -ForegroundColor DarkYellow
+      continue
+    }
     $action = if ($new) { "nach $new migrieren" } else { 'entfernen (Legacy)' }
     if (-not $PSCmdlet.ShouldProcess($oldPath, $action)) { continue }
 

@@ -35,6 +35,7 @@ if ($BundleId -and $BundleId.Count -gt 0) {
 $skills = Resolve-BundleSkills -BundleIds $bundleIds -Bundles $bundles -IncludeExtended:$IncludeExtended
 
 $targetMap = Get-SyncTargetMap -WorkspaceRoot $resolvedWorkspaceRoot
+$liveMaintained = @(Get-LiveMaintainedSkills)
 
 Write-Host "Bundles: $($bundleIds -join ', ')"
 Write-Host "Include extended: $([bool]$IncludeExtended)"
@@ -61,6 +62,10 @@ foreach ($target in $Targets) {
     $srcPath = Join-Path $root $registry[$skill].path
     if (-not (Test-Path -LiteralPath $srcPath)) { throw "Source path not found for skill '$skill': $srcPath" }
     $dstPath = Resolve-SkillTargetPath -BaseDir $targetDir -SkillId $skill
+    if ($liveMaintained -contains $skill -and (Test-Path -LiteralPath $dstPath)) {
+      Write-Host "  [SKIP] $skill (live gepflegt, der installierte Ordner ist die Quelle)" -ForegroundColor DarkYellow
+      continue
+    }
     if (-not $PSCmdlet.ShouldProcess($dstPath, "Skill '$skill' aus '$srcPath' synchronisieren")) { continue }
 
     New-Item -ItemType Directory -Path $targetDir -Force | Out-Null

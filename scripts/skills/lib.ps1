@@ -68,6 +68,16 @@ function Get-SyncTargetMap {
   }
 }
 
+# Skills, deren installierter Ordner die Wahrheit ist: Sessions pflegen dort laufend
+# Referenzen, Skripte und Arbeitsdaten (out/, workflows/), das Repo hinkt hinterher.
+# sync.ps1 installiert sie nur, wenn sie am Ziel fehlen, und ersetzt sie nie;
+# migrate-renames.ps1 lässt sie liegen. Zurück ins Repo fließt der Stand von Hand.
+# Anlass: am 2026-10-04 hat migrate-renames.ps1 den Live-Ordner gen-asset durch die
+# wochenalte Repo-Fassung ersetzt (siehe docs/decisions.md).
+function Get-LiveMaintainedSkills {
+  @('bs-media-image')
+}
+
 function Normalize-YamlValue {
   param([string]$Value)
   $v = $Value.Trim()
