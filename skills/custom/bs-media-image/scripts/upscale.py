@@ -180,6 +180,15 @@ def execution_error(entry):
     return "status=error ohne Detailmeldung"
 
 
+def with_trigger(prompt, trigger):
+    """Put the template's trigger word (_meta.trigger at POSITIVE_PROMPT) in front of the prompt,
+    never twice: compared without case and whitespace. Same rule as in comfy_generate.py."""
+    if not trigger or not prompt:
+        return prompt
+    plain = lambda s: "".join(s.split()).lower()
+    return prompt if plain(prompt).startswith(plain(trigger)) else f"{trigger}, {prompt}"
+
+
 def main():
     if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "WARTUNG")):
         raise SystemExit("bs-media-image ist in Wartung: die Bildablage zieht um. Erst weiterarbeiten, wenn die "
@@ -248,7 +257,7 @@ def main():
                 inp["seed"] = a.seed
             elif title == "POSITIVE_PROMPT" and a.prompt:
                 # Seit dem 22.09.2026 ist Krea 2 der Refiner, score-Tags braucht es nicht mehr.
-                inp["text"] = a.prompt
+                inp["text"] = with_trigger(a.prompt, node.get("_meta", {}).get("trigger"))
             elif title == "CHECKPOINT" and a.checkpoint:
                 # Krea 2 kommt über UNETLoader, SDXL-Checkpoints über CheckpointLoaderSimple.
                 if "unet_name" in inp:

@@ -184,6 +184,14 @@ Qwen-LoRAs sind auf Qwen-Image trainiert, 2512 hat dieselbe Architektur (60 Blö
 
 ## Entscheidungs-Log (append-only)
 
+- 2026-10-05: Nutzerentscheid nach Stapeltest 2 Phase B: PureLens wird Standard für Produkt und
+  Handwerk (gewann dort 9 von 12 Gruppen), Porträt und alles andere bleiben bei `krea2_turbo_t2i`.
+  Neue Vorlage `krea2_produkt.api.json`: Graph von `krea2_turbo_t2i` mit Detail 0.5, Afterlight 0.35
+  und `purelens_krea2` 1.0 im Knoten PURELENS_LORA, Ablage `produkt/produkt`. Der Trigger steht als
+  `_meta.trigger: "purelens"` am POSITIVE_PROMPT, `comfy_generate.py` und `upscale.py` setzen ihn vorn
+  an den Prompt (nie doppelt, verglichen ohne Groß- und Kleinschreibung und Leerzeichen). Die Galerie
+  schneidet ihn vor Prompt und prompt_hash wieder ab, damit der Vergleich über Modelle hält. Noch nicht
+  in SKILL.md und Workflow 10 als Standard eingetragen: erst wenn die Galerie-Seite live ist.
 - 2026-10-04 (Nahttest 2): Stufe 2 von `illustrious_t2i` (WAI, damit auch Workflow 06) rechnet in einer
   Kachel: `tile_width` und `tile_height` 4096, `force_uniform_tiles` aus, Sicherung `.bak-20261004`. Mit
   1024er-Kacheln kamen leichte Streifen durch die Bildmitte (Nutzernotiz, im Test mit den alten Werten

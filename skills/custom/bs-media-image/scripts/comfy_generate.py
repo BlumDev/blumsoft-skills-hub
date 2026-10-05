@@ -341,6 +341,17 @@ def execution_error(entry):
     return "status=error ohne Detailmeldung"
 
 
+def with_trigger(prompt, trigger):
+    """Put the template's trigger word (_meta.trigger at POSITIVE_PROMPT, e.g. purelens in
+    krea2_produkt) in front of the prompt, never twice: compared without case and whitespace.
+    The gallery cuts it off again before prompt and prompt_hash, so a motif still compares
+    across models."""
+    if not trigger or not prompt:
+        return prompt
+    plain = lambda s: "".join(s.split()).lower()
+    return prompt if plain(prompt).startswith(plain(trigger)) else f"{trigger}, {prompt}"
+
+
 def inject(workflow, args):
     """Set parameters on nodes, matched by their _meta.title marker."""
     if (getattr(args, "mood", False) or getattr(args, "no_mood", False)) and not any(
@@ -351,7 +362,7 @@ def inject(workflow, args):
         inp = node.get("inputs", {})
         if title == "POSITIVE_PROMPT":
             # Qwen-Edit-Nodes heissen das Feld "prompt", CLIPTextEncode "text".
-            inp["prompt" if "prompt" in inp else "text"] = args.prompt
+            inp["prompt" if "prompt" in inp else "text"] = with_trigger(args.prompt, node.get("_meta", {}).get("trigger"))
         elif title == "NEGATIVE_PROMPT":
             inp["prompt" if "prompt" in inp else "text"] = args.negative
         elif title == "INPUT_IMAGE" and args.uploaded_image:

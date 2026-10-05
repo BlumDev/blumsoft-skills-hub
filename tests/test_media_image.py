@@ -93,6 +93,26 @@ def cli_args(**overrides):
     return argparse.Namespace(**args)
 
 
+class WithTriggerTests(unittest.TestCase):
+    # comfy_generate.py and upscale.py each carry their own copy of the rule.
+    MODULES = (comfy_generate, upscale)
+
+    def test_puts_the_trigger_in_front(self):
+        for module in self.MODULES:
+            with self.subTest(module=module.__name__):
+                self.assertEqual(module.with_trigger('a red apple', 'purelens'), 'purelens, a red apple')
+
+    def test_keeps_a_trigger_already_there_in_another_spelling(self):
+        for module in self.MODULES:
+            with self.subTest(module=module.__name__):
+                self.assertEqual(module.with_trigger('PureLens, a red apple', 'purelens'), 'PureLens, a red apple')
+
+    def test_leaves_the_prompt_alone_without_a_trigger(self):
+        for module in self.MODULES:
+            with self.subTest(module=module.__name__):
+                self.assertEqual(module.with_trigger('a red apple', None), 'a red apple')
+
+
 class InjectSeedTests(unittest.TestCase):
     def test_seed_reaches_the_sampler_of_every_template(self):
         # KSamplerAdvanced (Wan) calls the field noise_seed, KSampler seed.

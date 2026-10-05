@@ -1551,3 +1551,8 @@ Plan `out/_tests/stapel2b/stapel2b-plan.md`, Zuordnung `out/_tests/stapel2b/stap
 - **Sieger je Gruppe:** PureLens 1.0 (Trigger `purelens`, zum Standard) zehnmal, UltraReal 0.7 viermal, Background Detail, Skin Detail Slider und AfterHours je einmal, der Standard selbst einmal.
 - **Nach Bereich:** Produkt PureLens 4 von 6 (sonst UltraReal), Handwerk PureLens 5 von 6 (sonst Background Detail), Porträt ohne klaren Sieger (UltraReal 2, PureLens, Skin Slider, AfterHours und Standard je 1).
 - **Direkte Duelle gegen den Standard** (nicht jedes Paar wurde verglichen): PureLens 4 Siege, 2 Niederlagen, 3 gleich; UltraReal 4:2; Background Detail 3:0; Skin Slider 2:0 bei 2 gleich; Skin Texture 0:1; AfterHours 1:2; God Rays einmal gleich.
+- **Folge (Nutzerentscheid 05.10.):** PureLens wird Standard für Produkt und Handwerk über die eigene Vorlage `krea2_produkt` mit Trigger in `_meta.trigger`, siehe models.md. Porträt bleibt beim Standard ohne PureLens.
+
+## Lesefehler beim Laden der Krea-Datei (2026-10-05)
+
+- **Einmaliger Aussetzer:** Das erste Probebild mit `krea2_produkt` brach im KSampler mit „HostBuffer.read_file_slice failed“ ab. Das ComfyUI-Log zeigt den Grund: Beim Streamen der 13-GB-Datei `krea2_turbo_fp8_scaled` scheiterte ein Windows-Lesezugriff bei 11,7 GB (`GetOverlappedResult failed`, Bibliothek comfy_aimdo). Derselbe Auftrag lief direkt danach fehlerfrei. Bei diesem Fehler einmal wiederholen, erst bei Wiederholung an der Datei oder am Laufwerk suchen. `comfy_generate.py` meldet solche ComfyUI-Fehler seit dem 04.10. sofort mit Knoten und Meldung, statt bis zum Timeout zu warten.
