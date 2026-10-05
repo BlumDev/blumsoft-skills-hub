@@ -100,6 +100,17 @@ backlog entries. It never implements them.
   repo (prefer `python -B`, redirect caches and build info to a temp dir; if a
   command writes into the tree anyway, do not run it). Record results; if not
   run, say so and why.
+- **Config outside the repo**: before any verdict on build or runtime, read
+  where the deploy platform builds from (Coolify, Vercel, CI settings, cron on
+  the host), read-only: the sibling infra repo or the platform API with GET
+  calls only (e.g. `blumsoft-devops/scripts/coolify.ps1 apps -Raw`), keeping
+  build and health check fields (`dockerfile_location`,
+  `health_check_enabled`), never env values. Name per deployable the build
+  file in use and its source. If the external config cannot be read, the
+  build source is an **Assumption** and no DELETE or runtime verdict rests on
+  it. Evidence (2026-09-24, blumsoft-platform): the review assumed
+  `deploy/admin.Dockerfile`; Coolify builds the root `admin.Dockerfile`, which
+  the review had marked DELETE.
 - **Runtime structure**: processes, services, databases, external APIs, taken
   from deploy config, compose files and env var NAMES (never values).
 - **Dependency direction**: who imports whom across modules (a sampled import
@@ -138,6 +149,31 @@ Own checks, no other skill covers them:
   EOL, and libraries the current platform version already replaces. If the
   environment belongs to another repo, count only packages the own code
   imports directly. Never install or upgrade.
+- **Runtime images**: judge the support end of a container on the image after
+  the LAST `FROM` of the Dockerfile actually built (Step 1): the runtime or
+  server version (node, nginx) and the base OS version (alpine, debian), each
+  against its release schedule, plus the date the tag was last pushed
+  (Docker Hub: `tag_last_pushed` from
+  `https://hub.docker.com/v2/repositories/<namespace>/<image>/tags/<tag>`).
+  Build-stage versions do not decide runtime support. Evidence (2026-09-24,
+  blumsoft-platform): the review flagged Node 20 for web, only its build
+  stage; its runtime `nginx:1.27-alpine` (superseded mainline, last pushed
+  2025-04-16) was never checked for support.
+- **Prerelease versions**: `npm audit` misses installed versions with a
+  prerelease tag (`-lts.2`, `-beta.1`), because advisory ranges match
+  prereleases only with `includePrerelease`. List them with
+  `npm ls --omit=dev --all | grep -E '@[0-9]+\.[0-9]+\.[0-9]+-'` and query
+  each with `gh api "/advisories?ecosystem=npm&affects=<pkg>@<version>"`;
+  every hit counts as a known vulnerability. Evidence (2026-09-24,
+  blumsoft-platform): multer 1.4.5-lts.2 was missing from `npm audit`, the
+  GitHub Advisory DB listed seven High advisories covering it.
+- **Monitoring**: every health, readiness or metrics endpoint and every alert
+  names its reader (platform health check, uptime monitor, smoke run, alert
+  rule) with evidence (config line, or a platform field from Step 1). An
+  endpoint nobody reads is not monitoring: report that as a finding, and a
+  work package that changes such an endpoint names the reader it relies on.
+  Evidence (2026-09-24, blumsoft-platform): WP8 wanted a deeper readiness
+  check nobody read; all six Coolify apps had `health_check_enabled: false`.
 - **Business rules to preserve**: implicit rules, special cases, validations,
   integration behavior, constants with domain meaning, each with `path:line`.
   This list is the contract any refactor or rewrite must keep.
@@ -157,11 +193,17 @@ may point to several work packages. No decision from style preference.
   (not just the code), refactoring would touch most of it anyway, AND its
   contract is small enough that parity can be proven. Name the parity check and
   the characterization tests to write first.
-- **DELETE**: unused, obsolete, or superseded by an existing component. Prove
-  "unused" by searching the WHOLE repo, including config, lint, build, CI and
-  deploy files (no imports, routes, script entries, cron or deploy
-  references). If dynamic loading, external callers or planned use cannot be
-  ruled out, mark it "confirm with owner".
+- **DELETE**: unused, obsolete, or superseded by an existing component. Every
+  "unused", "no caller" or "dead code" claim, here, in a finding or in a
+  package's verification command, rests on `git grep -n <name>` without a
+  pathspec: code, `deploy/`, `docs/`, `.github/`, `turbo.json`, `package.json`
+  scripts and root files, plus the external config from Step 1 (build paths,
+  cron); quote the command. A runbook or UI page that names it is a caller. A
+  search limited to `src/` or picked directories proves nothing. If dynamic
+  loading, external callers or planned use cannot be ruled out, mark it
+  "confirm with owner". Evidence (2026-09-24, blumsoft-platform): WP9 called
+  the backup script uncalled, verified by `grep -rn <name> deploy scripts`; a
+  runbook in `docs/` and the admin backups page used it.
 - **Out of scope**: upstream, vendored or generated code; one row, with the
   cost it causes for the own code if any.
 
@@ -220,8 +262,10 @@ Sections (Triage: only 1, 4, 5 and 9, shortened):
    On the first modernization review, reconcile the open items of earlier
    audits that bear on a module decision.
 3. **Repo map and as-is**: module table, stack, build/test/deploy (what ran,
-   with result), runtime, dependency direction, dependencies (measured), doc
-   drift. Deep adds data model, auth and integration boundaries.
+   with result; build file per deployable and its source), runtime (image
+   after the last `FROM`), monitoring (reader per endpoint), dependency
+   direction, dependencies (measured), doc drift. Deep adds data model, auth
+   and integration boundaries.
 4. **Risk register**: Severity | Risk | Evidence | Action.
 5. **Module classification**: Module | Decision | Reason (evidence) | Risk |
    Priority.
