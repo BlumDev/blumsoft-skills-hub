@@ -105,8 +105,8 @@ Quelle der Wahrheit inkl. Lizenzen: [reference/models.md](reference/models.md).
 |---|---|---|
 | Landschaft / Winzer | Qwen-Image-2512 mit 30 Steps, cfg 4.0, ohne Turbo-LoRA, `qwen_2512_landschaft` (Blindtest 28.09.: 8 von 16 Prompts); schnell: Krea 2 (5 von 16) | 16:9 (1344x768), etwa 100 s (Krea 11 s) |
 | Architektur / Web-Hero | Qwen-Image-2512 in Qualitätseinstellung, `qwen_2512_landschaft` (Fototest 28.09.: 3 von 4, Nutzerentscheid 03.10.); schnell: Krea 2 | 16:9 (1344x768), etwa 100 s |
-| Produkt | Krea 2, `krea2_turbo_t2i` (Workflow 10, Nutzerentscheid 03.10.: Krea mit Detail 0.5 und Afterlight 0.35 nach Stapeltest 2) | 1:1 / 4:5 |
-| Handwerk / Technik (Werkstatt, Schaltschrank) | Krea 2, `krea2_turbo_t2i` (Nutzerentscheid 03.10.) | 3:2 (1216x832) |
+| Produkt | Krea 2 mit PureLens, `krea2_produkt` (Nutzerentscheid 05.10. nach Stapeltest 2 Phase B: PureLens gewann 4 von 6 Produktmotiven) | 1:1 / 4:5 |
+| Handwerk / Technik (Werkstatt, Schaltschrank) | Krea 2 mit PureLens, `krea2_produkt` (Nutzerentscheid 05.10., Phase B: 5 von 6) | 3:2 (1216x832) |
 | Gastro / Food | Z-Image-Turbo (nicht im A/B geprüft) | 4:5 (896x1152) |
 | Menschen / Portrait SFW | Krea 2, `krea2_turbo_t2i` (Fototest 28.09.: 4 von 4) | 4:5 (896x1152) |
 | Lichtstimmung laut Prompt (Golden Hour, Blue Hour) | Qwen-Image-2512 | 1216x832 / 896x1152 |
@@ -126,7 +126,8 @@ Quelle der Wahrheit inkl. Lizenzen: [reference/models.md](reference/models.md).
 Seit dem blinden Fototest vom 2026-09-28 (16 Prompts, vier Modelle, Nutzerentscheid 2026-10-03)
 rechnet Architektur auf Qwen-2512 in Qualitätseinstellung, Produkt, Handwerk und Portrait auf
 Krea 2. Z-Image-Turbo lag dort nur bei 3 von 16 Prompts vorn und ist nur noch die schnellste
-Wahl. Krea hängt stark am LoRA-Stapel, der Stapel je Bereich wird noch abgestimmt. Zuvor galt
+Wahl. Krea hängt stark am LoRA-Stapel: Stapeltest 2 setzte Detail 0.5 und Afterlight 0.35 als
+Standard, für Produkt und Handwerk kommt PureLens dazu (`krea2_produkt`). Zuvor galt
 Z-Image als Erstwahl nach einem A/B gegen FLUX-schnell vom 2026-08-27, beurteilt von einem Agenten. Landschaft übernimmt seit dem Blindtest vom 2026-09-28 Qwen-2512 in
 Qualitätseinstellung (8 von 16 Prompts, Krea 5, CyberRealistic 2, Z-Image 1). Am 2026-09-19 wurde der Bestand
 auf diese fünf Modellfamilien konsolidiert: die Freistell-Kette läuft auf Z-Image (gleiche
@@ -213,7 +214,10 @@ Vorab-Tests in learnings.md.
 - `krea2_turbo_t2i.api.json`: Krea 2 Turbo (fp8) mit sechs LoRA-Knoten. Standard sind `DETAIL_LORA`
   0.5 (seit 27.09.2026) und `AFTERLIGHT_LORA` 0.35 (seit 03.10.2026: im blinden Stapeltest 2 gewann
   Afterlight 14 von 18 Foto-Gruppen, 0.35 neunmal, Detail 0.5 allein keine, auch bei Tageslicht 5
-  von 6). Die Galerie rechnet Krea in allen Zielen außer Kinobanner über diese Vorlage. Für Stile
+  von 6). Die Galerie rechnet Krea in allen Zielen außer Kinobanner und Produkt und Handwerk über
+  diese Vorlage. „Neu generieren“, Anpassen und Variationen behalten seit dem 05.10.2026 das Ziel
+  des Ausgangsbilds (Nutzerentscheid): ein Bild aus `produkt/` rechnet mit Krea über
+  `krea2_produkt`, eins aus `banner/` über die Kinobanner-Vorlage. Für Stile
   über `STYLE_LORA` (Sticker, Charakterbogen) `AFTERLIGHT_LORA` auf 0 setzen, dort ungetestet. Die
   übrigen Knoten stehen auf 0.0 und sind damit aus:
   `WARM_LORA` (Helligkeit und Wärme, +0.5 bis +1.5, einziger Hebel ohne Verlust an Feinstruktur),
@@ -223,6 +227,14 @@ Vorab-Tests in learnings.md.
   Krea 2, die aus 09 passen nicht und umgekehrt, ein Fehlgriff bleibt stumm. Dazu `REALISM_LORA`
   (-1.0 bis +1.0, negativ Illustration, positiv Foto) und `WEIGHT_LORA` (-2.0 bis +2.0,
   Körperfülle, sauberster Regler der Sammlung). Sechs Knoten auf 0.0 sind nachgemessen neutral.
+- `krea2_produkt.api.json`: **Produkt und Handwerk** (seit 05.10.2026). Graph von `krea2_turbo_t2i`,
+  Knoten 19 heißt `PURELENS_LORA` und trägt PureLens 1.0 statt des Stil-Platzhalters, Ablage
+  `produkt/produkt`. Das Auslösewort `purelens` steht als `_meta.trigger` am POSITIVE_PROMPT:
+  `comfy_generate.py` und `upscale.py` setzen es genau einmal vorn ein, die Galerie speichert den
+  Prompt ohne es, damit ein Motiv modellübergreifend vergleichbar bleibt. Im Stapeltest 2 Phase B
+  gewann PureLens Produkt 4 von 6 und Handwerk 5 von 6, Porträt nur 1 von 6: Porträts bleiben bei
+  `krea2_turbo_t2i`. Eine eigene Oberfläche gibt es noch nicht, in Workflow 10 geht es von Hand
+  (`STYLE_LORA` auf `purelens_krea2` mit 1.0, Prompt mit `purelens, ` beginnen).
 - `qwen_2512_landschaft.api.json`: **Erste Wahl für Fotolandschaft** (seit 28.09.2026, UI
   17-landschaft). Graph von `qwen_2512_t2i` mit TURBO_LORA 0.0, 30 Steps, cfg 4.0, 1344x768, etwa
   100 s je Bild. Gewann den Blindtest vom 28.09. (16 Prompts, vier Modelle, gleiche Seeds) mit 8
@@ -287,6 +299,14 @@ Vorab-Tests in learnings.md.
   Für Doppelbelichtung, Poster, Buchcover, Key-Art. Kein Trigger-Wort, 832x1216, 8 s.
   Achtung Lizenz: Luneva verlangt Namensnennung und verbietet Merges. Beide LoRAs laufen nur
   auf der Z-Image-Architektur, Tabelle in [reference/models.md](reference/models.md).
+- `zimage_luneva_t2i.api.json`: **Z-Image in Qualität, zweistufig** (seit 06.10.2026, Kern des
+  Luneva Infinite Details Workflows, Civitai 2226355, nur Bordmittel). `--width`/`--height` sind
+  die Zielgröße, lange Seite höchstens 2048 (1152x2048, 2048x1152). Stufe 1 rechnet in halber
+  Größe nur die Komposition (5 von 30 Schritten), Stufe 2 nach Latent 2x das ganze Bild neu
+  (dpmpp_2s_ancestral eta 0.5, 6 Schritte, denoise 0.85), Detail 0.6, etwa 25 s. Pilot mit fünf
+  Fototest-Motiven: schlug Standard und Standard plus Detailpass in 4 von 5, Keramik gleichauf,
+  Werkbank schlug auch Krea, Studioporträt gleichauf mit Krea (learnings.md, 05.10.2026). Ändert
+  die Komposition gegenüber `zimage_turbo_t2i` bei gleichem Seed. Ablage `foto/foto-luneva`.
 
 ## Freistellung (transparenter Hintergrund)
 

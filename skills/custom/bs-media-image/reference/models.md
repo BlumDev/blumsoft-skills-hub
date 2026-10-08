@@ -143,7 +143,7 @@ Eine LoRA passt nur auf die Architektur, auf der sie trainiert wurde. Der Datein
 
 | LoRA | Architektur | Läuft auf | Läuft nicht auf |
 |---|---|---|---|
-| Midjourney Luneva Cinematic, [ZIT] Detail Slider | Z-Image (`diffusion_model.layers.*`, Metadatum `ss_base_model_version: zimage`) | Z-Image-Turbo, CyberRealistic Z-Image v7 | Krea 2, Qwen-Image, Qwen-Edit, WAI-illustrious, Illustrious Realism, CyberRealistic Pony |
+| Midjourney Luneva Cinematic, Luneva CyberHD, [ZIT] Detail Slider | Z-Image (`diffusion_model.layers.*`, Metadatum `ss_base_model_version: zimage`) | Z-Image-Turbo, CyberRealistic Z-Image v7 | Krea 2, Qwen-Image, Qwen-Edit, WAI-illustrious, Illustrious Realism, CyberRealistic Pony |
 | Wuli Turbo 2 Steps, Lightning 4 Steps | Qwen-Image | Qwen-Image-2512, Qwen-Image-Edit-2511 | alles andere |
 | Illustrious-LoRAs von Civitai | SDXL/Illustrious | WAI-illustrious v17, Illustrious Realism v4 | Pony, Z-Image, Qwen, Krea 2 |
 
@@ -184,6 +184,15 @@ Qwen-LoRAs sind auf Qwen-Image trainiert, 2512 hat dieselbe Architektur (60 Blö
 
 ## Entscheidungs-Log (append-only)
 
+- 2026-10-06: Für das volle Luneva-Rezept (Civitai 2226355 v2.2b) mit Download-Ja des Nutzers geladen:
+  `ZIT_Luneva CyberHD.safetensors` (Civitai 2215818, Version 2494657, 649 MB, SHA256 stimmt, Trigger
+  `lunevacyber`, Lizenz wie Cinematic: kommerzielle Bilder erlaubt, Namensnennung Pflicht, keine Ableitungen)
+  und `scunet_color_real_gan.pth` (KAIR-Release v1.0, 72 MB) in `Models\ESRGAN`, weil ComfyUI den Ordner
+  `ScuNET` nicht als upscale_models liest. Der Nutzer hat die Custom-Nodes selbst geklont (der Auto-Modus
+  blockte es mir): RES4LYF 56e4475 und ComfyUI-EulerDiscreteScheduler eb5bd4d, dazu die Luneva-LUT in
+  `comfyui_essentials\luts`. Kein pip-Lauf, diffusers 0.37, matplotlib, PyWavelets und numpy 2.4.4
+  lagen schon im venv; das `opencv-python` aus der RES4LYF-requirements bewusst nicht installiert
+  (opencv-Kollision vom 15.08.). Neustart 06.10. 00:38, beide Pakete laden ohne Fehler.
 - 2026-10-05: Nutzerentscheid nach Stapeltest 2 Phase B: PureLens wird Standard für Produkt und
   Handwerk (gewann dort 9 von 12 Gruppen), Porträt und alles andere bleiben bei `krea2_turbo_t2i`.
   Neue Vorlage `krea2_produkt.api.json`: Graph von `krea2_turbo_t2i` mit Detail 0.5, Afterlight 0.35
