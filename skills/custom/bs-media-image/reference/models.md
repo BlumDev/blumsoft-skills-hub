@@ -67,21 +67,22 @@ laufendes ComfyUI.
 
 ## Vertical -> Modellempfehlung
 
-Aktualisiert am 2026-09-22: Pony aus den drei Alternativspalten entfernt (Modell gelöscht), Kinderbuch, Stil-LoRAs und Namensgrafik ergänzt. Am 2026-09-28 Landschaft nach dem Blindtest neu besetzt. Details in learnings.md.
+Aktualisiert am 2026-09-22: Pony aus den drei Alternativspalten entfernt (Modell gelöscht), Kinderbuch, Stil-LoRAs und Namensgrafik ergänzt. Am 2026-09-28 Landschaft nach dem Blindtest neu besetzt. Am 2026-10-08 an SKILL.md und das Entscheidungs-Log nachgezogen (Stand 06.10.2026): Architektur, Produkt, Handwerk, Portrait und Anime neu besetzt, Gastro ergänzt, Freisteller auf hellgrauem Grund. Formate und die Spezial-Workflows (Kinobanner, Icon-Serie, UI-Elemente, Sprites, Kacheln) stehen nur in der Tabelle in SKILL.md. Details in learnings.md.
 
 | Vertical | Erste Wahl | Alternative |
 |---|---|---|
 | Landschaft / Winzer | Qwen-Image-2512 mit 30 Steps, cfg 4.0, ohne Turbo-LoRA (Workflow 17, etwa 100 s bei 1344x768) | Krea 2 Turbo als schnelle Alternative (Workflow 10, Detail 0.5, etwa 11 s) |
-| Architektur / Web-Hero | Z-Image-Turbo (offen: gegen Krea und Qwen nie getestet, gegen FLUX am 27.08. nur 5:5) | Qwen-2512 (Blue Hour, dramatischer Himmel) |
-| Produkt | Z-Image-Turbo | Qwen-2512 |
-| Handwerk / Technik | Z-Image-Turbo | Qwen-2512 |
-| Freigestelltes Motiv (Icon, Sprite, Produkt ohne Grund) | Z-Image-Turbo + BiRefNet | BiRefNet allein auf vorhandenem Bild |
+| Architektur / Web-Hero | Qwen-Image-2512 in Qualitätseinstellung, `qwen_2512_landschaft` (Fototest 28.09.: 3 von 4, Nutzerentscheid 03.10.) | Krea 2 Turbo als schnelle Wahl (Workflow 10) |
+| Produkt | Krea 2 mit PureLens 1.0, `krea2_produkt` (Stapeltest 2 Phase B: 4 von 6, Nutzerentscheid 05.10.) | Qwen-2512 in Qualitätseinstellung (Fototest 28.09.: 2 von 4, rund 100 s) |
+| Handwerk / Technik | Krea 2 mit PureLens 1.0, `krea2_produkt` (Phase B: 5 von 6, Nutzerentscheid 05.10.) | Qwen-2512 in Qualitätseinstellung (Fototest 28.09.: 2 von 4, rund 100 s) |
+| Gastro / Food | Z-Image-Turbo (nicht im A/B geprüft) | - |
+| Freigestelltes Motiv (Icon, Sprite, Produkt ohne Grund) | Z-Image-Turbo + BiRefNet, Grund hellgrau (Workflow 01) | BiRefNet allein auf vorhandenem Bild |
 | Englischer Text im Bild | Qwen-Image-2512 | - |
 | Deutscher Text im Bild | kein Modell, Typografie im Layout setzen | - |
 | Lichtstimmung laut Prompt (golden hour) | Qwen-Image-2512 | Z-Image mit ausdrücklichem Licht-Prompt |
 | Vorhandenes Bild ändern | Qwen-Image-Edit-2511 | - |
-| Menschen / Portrait (SFW) | Z-Image-Turbo | Illustrious Realism v4 (echter Negativ-Prompt) |
-| Anime | WAI-illustrious v17 | - |
+| Menschen / Portrait (SFW) | Krea 2, `krea2_turbo_t2i` ohne PureLens (Fototest 28.09.: 4 von 4, Nutzerentscheid 03.10.) | Z-Image-Turbo als schnellste Wahl, Illustrious Realism v4 (echter Negativ-Prompt) |
+| Anime | JANKU v5 + vier Stil-LoRAs, `janku_t2i` (seit 25.09.) | WAI-illustrious v17 für Kundenmaterial und abstrakte Konzepte |
 | NSFW realistisch | CyberRealistic Z-Image v7 | - |
 | Upscale | 4x-UltraSharp + Z-Image-Turbo als Refiner | - |
 | Kinderbuch / Illustration für Kinder | Krea 2 Turbo (ohne LoRA) | Z-Image (flache Vektoroptik, besser für Druck) |

@@ -7,7 +7,7 @@ Für dich zum Selbergenerieren. Der Kommandozeilen-Weg für Agenten bleibt unver
 Zwei Wege, einer reicht:
 
 - **Aus Stability Matrix:** Packages, ComfyUI, Launch. Danach öffnet sich die Oberfläche von selbst.
-- **Ohne Stability-Matrix-Fenster:** `powershell -File "C:\Users\Marcus\.claude\skills\gen-asset\scripts\ensure_comfyui.ps1"`, dann `http://127.0.0.1:8188` im Browser aufrufen. Startet nur, wenn nicht schon etwas läuft. Der Kaltstart dauert seit dem ComfyUI-Manager drei bis fünf Minuten, solange blockiert der Manager beim Laden der Registry die Oberfläche. **Updates von ComfyUI nur bei gestopptem Server** (Stability Matrix stoppt die Headless-Instanz des Skills nicht mit), sonst bleibt eine halb erneuerte Umgebung zurück, siehe learnings.md.
+- **Ohne Stability-Matrix-Fenster:** `powershell -File "C:\Users\Marcus\.claude\skills\bs-media-image\scripts\ensure_comfyui.ps1"`, dann `http://127.0.0.1:8188` im Browser aufrufen. Startet nur, wenn nicht schon etwas läuft. Der Kaltstart dauert seit dem ComfyUI-Manager drei bis fünf Minuten, solange blockiert der Manager beim Laden der Registry die Oberfläche. **Updates von ComfyUI nur bei gestopptem Server** (Stability Matrix stoppt die Headless-Instanz des Skills nicht mit), sonst bleibt eine halb erneuerte Umgebung zurück, siehe learnings.md.
 
 ## 2. Die Workflows
 
@@ -26,7 +26,7 @@ Links in der Leiste auf **Workflows**, dort den Ordner **gen-asset** aufklappen.
 | 09-cinematic-illustration | Z-Image-Turbo + zwei LoRAs | Doppelbelichtung, Poster, Buchcover, Key-Art, filmischer Look statt Doku-Foto | etwa 8 s |
 | 10-krea-foto-und-stile | Krea 2 Turbo + sechs LoRA-Regler, Detail 0.5 und Afterlight 0.35 | Erste Wahl für Produkt, Handwerk und Portrait (seit 03.10.2026), natürlicherer Look als 00. Für Produkt und Handwerk seit 05.10.2026 mit PureLens: Knoten STYLE_LORA auf `purelens_krea2` mit 1.0 stellen und den Prompt mit `purelens, ` beginnen (Skripte und Galerie machen das selbst über `krea2_produkt`). Dazu Sticker, Charakterbogen, Pop-up-Buch und Anatomie-Querschnitt. Prompt im Knoten „Prompt“, Schalter „Ausformulieren?“ (aus) lässt Qwen3-VL einen kurzen Prompt ausschreiben | 11 bis 16 s, ausformuliert rund 30 s mehr |
 | 11-regler-vergleich | Krea 2 Turbo | zeigt in einem Lauf, was ein Regler macht: fünf Stufen desselben Bildes nebeneinander | etwa 50 s |
-| 12-anime-janku | JANKU v5 + vier Stil-LoRAs | Anime mit mehr Detail als 06 (Gesicht, Augen, Hintergrund), Danbooru-Tags, 832 x 1216 plus Hires 1,5-fach (seit 03.10.2026), Ganzkörper nur im Hochformat | etwa 53 s |
+| 12-anime-janku | JANKU v5 + vier Stil-LoRAs | Anime mit mehr Detail als 06 (Gesicht, Augen, Hintergrund), Danbooru-Tags, 832 x 1216 plus Hires 1,5-fach (seit 03.10.2026), Ganzkörper nur im Hochformat | etwa 25 s, beim ersten Lauf nach dem Laden rund 40 s (gemessen 08.10.2026) |
 | 13-namensposter | Krea 2 Turbo + Typnosis 1,5 + Licht- und Detailstapel | ein Name als Hauptmotiv in einer gestalteten Szene, im Stil der Namensbilder von Ideogram. Figuren links vom ersten Buchstaben anordnen, Voxel-Schrift lieber mit 04. Prompt im Knoten „Prompt“, Schalter „Ausformulieren?“ (aus, für Namensposter ungetestet) | 11 bis 16 s |
 | 14-kinobanner | Krea 2, Detail 1.0 | Key-Art im Kinoformat 21:9 (1568 x 672) mit freier Fläche für einen Titel, die Fläche im Prompt bestellen. Die Stimmung (Afterlight 0.35, Warm 0.5) ist seit 03.10.2026 an, auf 0 stellen bei Produkt, Architektur und klarem Tageslicht | etwa 12 s |
 | 14b-kinobanner-zimage | Z-Image-Turbo + Luneva + Detail-Slider | dieselbe Aufgabe auf Z-Image in 1680 x 720, Alternative zu 14 | etwa 9 s |
@@ -136,7 +136,7 @@ Behaltenswertes gehört als Hardlink nach `D:\Apps\Stability Matrix\Data\Images\
 
 ## 5. Fallen, die Zeit kosten
 
-- **Das freigestellte PNG sieht grün aus.** Workflow 01 und 02 behalten die Hintergrundfarbe in den RGB-Werten und setzen nur den Alpha-Kanal auf durchsichtig. Windows-Fotoanzeige und viele Editoren zeigen dann Grün. Die Transparenz ist trotzdem da, geprüft am Beispiel: Rand-Alpha 0, Motiv-Alpha 255. Zum Prüfen ein Programm nehmen, das Alpha kann (Browser, GIMP, Krita, Figma).
+- **Das freigestellte PNG zeigt noch seinen Grund.** Workflow 01 und 02 behalten die Hintergrundfarbe in den RGB-Werten und setzen nur den Alpha-Kanal auf durchsichtig. Windows-Fotoanzeige und viele Editoren zeigen dann bei 01 den hellgrauen Grund (seit der Entgrünung vom 26.08.2026, ältere Freisteller grün), bei 02 den Hintergrund des Ausgangsbilds. Die Transparenz ist trotzdem da, geprüft am Beispiel: Rand-Alpha 0, Motiv-Alpha 255. Zum Prüfen ein Programm nehmen, das Alpha kann (Browser, GIMP, Krita, Figma).
 - **Deutsche Schrift im Bild wird falsch.** Qwen setzt englischen Text fehlerfrei, deutsche Wörter kippen in einzelnen Buchstaben ("Weengut"), und 05 kann das nicht reparieren. Für Kundenmaterial die Typografie im Layout setzen.
 - **Zu dunkel oder zu kalt?** In 10 gibt es dafür einen eigenen Regler. WARM_LORA zwischen +0.5 und +1.5 macht das Bild heller und wärmer, ohne Feinstruktur zu kosten, gemessen 103 auf 144. Das kann sonst nichts: in 09 kostet der Detail-Slider Struktur, und Hell-Wörter im Prompt verschieben die Bildkomposition mit. Achtung, die Civitai-Seite nennt -6 bis +3, das ist zu weit gegriffen, bei +3 ist alles orange.
 
@@ -152,7 +152,7 @@ Behaltenswertes gehört als Hardlink nach `D:\Apps\Stability Matrix\Data\Images\
 Änderst du einen Graphen und willst ihn behalten: **Workflow, Save As**, unter eigenem Namen. Speichere nicht über die gen-asset-Dateien, die werden aus den Vorlagen neu erzeugt und dabei überschrieben:
 
 ```powershell
-& "D:\SDKs\Python311\python.exe" "C:\Users\Marcus\.claude\skills\gen-asset\scripts\api_to_ui_workflow.py" --all --out-dir "D:\Apps\Stability Matrix\Data\Packages\ComfyUI\user\default\workflows\gen-asset"
+& "D:\SDKs\Python311\python.exe" "C:\Users\Marcus\.claude\skills\bs-media-image\scripts\api_to_ui_workflow.py" --all --out-dir "D:\Apps\Stability Matrix\Data\Packages\ComfyUI\user\default\workflows\gen-asset"
 ```
 
 Der Befehl baut die neun Oberflächen-Workflows aus den API-Vorlagen in `workflows\*.api.json` neu. Nötig ist er nur, wenn eine Vorlage sich ändert oder ein Node-Paket dazukommt. ComfyUI muss dabei laufen, der Konverter holt die Knoten-Definitionen vom Server.

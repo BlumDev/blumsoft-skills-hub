@@ -86,7 +86,7 @@ UI_PROMPTS = {
     },
     "zimage_cutout": {
         "positiv": "a single glossy blue potion bottle, game icon, centered, "
-                   "flat plain pure green background, no shadow, sharp focus",
+                   "isolated on a flat plain light grey background, even studio light, no shadow, sharp focus",
         "negativ": "",
     },
     "upscale": {
@@ -405,15 +405,15 @@ Icon, Sprite, Spiel-Asset, Produkt ohne Hintergrund. Z-Image erzeugt das Motiv, 
 
 **Format:** 1024 x 1024 lassen. Ein freigestelltes Einzelmotiv braucht kein Panorama, und die Kante wird im Quadrat am saubersten.
 
-**Im Prompt stehen lassen:** `flat plain pure green background, no shadow`. Der grüne Grund gibt die saubere Kante, entfernt wird er trotzdem.
+**Im Prompt stehen lassen:** `isolated on a flat plain light grey background, even studio light, no shadow`. Der flache Grund gibt die saubere Kante, entfernt wird er trotzdem. Hellgrau statt Grün seit dem 26.08.2026: Grün färbt halbtransparente Ränder oliv, am Haarsaum 58,7 Prozent grünstichige Randpixel gegen 0,0 bei Grau.
 
 **Im Feld steht schon ein Beispiel** (blaue Trankflasche), Run genügt. Weitere Ideen:
 
-- `a wooden treasure chest, closed, game icon, flat plain pure green background, no shadow`
-- `a single red apple, product cutout, flat plain pure green background, no shadow`
-- `a stylized silver key, game icon, centered, flat plain pure green background, no shadow`
+- `a wooden treasure chest, closed, game icon, isolated on a flat plain light grey background, even studio light, no shadow`
+- `a single red apple, product cutout, isolated on a flat plain light grey background, even studio light, no shadow`
+- `a stylized silver key, game icon, centered, isolated on a flat plain light grey background, even studio light, no shadow`
 
-**Nicht erschrecken:** In der Windows-Fotoanzeige sieht die Datei grün aus. Die Farbwerte behalten den Grund, durchsichtig ist nur der Alpha-Kanal. Im Browser, in Figma oder in GIMP stimmt es.
+**Nicht erschrecken:** In der Windows-Fotoanzeige sieht die Datei hellgrau aus. Die Farbwerte behalten den Grund, durchsichtig ist nur der Alpha-Kanal. Im Browser, in Figma oder in GIMP stimmt es.
 
 Etwa 20 s je Bild. Ablage: `output/freigestellt/<datum>/cutout_00001_.png`""",
     "birefnet_matte": """## 02 Vorhandenes Bild freistellen (BiRefNet)

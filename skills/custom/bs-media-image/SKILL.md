@@ -146,7 +146,8 @@ Vorab-Tests in learnings.md.
 - `zimage_cutout.api.json`: **Standard für freistehende Motive** (Figur, Symbol, Icon,
   Produkt ohne Hintergrund). Ein Graph, ein `comfy_generate.py`-Aufruf: Z-Image generiert,
   BiRefNet-Matting stellt direkt im selben Lauf frei, Ausgabe ist ein fertiges RGBA-PNG.
-  Prompt weiterhin mit `flat plain pure green background, no shadow` bauen, etwa 20 s.
+  Prompt mit `isolated on a flat plain light grey background, even studio light, no shadow` bauen
+  (hellgrau seit der Entgrünung vom 26.08.2026, Regeln unten), etwa 20 s.
 - `birefnet_matte.api.json`: nur freistellen, für ein vorhandenes Bild (`--image`), 2 bis 4 s.
 - `upscale.api.json`: UltimateSDUpscale mit 4x-UltraSharp und Z-Image-Turbo als Refiner
   (denoise 0.2, Clip Skip 2 im Graphen). **Bei Porträts denoise auf 0.05 setzen und wissen, was
