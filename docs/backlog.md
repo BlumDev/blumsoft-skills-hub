@@ -2,7 +2,7 @@
 status: wartung
 track: infra
 next_step: "migrate-renames.ps1 auf jedem Rechner laufen lassen, claude.ai-Skills auf die bs-Namen umstellen"
-updated: 2026-10-04
+updated: 2026-10-08
 ---
 
 # Backlog
@@ -40,6 +40,11 @@ Aus Code-Audit 2026-06-24 (`reviews/2026-06-24-code-audit.md`), recovered, am 20
 ## Erledigt
 
 Ältere Einträge liegen in `archive/backlog-archive.md` (Archiv-Regel der AGENTS.md). Der Reconcile vom 2026-08-18 hat die damals hier stehenden Einträge stichprobenartig gegen den Code gehalten, alle geprüften sind tatsächlich umgesetzt (Belege in `docs/reviews/2026-08-18-reconcile.md`); inzwischen sind sie ins Archiv gewandert, ebenso die Security-Session und die Wartungs-Session 2026-09-01 (ausgelagert 2026-09-02) sowie die Wartungs-Session 5b und der Verify der Runde-2-Commits (ausgelagert 2026-09-07).
+
+Veraltete Stellen in `bs-media-image`, Auftrag der Galerie-Session „comfy-koordinator“ vom 2026-10-08 (Galerie-Karten seit master 624067b korrigiert, der Skill bewusst nicht):
+
+- [x] 20261008-bs-media-image-reimport Live-Ordner erneut ins Repo geholt, vorher gegen die Repo-Fassung gedifft: Live war reine Obermenge (nur angehängte Zeilen in SKILL.md, `bedienung.md`, `models.md`, `learnings.md`, neue Vorlage `zimage_luneva_t2i`), Skripte und übrige Vorlagen bis auf Zeilenenden gleich. Gates: `validate.ps1` und `validate-skills.ps1` PASS (46431b9, 2026-10-08)
+- [x] 20261008-bs-media-image-stale-spots Erst live, dann gleich im Repo: Freisteller auf hellgrauem Grund in SKILL.md, `bedienung.md` und `api_to_ui_workflow.py` (UI-Workflow 01 neu erzeugt, die übrigen 19 kommen byte-gleich heraus und blieben stehen), JANKU-Zeit aus der ComfyUI-History, Pfade auf `bs-media-image`, Vertical-Tabelle in `models.md` nachgezogen, Auswertung von Gegenprobe, luneva2 und Qwen-Test als neuer Abschnitt in `learnings.md`. Offen beim Nutzer: Realism +0.5 für Produkt und ob Z-Image für Foto nur die schnellste Wahl bleibt. Gates: `python -m unittest tests.test_media_image tests.test_with_server` 30 grün, `validate.ps1` und `validate-skills.ps1` PASS (e7db484, 2026-10-08)
 
 Vorfall `bs-media-image` vom 2026-10-04 (Entscheidung in docs/decisions.md vom selben Tag):
 
