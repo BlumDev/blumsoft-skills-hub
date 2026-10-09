@@ -16,3 +16,6 @@ Desktop.ini
 
 # Local IDE/project metadata
 cereblum.project.json
+
+# Python bytecode
+__pycache__/
