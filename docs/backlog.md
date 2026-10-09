@@ -2,7 +2,7 @@
 status: wartung
 track: infra
 next_step: "migrate-renames.ps1 auf jedem Rechner laufen lassen, claude.ai-Skills auf die bs-Namen umstellen"
-updated: 2026-10-04
+updated: 2026-10-05
 ---
 
 # Backlog
@@ -40,6 +40,10 @@ Aus Code-Audit 2026-06-24 (`reviews/2026-06-24-code-audit.md`), recovered, am 20
 ## Erledigt
 
 Ältere Einträge liegen in `archive/backlog-archive.md` (Archiv-Regel der AGENTS.md). Der Reconcile vom 2026-08-18 hat die damals hier stehenden Einträge stichprobenartig gegen den Code gehalten, alle geprüften sind tatsächlich umgesetzt (Belege in `docs/reviews/2026-08-18-reconcile.md`); inzwischen sind sie ins Archiv gewandert, ebenso die Security-Session und die Wartungs-Session 2026-09-01 (ausgelagert 2026-09-02) sowie die Wartungs-Session 5b und der Verify der Runde-2-Commits (ausgelagert 2026-09-07).
+
+Prüfregeln aus der Nachprüfung des Modernisierungs-Reviews von blumsoft-platform (`blumsoft-platform/docs/reviews/2026-09-24-claude-modernization.md`, Abschnitt "Nachprüfung 2026-09-24"):
+
+- [x] 20261005-repo-review-recheck-rules `bs-dev-repo-review` um fünf Prüfregeln ergänzt, jede mit einer Belegzeile samt Datum: Build-Konfiguration außerhalb des Repos read-only lesen (Coolify baut admin aus dem Root-`admin.Dockerfile`), Support-Ende nach dem letzten `FROM` (nginx 1.27 statt Node 20), Vorabversionen an `npm audit` vorbei über die GitHub Advisory DB prüfen (multer 1.4.5-lts.2), "kein Aufrufer" nur per `git grep` ohne Pfadangabe (bestehende DELETE-Regel geschärft), Monitoring braucht einen Leser (a93eb08, 2026-10-05)
 
 Vorfall `bs-media-image` vom 2026-10-04 (Entscheidung in docs/decisions.md vom selben Tag):
 
