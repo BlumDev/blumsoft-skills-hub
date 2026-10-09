@@ -67,21 +67,22 @@ laufendes ComfyUI.
 
 ## Vertical -> Modellempfehlung
 
-Aktualisiert am 2026-09-22: Pony aus den drei Alternativspalten entfernt (Modell gelöscht), Kinderbuch, Stil-LoRAs und Namensgrafik ergänzt. Am 2026-09-28 Landschaft nach dem Blindtest neu besetzt. Details in learnings.md.
+Aktualisiert am 2026-09-22: Pony aus den drei Alternativspalten entfernt (Modell gelöscht), Kinderbuch, Stil-LoRAs und Namensgrafik ergänzt. Am 2026-09-28 Landschaft nach dem Blindtest neu besetzt. Am 2026-10-08 an SKILL.md und das Entscheidungs-Log nachgezogen (Stand 06.10.2026): Architektur, Produkt, Handwerk, Portrait und Anime neu besetzt, Gastro ergänzt, Freisteller auf hellgrauem Grund. Formate und die Spezial-Workflows (Kinobanner, Icon-Serie, UI-Elemente, Sprites, Kacheln) stehen nur in der Tabelle in SKILL.md. Details in learnings.md.
 
 | Vertical | Erste Wahl | Alternative |
 |---|---|---|
 | Landschaft / Winzer | Qwen-Image-2512 mit 30 Steps, cfg 4.0, ohne Turbo-LoRA (Workflow 17, etwa 100 s bei 1344x768) | Krea 2 Turbo als schnelle Alternative (Workflow 10, Detail 0.5, etwa 11 s) |
-| Architektur / Web-Hero | Z-Image-Turbo (offen: gegen Krea und Qwen nie getestet, gegen FLUX am 27.08. nur 5:5) | Qwen-2512 (Blue Hour, dramatischer Himmel) |
-| Produkt | Z-Image-Turbo | Qwen-2512 |
-| Handwerk / Technik | Z-Image-Turbo | Qwen-2512 |
-| Freigestelltes Motiv (Icon, Sprite, Produkt ohne Grund) | Z-Image-Turbo + BiRefNet | BiRefNet allein auf vorhandenem Bild |
+| Architektur / Web-Hero | Qwen-Image-2512 in Qualitätseinstellung, `qwen_2512_landschaft` (Fototest 28.09.: 3 von 4, Nutzerentscheid 03.10.) | Krea 2 Turbo als schnelle Wahl (Workflow 10) |
+| Produkt | Krea 2 mit PureLens 1.0, `krea2_produkt` (Stapeltest 2 Phase B: 4 von 6, Nutzerentscheid 05.10.) | Qwen-2512 in Qualitätseinstellung (Fototest 28.09.: 2 von 4, rund 100 s) |
+| Handwerk / Technik | Krea 2 mit PureLens 1.0, `krea2_produkt` (Phase B: 5 von 6, Nutzerentscheid 05.10.) | Qwen-2512 in Qualitätseinstellung (Fototest 28.09.: 2 von 4, rund 100 s) |
+| Gastro / Food | Z-Image-Turbo (nicht im A/B geprüft) | - |
+| Freigestelltes Motiv (Icon, Sprite, Produkt ohne Grund) | Z-Image-Turbo + BiRefNet, Grund hellgrau (Workflow 01) | BiRefNet allein auf vorhandenem Bild |
 | Englischer Text im Bild | Qwen-Image-2512 | - |
 | Deutscher Text im Bild | kein Modell, Typografie im Layout setzen | - |
 | Lichtstimmung laut Prompt (golden hour) | Qwen-Image-2512 | Z-Image mit ausdrücklichem Licht-Prompt |
 | Vorhandenes Bild ändern | Qwen-Image-Edit-2511 | - |
-| Menschen / Portrait (SFW) | Z-Image-Turbo | Illustrious Realism v4 (echter Negativ-Prompt) |
-| Anime | WAI-illustrious v17 | - |
+| Menschen / Portrait (SFW) | Krea 2, `krea2_turbo_t2i` ohne PureLens (Fototest 28.09.: 4 von 4, Nutzerentscheid 03.10.) | Z-Image-Turbo als schnellste Wahl, Illustrious Realism v4 (echter Negativ-Prompt) |
+| Anime | JANKU v5 + vier Stil-LoRAs, `janku_t2i` (seit 25.09.) | WAI-illustrious v17 für Kundenmaterial und abstrakte Konzepte |
 | NSFW realistisch | CyberRealistic Z-Image v7 | - |
 | Upscale | 4x-UltraSharp + Z-Image-Turbo als Refiner | - |
 | Kinderbuch / Illustration für Kinder | Krea 2 Turbo (ohne LoRA) | Z-Image (flache Vektoroptik, besser für Druck) |
@@ -143,7 +144,7 @@ Eine LoRA passt nur auf die Architektur, auf der sie trainiert wurde. Der Datein
 
 | LoRA | Architektur | Läuft auf | Läuft nicht auf |
 |---|---|---|---|
-| Midjourney Luneva Cinematic, [ZIT] Detail Slider | Z-Image (`diffusion_model.layers.*`, Metadatum `ss_base_model_version: zimage`) | Z-Image-Turbo, CyberRealistic Z-Image v7 | Krea 2, Qwen-Image, Qwen-Edit, WAI-illustrious, Illustrious Realism, CyberRealistic Pony |
+| Midjourney Luneva Cinematic, Luneva CyberHD, [ZIT] Detail Slider | Z-Image (`diffusion_model.layers.*`, Metadatum `ss_base_model_version: zimage`) | Z-Image-Turbo, CyberRealistic Z-Image v7 | Krea 2, Qwen-Image, Qwen-Edit, WAI-illustrious, Illustrious Realism, CyberRealistic Pony |
 | Wuli Turbo 2 Steps, Lightning 4 Steps | Qwen-Image | Qwen-Image-2512, Qwen-Image-Edit-2511 | alles andere |
 | Illustrious-LoRAs von Civitai | SDXL/Illustrious | WAI-illustrious v17, Illustrious Realism v4 | Pony, Z-Image, Qwen, Krea 2 |
 
@@ -184,6 +185,15 @@ Qwen-LoRAs sind auf Qwen-Image trainiert, 2512 hat dieselbe Architektur (60 Blö
 
 ## Entscheidungs-Log (append-only)
 
+- 2026-10-06: Für das volle Luneva-Rezept (Civitai 2226355 v2.2b) mit Download-Ja des Nutzers geladen:
+  `ZIT_Luneva CyberHD.safetensors` (Civitai 2215818, Version 2494657, 649 MB, SHA256 stimmt, Trigger
+  `lunevacyber`, Lizenz wie Cinematic: kommerzielle Bilder erlaubt, Namensnennung Pflicht, keine Ableitungen)
+  und `scunet_color_real_gan.pth` (KAIR-Release v1.0, 72 MB) in `Models\ESRGAN`, weil ComfyUI den Ordner
+  `ScuNET` nicht als upscale_models liest. Der Nutzer hat die Custom-Nodes selbst geklont (der Auto-Modus
+  blockte es mir): RES4LYF 56e4475 und ComfyUI-EulerDiscreteScheduler eb5bd4d, dazu die Luneva-LUT in
+  `comfyui_essentials\luts`. Kein pip-Lauf, diffusers 0.37, matplotlib, PyWavelets und numpy 2.4.4
+  lagen schon im venv; das `opencv-python` aus der RES4LYF-requirements bewusst nicht installiert
+  (opencv-Kollision vom 15.08.). Neustart 06.10. 00:38, beide Pakete laden ohne Fehler.
 - 2026-10-05: Nutzerentscheid nach Stapeltest 2 Phase B: PureLens wird Standard für Produkt und
   Handwerk (gewann dort 9 von 12 Gruppen), Porträt und alles andere bleiben bei `krea2_turbo_t2i`.
   Neue Vorlage `krea2_produkt.api.json`: Graph von `krea2_turbo_t2i` mit Detail 0.5, Afterlight 0.35

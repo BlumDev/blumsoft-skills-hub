@@ -1,0 +1,263 @@
+{
+ "10": {
+  "class_type": "UNETLoader",
+  "_meta": {
+   "title": "CHECKPOINT"
+  },
+  "inputs": {
+   "unet_name": "z_image_turbo_bf16.safetensors",
+   "weight_dtype": "default"
+  }
+ },
+ "11": {
+  "class_type": "CLIPLoader",
+  "_meta": {
+   "title": "CLIP"
+  },
+  "inputs": {
+   "clip_name": "qwen_3_4b.safetensors",
+   "type": "lumina2",
+   "device": "default"
+  }
+ },
+ "12": {
+  "class_type": "VAELoader",
+  "_meta": {
+   "title": "VAE"
+  },
+  "inputs": {
+   "vae_name": "ae_zimage.safetensors"
+  }
+ },
+ "16": {
+  "class_type": "LoraLoaderModelOnly",
+  "_meta": {
+   "title": "DETAIL_LORA"
+  },
+  "inputs": {
+   "model": [
+    "10",
+    0
+   ],
+   "lora_name": "zimage_detail_slider.safetensors",
+   "strength_model": 0.6
+  }
+ },
+ "15": {
+  "class_type": "ModelSamplingAuraFlow",
+  "_meta": {
+   "title": "SHIFT"
+  },
+  "inputs": {
+   "shift": 3.0,
+   "model": [
+    "16",
+    0
+   ]
+  }
+ },
+ "6": {
+  "class_type": "CLIPTextEncode",
+  "_meta": {
+   "title": "POSITIVE_PROMPT"
+  },
+  "inputs": {
+   "text": "placeholder",
+   "clip": [
+    "11",
+    0
+   ]
+  }
+ },
+ "14": {
+  "class_type": "ConditioningZeroOut",
+  "_meta": {
+   "title": "NEGATIVE_ZEROED"
+  },
+  "inputs": {
+   "conditioning": [
+    "6",
+    0
+   ]
+  }
+ },
+ "5": {
+  "class_type": "EmptySD3LatentImage",
+  "_meta": {
+   "title": "LATENT"
+  },
+  "inputs": {
+   "width": 1152,
+   "height": 2048,
+   "batch_size": 1
+  }
+ },
+ "19": {
+  "class_type": "LatentUpscaleBy",
+  "_meta": {
+   "title": "HALB"
+  },
+  "inputs": {
+   "upscale_method": "nearest-exact",
+   "scale_by": 0.5,
+   "samples": [
+    "5",
+    0
+   ]
+  }
+ },
+ "13": {
+  "class_type": "KSamplerAdvanced",
+  "_meta": {
+   "title": "SAMPLER"
+  },
+  "inputs": {
+   "add_noise": "enable",
+   "noise_seed": 0,
+   "steps": 30,
+   "cfg": 1.0,
+   "sampler_name": "euler",
+   "scheduler": "simple",
+   "start_at_step": 0,
+   "end_at_step": 5,
+   "return_with_leftover_noise": "disable",
+   "model": [
+    "15",
+    0
+   ],
+   "positive": [
+    "6",
+    0
+   ],
+   "negative": [
+    "14",
+    0
+   ],
+   "latent_image": [
+    "19",
+    0
+   ]
+  }
+ },
+ "20": {
+  "class_type": "LatentUpscaleBy",
+  "_meta": {
+   "title": "HOCH_2X"
+  },
+  "inputs": {
+   "upscale_method": "bicubic",
+   "scale_by": 2.0,
+   "samples": [
+    "13",
+    0
+   ]
+  }
+ },
+ "22": {
+  "class_type": "BasicScheduler",
+  "_meta": {
+   "title": "SIGMAS_2"
+  },
+  "inputs": {
+   "scheduler": "simple",
+   "steps": 6,
+   "denoise": 0.85,
+   "model": [
+    "15",
+    0
+   ]
+  }
+ },
+ "23": {
+  "class_type": "SamplerDPMPP_2S_Ancestral",
+  "_meta": {
+   "title": "SAMPLER_2_ART"
+  },
+  "inputs": {
+   "eta": 0.5,
+   "s_noise": 1.0
+  }
+ },
+ "24": {
+  "class_type": "RandomNoise",
+  "_meta": {
+   "title": "NOISE_2"
+  },
+  "inputs": {
+   "noise_seed": 12337617042096
+  }
+ },
+ "25": {
+  "class_type": "BasicGuider",
+  "_meta": {
+   "title": "GUIDER_2"
+  },
+  "inputs": {
+   "model": [
+    "15",
+    0
+   ],
+   "conditioning": [
+    "6",
+    0
+   ]
+  }
+ },
+ "26": {
+  "class_type": "SamplerCustomAdvanced",
+  "_meta": {
+   "title": "SAMPLER_2"
+  },
+  "inputs": {
+   "noise": [
+    "24",
+    0
+   ],
+   "guider": [
+    "25",
+    0
+   ],
+   "sampler": [
+    "23",
+    0
+   ],
+   "sigmas": [
+    "22",
+    0
+   ],
+   "latent_image": [
+    "20",
+    0
+   ]
+  }
+ },
+ "8": {
+  "class_type": "VAEDecode",
+  "_meta": {
+   "title": "DECODE"
+  },
+  "inputs": {
+   "samples": [
+    "26",
+    0
+   ],
+   "vae": [
+    "12",
+    0
+   ]
+  }
+ },
+ "9": {
+  "class_type": "SaveImage",
+  "_meta": {
+   "title": "SAVE"
+  },
+  "inputs": {
+   "filename_prefix": "foto/foto-luneva",
+   "images": [
+    "8",
+    0
+   ]
+  }
+ }
+}
